@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "tasty-hub",
+    "owner":"tridente",
     "slug": "tasty-hub",
     "version": "1.0.0",
     "orientation": "portrait",
