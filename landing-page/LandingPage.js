@@ -1,9 +1,58 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import {useFonts} from 'expo-font'
+import { StyleSheet, View, ImageBackground, Text } from 'react-native';
+import image from "../assets/landing-page/landing-page-pic.png"
+import { ButtonCustom } from '../shared-components/ButtonCustom';
 
 export const LandingPage = () => {
+    
+    const [loaded] = useFonts({
+        InterSemiBold: require ('../assets/fonts/Inter-Bold.ttf')
+    });
+    if(!loaded){
+        return null;
+    }
+
     return (
-        <View>
+        <View style={Styles.container}>
+            <ImageBackground source={image} style={Styles.image}>
+                <View>
+                    <Text style={Styles.title}>¡Bienvenido!</Text>
+                </View>
+                <ButtonCustom text={"Registrarse"}/>
+                <Text style={Styles.text}>o</Text>
+                <ButtonCustom text={"Iniciar Sesión"}/>
+            </ImageBackground>
         </View>
     );
 }
+
+const Styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        resizeMode: 'cover',
+        justifyContent: 'center',
+    },
+    image : {
+        flex: 1,
+        resizeMode: 'cover',
+        justifyContent: 'center',
+        
+    },
+    text: {
+        textAlign: 'center',
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: 'bold',
+        fontFamily: "InterSemiBold",
+        marginVertical: 10
+    },
+    title: {
+        textAlign: 'center',
+        fontSize: 48,
+        color: "#fff",
+        fontWeight: 'bold',
+        fontFamily: "InterSemiBold",
+        marginBottom: "120%"
+    }
+})
