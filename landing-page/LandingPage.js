@@ -21,9 +21,12 @@ export const LandingPage = () => {
                 <View>
                     <Text style={Styles.title}>¡Bienvenido!</Text>
                 </View>
-                <ButtonCustom text={"Registrarse"}/>
-                <Text style={Styles.text}>o</Text>
-                <ButtonCustom text={"Iniciar Sesión"}/>
+                <View style = {{marginHorizontal: 50}}>
+                    <ButtonCustom text={"Registrarse"}/>
+                    <Text style={Styles.text}>o</Text>
+                    <ButtonCustom text={"Iniciar Sesión"}/>
+                </View>
+                
             </ImageBackground>
         </View>
     );
