@@ -76,7 +76,7 @@ export const Register = ({navigation}) => {
                     </View>
 
                     <View style = {styles.formContainerItem2}>
-                        <ButtonCustom  text = 'Continuar'/>
+                        <ButtonCustom navigation = {navigation} mail = 'userEmail@gmail.com' screen = 'EmailSent' text = 'Continuar'/>
                     </View>
 
                     
