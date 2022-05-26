@@ -5,7 +5,7 @@ import image from "../assets/landing-page/landing-page-pic.png"
 import { ButtonCustom } from '../shared-components/ButtonCustom';
 import { StatusBar } from 'expo-status-bar';
 
-export const LandingPage = () => {
+export const LandingPage = ({navigation}) => {
     
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-Bold.ttf')
@@ -22,7 +22,7 @@ export const LandingPage = () => {
                     <Text style={Styles.title}>¡Bienvenido!</Text>
                 </View>
                 <View style = {{marginHorizontal: 50}}>
-                    <ButtonCustom text={"Registrarse"}/>
+                    <ButtonCustom navigation={navigation} screen='Register' text={"Registrarse"}/>
                     <Text style={Styles.text}>o</Text>
                     <ButtonCustom text={"Iniciar Sesión"}/>
                 </View>

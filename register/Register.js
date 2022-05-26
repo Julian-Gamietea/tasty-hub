@@ -4,9 +4,8 @@ import * as React from 'react';
 import { InputTasty } from "../shared-components/InputTasty";
 import { ButtonCustom } from "../shared-components/ButtonCustom";
 import { RadioButton } from 'react-native-paper';
-import { useState } from "react"
 
-export const Register = () => {
+export const Register = ({navigation}) => {
 
     const [checked, setChecked] = React.useState('first');
     const [loaded] = useFonts({
