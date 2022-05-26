@@ -1,4 +1,4 @@
-import { Text, View,StyleSheet,Image } from 'react-native'
+import { Text, View,StyleSheet,Image,ScrollView } from 'react-native'
 import React, { Component } from 'react'
 import { InputTasty } from '../shared-components/InputTasty'
 import { ButtonCustom } from '../shared-components/ButtonCustom'
@@ -6,6 +6,7 @@ import { ButtonCustom } from '../shared-components/ButtonCustom'
 export class InsertMail extends Component {
   render() {
     return (
+      <ScrollView style={styles.scrollView}>
       <View style = {styles.container}>
         <View style = {styles.imageContainer}>
           <Image source={require('../assets/icons/email-icon.png')} style = {styles.image}/>
@@ -24,9 +25,8 @@ export class InsertMail extends Component {
         <View style = {styles.formContainerItem}>
                     <ButtonCustom text = 'Continuar'/>
         </View>
-            
-  
       </View>
+      </ScrollView>
     )
   }
 }
@@ -36,6 +36,7 @@ const styles = StyleSheet.create(
           marginTop:"15%",
           width:"60%"
       },
+  
       container:{
           flex:1,
           justifyContent:"center",
@@ -48,9 +49,6 @@ const styles = StyleSheet.create(
       primaryText:{
         marginTop:"30%",
         marginBottom:"4%",
-        // whiteSpace: "pre-wrap",
-        // wordWrap: "break-word",
-        // wordBreak: "break-word",
          fontWeight: "600",
           color: "#000000",
           fontSize: 28,
@@ -61,11 +59,8 @@ const styles = StyleSheet.create(
       },
       secondaryText:{
         width:"92%",
-        //whiteSpace: "pre-wrap",
-        //wordWrap: "break-word",
-        //wordBreak: "break-word",
+
         fontWeight: "600",
-        //fontFamily: `"Inter-SemiBold", "Inter", sans-serif`,
         color: "#000000",
         fontSize: 14,
         marginTop:"10%",
@@ -89,19 +84,19 @@ const styles = StyleSheet.create(
       }
       ,
       inputContainer:{
+          
           flex:.5,
           flexDirection: 'column',
           justifyContent: 'flex-start',
       },
       formContainerItem:{
-        zIndex:2,
         flex:.5,
         flexDirection: 'column',
         justifyContent: 'flex-start',
     }
       ,
       button:{
-      
+        
           width: "100%"
       }
   }
