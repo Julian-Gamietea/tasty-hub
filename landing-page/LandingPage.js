@@ -3,6 +3,7 @@ import {useFonts} from 'expo-font'
 import { StyleSheet, View, ImageBackground, Text } from 'react-native';
 import image from "../assets/landing-page/landing-page-pic.png"
 import { ButtonCustom } from '../shared-components/ButtonCustom';
+import { StatusBar } from 'expo-status-bar';
 
 export const LandingPage = () => {
     
@@ -15,6 +16,7 @@ export const LandingPage = () => {
 
     return (
         <View style={Styles.container}>
+            <StatusBar style='light'/>
             <ImageBackground source={image} style={Styles.image}>
                 <View>
                     <Text style={Styles.title}>¡Bienvenido!</Text>
