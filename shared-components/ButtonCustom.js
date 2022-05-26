@@ -1,7 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import {useFonts} from 'expo-font'
 
 export const ButtonCustom = ({ text }) => {
+    const [loaded] = useFonts({
+        InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf')
+    });
+    if(!loaded){
+        return null;
+    }
+
     return (
         <TouchableOpacity style={styles.container}>
             <Text style={styles.button}>{text}</Text>
@@ -19,9 +27,9 @@ const styles = StyleSheet.create({
     },
     button: {
         fontSize: 16,
+        fontFamily: 'InterSemiBold',
         color: "#fff",
         fontWeight: "bold",
-        alignSelf: "center",
-        textTransform: "uppercase",
+        alignSelf: "center"
     }
 })
