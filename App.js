@@ -1,19 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer, StackActions } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { Register } from './register/Register';
-import InsertMail from './restore-password/InsertMail';
-import { ButtonCustom } from './shared-components/ButtonCustom';
-import { InputTasty } from './shared-components/InputTasty';
 
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-      <View style ={{flex:1, alignItems:'stretch'}}>
-        <InsertMail/>
-      </View>
-        
-        
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
+          <Stack.Screen name="Home" component={Register}/>
+          {/* habría que ir agregando las screens aca */}
+        </Stack.Navigator>
+      </NavigationContainer>
   );
 }
 
