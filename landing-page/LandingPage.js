@@ -24,7 +24,7 @@ export const LandingPage = ({navigation}) => {
                 <View style = {{marginHorizontal: 50}}>
                     <ButtonCustom navigation={navigation} screen='Register' text={"Registrarse"}/>
                     <Text style={Styles.text}>o</Text>
-                    <ButtonCustom text={"Iniciar Sesión"}/>
+                    <ButtonCustom navigation={navigation} screen='SignIn' text={"Iniciar Sesión"}/>
                 </View>
                 
             </ImageBackground>
