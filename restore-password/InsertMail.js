@@ -23,7 +23,9 @@ export class InsertMail extends Component {
           </View>
         </View>
         <View style = {styles.formContainerItem}>
-                    <ButtonCustom text = 'Continuar'/>
+        
+              <ButtonCustom text = 'Continuar'
+      /> 
         </View>
       </View>
       </ScrollView>

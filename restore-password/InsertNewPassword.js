@@ -1,5 +1,5 @@
 
-import { View, StyleSheet, Text, RadioButton,Image,ScrollView } from "react-native"
+import { View, StyleSheet, Text, SafeAreaView,Image,ScrollView } from "react-native"
 import React, { Component } from 'react'
 import { InputTasty } from "../shared-components/InputTasty";
 import { ButtonCustom } from "../shared-components/ButtonCustom";
@@ -7,29 +7,32 @@ import { ButtonCustom } from "../shared-components/ButtonCustom";
 export class InsertNewPassword extends Component {
     render() {
         return (
-            <ScrollView style={styles.scrollView}>
-          <View style = {styles.container}>
-            <View style = {styles.imageContainer}>
-            <Text style={styles.secondaryText}>Ultimo Paso!</Text>
-              <Image source={require('../assets/restore-password/last-step-password-recovery.png')} style = {styles.image}/>
+      <SafeAreaView style={{ flex: 2,paddingBottom:"20%"
+    }}>
+            <ScrollView >
+              <View style = {styles.container}>
+                <View style = {styles.imageContainer}>
+                  <Text style={styles.secondaryText}>Ultimo Paso!</Text>
+                  <Image source={require('../assets/restore-password/last-step-password-recovery.png')} style = {styles.image}/>
+                </View>
+                
+                <View style = {styles.mailFormContainer}>
+                  <View>
+                    <Text style = {styles.primaryText}> Nueva contraseña</Text>
+                    <InputTasty  placeholder = 'Ingrese aqui'/>
+                  </View>
+                  <View>
+                    <Text style = {styles.primaryText}> Reingrese contraseña </Text>
+                    <InputTasty  placeholder = 'Ingrese aqui'/>
+                  </View>
+                </View>
+                <View style={styles.buttonContainer}>
+                        <ButtonCustom text = 'Continuar'/>
+                </View>
             </View>
-            
-            <View style = {styles.mailFormContainer}>
-              <View>
-                <Text style = {styles.primaryText}> Nueva contraseña</Text>
-                <InputTasty  placeholder = 'Ingrese aqui'/>
-              </View>
-              <View>
-                <Text style = {styles.primaryText}> Reingrese contraseña </Text>
-                <InputTasty  placeholder = 'Ingrese aqui'/>
-              </View>
-            </View>
-            <View style={styles.buttonContainer}>
-                    <ButtonCustom text = 'Continuar'/>
-            </View>
-        </View>
 
-        </ScrollView>
+          </ScrollView>
+        </SafeAreaView>
         )
       }
     }
@@ -39,9 +42,13 @@ export class InsertNewPassword extends Component {
               marginTop:"5%"        
           },
           buttonContainer:{
-              flex:1,
+            flex: 3,
+            zIndex: 3, 
+            elevation: 3,
           },
           container:{
+            zIndex: 3, 
+            elevation: 3, 
               flex:1,
               justifyContent:"center",
               alignContent:"center",
