@@ -57,7 +57,9 @@ const styles = StyleSheet.create(
             flex: 1,
             resizeMode: 'cover',
             justifyContent: 'center',
-            marginTop: 30
+            marginTop: 80,
+            width: 200,
+            height: 200
         }
         ,
         text:{
