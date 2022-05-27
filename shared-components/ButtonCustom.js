@@ -10,7 +10,7 @@ export const ButtonCustom = ({ text }) => {
 }
 
 const styles = StyleSheet.create({
-    container: {
+    container: { 
         elevation: 8,
         backgroundColor: "#F3A200",
         borderRadius: 15,
