@@ -6,6 +6,9 @@ import { LandingPage } from './landing-page/LandingPage';
 import { EmailSent } from './register/EmailSent';
 import { SignIn } from './sign-in/SignIn';
 import {InsertMail} from './restore-password/InsertMail'
+import { EnterData } from './register/EnterData';
+import { EnterAvatar } from './register/EnterAvatar';
+import { RegisterSuccess } from './register/RegisterSuccess';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +20,9 @@ export default function App() {
           <Stack.Screen name="SignIn" component={SignIn} />
           <Stack.Screen name="Register" component={Register}/>
           <Stack.Screen name="EmailSent" component={EmailSent}/>
+          <Stack.Screen name="EnterData" component={EnterData}/>
+          <Stack.Screen name="EnterAvatar" component={EnterAvatar}/>
+          <Stack.Screen name="RegisterSuccess" component={RegisterSuccess}/>
           <Stack.Screen name="RestorePassword" component={InsertMail}/>
           {/* habría que ir agregando las screens aca */}
         </Stack.Navigator>

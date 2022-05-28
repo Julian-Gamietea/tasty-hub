@@ -25,7 +25,7 @@ export const EmailSent = ({route, navigation}) =>{
                 <Text style = {styles.text2}> Un correo electronico {'\n'} fue enviado a </Text>
                 <Text style = {styles.text3}> {mail} </Text>
             </View>
-            <Image style = {{flex: 2}}source={image}></Image>
+            <Image style = {{flex: 2, height: 150, width: 200}}source={image}></Image>
             <View>
                 <Text style = {styles.text4}> Ingrese a su correo {'\n'} electronico (no cierre la {'\n'} aplicacion) </Text>
             </View>
