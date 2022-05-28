@@ -1,17 +1,17 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import {useFonts} from 'expo-font'
+import { useFonts } from 'expo-font'
 
-export const ButtonCustom = ({ screen, navigation, text, mail }) => {
+export const ButtonCustom = ({ text, callback }) => {
     const [loaded] = useFonts({
-        InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf')
+        InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf')
     });
-    if(!loaded){
+    if (!loaded) {
         return null;
     }
 
     return (
-        <TouchableOpacity onPress={()=> navigation.navigate(screen, {mail: mail})} style={styles.container}>
+        <TouchableOpacity onPress={callback} style={styles.container}>
             <Text style={styles.button}>{text}</Text>
         </TouchableOpacity>
     );
