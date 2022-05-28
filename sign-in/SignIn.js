@@ -94,7 +94,7 @@ const styles = StyleSheet.create(
             flex:3,
             flexDirection: 'column',
             justifyContent: 'center',
-            marginTop: 60,
+            marginTop: 40,
             marginHorizontal: 15
         },
         link : {
@@ -103,7 +103,7 @@ const styles = StyleSheet.create(
             color: '#F3A200',
             textAlign: 'center',
             fontSize: 16,
-            marginTop: 50
+            marginTop: 30
 
         }
         
