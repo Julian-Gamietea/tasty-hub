@@ -25,7 +25,6 @@ const styles = StyleSheet.create(
             borderWidth:1,
             fontFamily:"",
             fontSize:16,
-            lineHeight:1.4,
             padding:15,
             textAlign:"left"
             
