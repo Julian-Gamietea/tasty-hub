@@ -9,6 +9,7 @@ import {InsertMail} from './restore-password/InsertMail'
 import { EnterData } from './register/EnterData';
 import { EnterAvatar } from './register/EnterAvatar';
 import { RegisterSuccess } from './register/RegisterSuccess';
+import { Dashboard } from './dashboard/Dashboard';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,7 @@ export default function App() {
           <Stack.Screen name="EnterAvatar" component={EnterAvatar}/>
           <Stack.Screen name="RegisterSuccess" component={RegisterSuccess}/>
           <Stack.Screen name="RestorePassword" component={InsertMail}/>
+          <Stack.Screen name="Dashboard" component={Dashboard} />
           {/* habría que ir agregando las screens aca */}
         </Stack.Navigator>
       </NavigationContainer>
