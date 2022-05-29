@@ -11,6 +11,7 @@ import { EnterAvatar } from './register/EnterAvatar';
 import { RegisterSuccess } from './register/RegisterSuccess';
 import { Dashboard } from './dashboard/Dashboard';
 import { ExistingMail } from './register/ExistingMail';
+import { UncompletedRegistry } from './register/UncompletedRegistry';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ export default function App() {
           <Stack.Screen name="RestorePassword" component={InsertMail}/>
           <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="ExistingMail" component={ExistingMail} />
+          <Stack.Screen name="UncompletedRegistry" component={UncompletedRegistry} />
           {/* habría que ir agregando las screens aca */}
         </Stack.Navigator>
       </NavigationContainer>
