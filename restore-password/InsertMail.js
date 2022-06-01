@@ -1,41 +1,44 @@
-import { Text, View,StyleSheet,Image } from 'react-native'
+import { Text, View,StyleSheet,Image,ScrollView } from 'react-native'
 import React, { Component } from 'react'
 import { InputTasty } from '../shared-components/InputTasty'
 import { ButtonCustom } from '../shared-components/ButtonCustom'
 
-export class InsertMail extends Component {
-  render() {
-    return (
-      <View style = {styles.container}>
-        <View style = {styles.imageContainer}>
-          <Image source={require('../assets/icons/email-icon.png')} style = {styles.image}/>
-        </View>
-        
-        <View style = {styles.formContainer}>
-          <View style = {styles.formContainerItem}>
-            <Text style = {styles.primaryText}> Ingrese su email </Text>
-            <InputTasty  placeholder = 'E.g: cooking@mail.com'/>
-          </View>
-          <View style = {styles.formContainerItem}>
-            <Text style = {styles.secondaryText}> Le enviaremos un codigo de 6 digitos para continuar
-            con su recuperacion de contraseña</Text>
-          </View>
-        </View>
-        <View style = {styles.formContainerItem}>
-                    <ButtonCustom text = 'Continuar'/>
-        </View>
+export const InsertMail = ({navigation}) =>{
+ 
+      return (
+        <ScrollView style={styles.scrollView}>
+
+          <View style = {styles.container}>
+            <View style = {styles.imageContainer}>
+              <Image source={require('../assets/icons/email-icon.png')} style = {styles.image}/>
+            </View>
             
-  
-      </View>
-    )
-  }
-}
+            <View style = {styles.formContainer}>
+              <View style = {styles.formContainerItem}>
+                <Text style = {styles.primaryText}> Ingrese su email </Text>
+                <InputTasty  placeholder = 'E.g: cooking@mail.com'/>
+              </View>
+              <View style = {styles.formContainerItem}>
+                <Text style = {styles.secondaryText}> Le enviaremos un codigo de 6 digitos para continuar
+                con su recuperacion de contraseña</Text>
+              </View>
+            </View>
+            <View style = {styles.buttonContainer}>
+              <ButtonCustom navigation={navigation} screen='InsertCode' text = 'Continuar'/> 
+            </View>
+          </View>
+
+        </ScrollView>
+      )
+    }
+
 const styles = StyleSheet.create(
   {
       image:{
           marginTop:"15%",
           width:"60%"
       },
+  
       container:{
           flex:1,
           justifyContent:"center",
@@ -48,9 +51,6 @@ const styles = StyleSheet.create(
       primaryText:{
         marginTop:"30%",
         marginBottom:"4%",
-        // whiteSpace: "pre-wrap",
-        // wordWrap: "break-word",
-        // wordBreak: "break-word",
          fontWeight: "600",
           color: "#000000",
           fontSize: 28,
@@ -61,11 +61,8 @@ const styles = StyleSheet.create(
       },
       secondaryText:{
         width:"92%",
-        //whiteSpace: "pre-wrap",
-        //wordWrap: "break-word",
-        //wordBreak: "break-word",
+
         fontWeight: "600",
-        //fontFamily: `"Inter-SemiBold", "Inter", sans-serif`,
         color: "#000000",
         fontSize: 14,
         marginTop:"10%",
@@ -89,19 +86,26 @@ const styles = StyleSheet.create(
       }
       ,
       inputContainer:{
+          
           flex:.5,
           flexDirection: 'column',
           justifyContent: 'flex-start',
       },
       formContainerItem:{
-        zIndex:2,
         flex:.5,
         flexDirection: 'column',
         justifyContent: 'flex-start',
-    }
+    },
+    buttonContainer:{
+      marginTop:"40%",
+      marginBottom:"5%",
+      flex:.5,
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+  }
       ,
       button:{
-      
+        
           width: "100%"
       }
   }
