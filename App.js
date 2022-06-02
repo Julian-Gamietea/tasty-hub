@@ -4,17 +4,18 @@ import React from 'react';
 import { Register } from './register/Register';
 import { LandingPage } from './landing-page/LandingPage';
 import { EmailSent } from './register/EmailSent';
-import {InsertCode} from './restore-password/InsertCode'
-import {InsertMail} from './restore-password/InsertMail'
-import {InsertNewPassword} from './restore-password/InsertNewPassword'
-
 import { SignIn } from './sign-in/SignIn';
+import {InsertMail} from './restore-password/InsertMail';
+import {InsertCode} from './restore-password/InsertCode'
+import {InsertNewPassword} from './restore-password/InsertNewPassword'
 import { EnterData } from './register/EnterData';
 import { EnterAvatar } from './register/EnterAvatar';
 import { RegisterSuccess } from './register/RegisterSuccess';
 import { Dashboard } from './dashboard/Dashboard';
 import { ExistingMail } from './register/ExistingMail';
 import { UncompletedRegistry } from './register/UncompletedRegistry';
+import { EmailNotConfirmed } from './register/EmailNotConfirmed';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,8 @@ export default function App() {
           <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="ExistingMail" component={ExistingMail} />
           <Stack.Screen name="UncompletedRegistry" component={UncompletedRegistry} />
+          <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
+
           {/* habría que ir agregando las screens aca */}
         </Stack.Navigator>
       </NavigationContainer>
