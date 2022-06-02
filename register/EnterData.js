@@ -60,7 +60,9 @@ export const EnterData = ({navigation}) => {
                         />
                     </View >   
                     <View style = {styles.formContainerItem2}>
-                        <ButtonCustom navigation = {navigation} screen = 'EnterAvatar' text = 'Continuar'/>
+                        <ButtonCustom 
+                        callback={() => navigation.navigate('EnterAvatar')}
+                        text = 'Continuar'/>
                     </View>
                 </View>  
                 

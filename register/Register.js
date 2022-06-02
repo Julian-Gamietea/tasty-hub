@@ -6,7 +6,6 @@ import { ButtonCustom } from "../shared-components/ButtonCustom";
 import { RadioButton } from 'react-native-paper';
 
 export const Register = ({navigation}) => {
-
     const [checked, setChecked] = React.useState('first');
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
@@ -15,6 +14,7 @@ export const Register = ({navigation}) => {
     if(!loaded){
         return null;
     }
+
 
     return (
         <ScrollView style ={styles.container}>
