@@ -19,7 +19,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="EmailSent" screenOptions={{headerShown: false}}>
+        <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
           <Stack.Screen name="Home" component={LandingPage}/>
           <Stack.Screen name="SignIn" component={SignIn} />
           <Stack.Screen name="Register" component={Register}/>

@@ -76,7 +76,7 @@ export const Register = ({navigation}) => {
                     </View>
 
                     <View style = {styles.formContainerItem2}>
-                        <ButtonCustom navigation = {navigation} mail = 'userEmail@gmail.com' screen = 'EmailSent' text = 'Continuar'/>
+                        <ButtonCustom callback={() => navigation.navigate('EmailSent', {mail: 'Email@gmail.com'})} text = 'Continuar'/>
                     </View>
 
                     
