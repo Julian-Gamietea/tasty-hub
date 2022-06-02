@@ -6,6 +6,7 @@ export const Dashboard = ({route, navigation}) => {
     const user = route.params;
     return (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <Text>Bienvenido!</Text>
             <Text>{user.id}</Text>
             <Text>{user.email}</Text>
             <Text>{user.name}</Text>
