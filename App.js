@@ -6,6 +6,8 @@ import { LandingPage } from './landing-page/LandingPage';
 import { EmailSent } from './register/EmailSent';
 import { SignIn } from './sign-in/SignIn';
 import {InsertMail} from './restore-password/InsertMail';
+import {InsertCode} from './restore-password/InsertCode'
+import {InsertNewPassword} from './restore-password/InsertNewPassword'
 import { EnterData } from './register/EnterData';
 import { EnterAvatar } from './register/EnterAvatar';
 import { RegisterSuccess } from './register/RegisterSuccess';
@@ -25,6 +27,9 @@ export default function App() {
           <Stack.Screen name="SignIn" component={SignIn} />
           <Stack.Screen name="Register" component={Register}/>
           <Stack.Screen name="EmailSent" component={EmailSent}/>
+          <Stack.Screen name="InsertCode" component={InsertCode}/>
+          <Stack.Screen name="InsertMail" component={InsertMail}/>
+          <Stack.Screen name="InsertNewPassword" component={InsertNewPassword}/>
           <Stack.Screen name="EnterData" component={EnterData}/>
           <Stack.Screen name="EnterAvatar" component={EnterAvatar}/>
           <Stack.Screen name="RegisterSuccess" component={RegisterSuccess}/>
