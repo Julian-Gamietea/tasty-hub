@@ -12,6 +12,7 @@ export const Register = ({navigation}) => {
         userName: ""
     })
     const [errorMessage, setErrorMessage] = React.useState('');
+    const [errorMessage2, setErrorMessage2] = React.useState('');
     const [isValid, setIsValid] = React.useState(true);
     const [checked, setChecked] = React.useState('alumno');
     const [loaded] = useFonts({
@@ -30,56 +31,111 @@ export const Register = ({navigation}) => {
     }
 
     const register = async () => {
-        if(checked ==='alumno'){
-            var config = {
-                method: 'post',
-                url: 'https://tasty-hub.herokuapp.com/api/user/student/',
-                headers: { 
-                  'Content-Type': 'application/json'
-                },
-                data : datos
-              };
-              
-              axios(config)
-              .then(function (response) {
-                console.log(JSON.stringify(response.data));
-                navigation.navigate('EmailSent', {mail: datos.email})
-              })
-              .catch(function async (error) {
-                const mensaje = error.response.data;
-                if (mensaje === 'There is already a user with that username'){
-                    setIsValid(false);
-                    setErrorMessage('El alias ingresado ya existe. Pruebe ingresando otro');
-                }else if(mensaje === 'There is already a user with that email'){
-                    navigation.navigate('ExistingMail')
-                }else{
-                    navigation.navigate('UncompletedRegistry')
-                }
-              });  
-        }else{
-            var config = {
-                method: 'post',
-                url: 'https://tasty-hub.herokuapp.com/api/user/guest/',
-                headers: { 
-                  'Content-Type': 'application/json'
-                },
-                data : datos
-              };
-              
-              axios(config)
-              .then(function () {
-                
-                navigation.navigate('EmailSent', {mail: datos.email})
-              })
-              .catch(function async (error) {
-                const mensaje = error.response.data;
-                if (mensaje === 'There is already a user with that email'){
-                    setIsValid(false);
-                    setErrorMessage('El alias ingresado ya existe. Pruebe ingresando otro');
-                }
-              });    
+
+        const status = checkBlanks();
+        if(status){
+            if(checked ==='alumno'){
+                var config = {
+                    method: 'post',
+                    url: 'https://tasty-hub.herokuapp.com/api/user/student/',
+                    headers: { 
+                      'Content-Type': 'application/json'
+                    },
+                    data : datos
+                  };
+                  
+                  axios(config)
+                  .then(function () {
+                    setDatos({
+                        email: "",
+                        userName: ""
+                    })
+                    navigation.navigate('EmailSent', {mail: datos.email})
+                  })
+                  .catch(function async (error) {
+                    const mensaje = error.response.data;
+                    if (mensaje === 'There is already a user with that username'){
+                        setIsValid(false);
+                        setErrorMessage('El alias ingresado ya existe. Pruebe ingresando otro');
+                    }else if(mensaje === 'There is already a user with that email'){
+                        setDatos({
+                            email: "",
+                            userName: ""
+                        })
+                        navigation.navigate('ExistingMail')
+                    }else{
+                        setDatos({
+                            email: "",
+                            userName: ""
+                        })
+                        navigation.navigate('UncompletedRegistry')
+                    }
+                  });  
+            }else{
+                var config = {
+                    method: 'post',
+                    url: 'https://tasty-hub.herokuapp.com/api/user/guest/',
+                    headers: { 
+                      'Content-Type': 'application/json'
+                    },
+                    data : datos
+                  };
+                  
+                  axios(config)
+                  .then(function () {
+                    setDatos({
+                        email: "",
+                        userName: ""
+                    })
+                    navigation.navigate('EmailSent', {mail: datos.email})
+                  })
+                  .catch(function async (error) {
+                    const mensaje = error.response.data;
+                    if (mensaje === 'There is already a user with that username'){
+                        setIsValid(false);
+                        setErrorMessage('El alias ingresado ya existe. Pruebe ingresando otro');
+                    }else if(mensaje === 'There is already a user with that email'){
+                        setDatos({
+                            email: "",
+                            userName: ""
+                        })
+                        navigation.navigate('ExistingMail')
+                    }else{
+                        setDatos({
+                            email: "",
+                            userName: ""
+                        })
+                        navigation.navigate('UncompletedRegistry')
+                    }
+                  });  
+            }
         }
         
+        
+    }
+
+
+    const checkBlanks = () => {
+        console.log("email" + datos.email)
+        console.log("username" + datos.userName)
+        if(datos.email === "" && datos.userName === ""){
+            setIsValid(false);
+            setErrorMessage2("El campo Email no puede estar vacio")
+            setErrorMessage("El campo Alias no puede estar vacio")
+            
+            return false;
+        }else if (datos.email === ""){
+            setIsValid(false);
+            setErrorMessage2("El campo Email no puede estar vacio")
+            return false;
+        }else if(datos.userName === ""){
+            setIsValid(false);
+            setErrorMessage("El campo Alias no puede estar vacio")
+            return false;
+        }else{
+            setIsValid(true);
+            return true;
+        }
     }
 
     return (
@@ -103,8 +159,10 @@ export const Register = ({navigation}) => {
                         <InputTasty 
                             onChange={(text) => handleChange(text, 'email')}
                             placeholder = 'E.g: cooking@mail.com'
-                            isValid={true}
+                            isValid={isValid}
+                            errorMessage={errorMessage2}
                             value={datos.email}
+                            
                         />
                     </View>
 
