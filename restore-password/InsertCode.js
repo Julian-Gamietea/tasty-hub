@@ -1,10 +1,30 @@
-import CodeInput from 'react-native-confirmation-code-input';
 import { View, StyleSheet, Text,Image } from "react-native"
 import React from 'react'
 import { ButtonCustom } from '../shared-components/ButtonCustom';
+import axios from 'axios';
+import CodeInput from "react-native-confirmation-code-input";
 
-export const InsertCode = ({navigation}) =>{
-        return ( 
+export const InsertCode = ({navigation,route}) =>{
+    const [status, setStatus] = React.useState("");
+    console.log(route)
+    const {email} = route.params.mail;
+    const [code,setCode] = React.useState({token:""});
+    const handleChange = (numeric, token) => {
+        setCode({
+            ...code,
+            [token] : numeric
+        })};
+    const validateCode = async (codigo) => {
+        
+        await axios.get('https://tasty-hub.herokuapp.com/api/auth/check?token=${code}&email=${email}')
+        .then(()=>{
+            navigation.navigate('InsertNewPassword')
+        })
+        .catch( (e)=>{
+            setStatus("Token Invalido")
+        })
+      }
+    return ( 
         <View style={styles.container}>
                 <View style = {styles.imageContainer}>
                     <Image source={require('../assets/restore-password/encrypted-code.png')} style = {styles.image}/>
@@ -22,12 +42,16 @@ export const InsertCode = ({navigation}) =>{
                             size={40}
                             compareWithCode='123456'
                             autoFocus={true}
-                            onFulfill={(isValid) => true}
+                            onFulfill={()=>true}
+                            editable={true}
+                            clearButtonMode='never'
                             codeInputStyle={{ fontWeight: '800',borderWidth: 1.5 }}
                             containerStyle={{ marginTop: 30 }}/>
+                            
+                    <Text></Text>
                 </View>
                     <View style={styles.button}>
-                        <ButtonCustom navigation={navigation} screen='InsertNewPassword' text = 'Continuar'/>
+                        <ButtonCustom callback={() => navigation.navigate('InsertNewPassword',{userEmail:route.params.mail})} text = 'Continuar'/>
                     </View>
             </View>
         </View>)
@@ -107,4 +131,6 @@ const styles = StyleSheet.create(
             justifyContent: 'flex-end'
         }
     }
-  )
+)
+
+export default InsertCode

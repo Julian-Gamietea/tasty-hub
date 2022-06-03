@@ -2,10 +2,36 @@ import { Text, View,StyleSheet,Image,ScrollView } from 'react-native'
 import React, { Component } from 'react'
 import { InputTasty } from '../shared-components/InputTasty'
 import { ButtonCustom } from '../shared-components/ButtonCustom'
+import axios from 'axios';
 
 export const InsertMail = ({navigation}) =>{
- 
-      return (
+  const [status, setStatus] = React.useState("");
+  const [inputMail, setMail] = React.useState({mail: ''})
+  const handleChange = (text, mail) => {
+    setMail({
+        ...inputMail,
+        [mail] : text
+    });
+}
+const sentCode = async () => {
+  
+  await axios.get('https://tasty-hub.herokuapp.com/api/auth/token?email='+inputMail.mail)
+  .then(()=>{
+      navigation.navigate('InsertCode',{mail: inputMail.mail})
+  })
+  .catch( (e)=>{
+    if (e.response.status == 422) {
+      setStatus("Ya se a generado un token para el mail ingresado")
+      navigation.navigate('InsertCode',{mail: inputMail.mail})
+    }
+    if(e.response.status == 404){
+      setStatus("El mail ingresado no se encuentra registrado")
+    }
+      
+})}
+
+      
+  return (
         <ScrollView style={styles.scrollView}>
 
           <View style = {styles.container}>
@@ -16,27 +42,43 @@ export const InsertMail = ({navigation}) =>{
             <View style = {styles.formContainer}>
               <View style = {styles.formContainerItem}>
                 <Text style = {styles.primaryText}> Ingrese su email </Text>
-                <InputTasty  placeholder = 'E.g: cooking@mail.com'/>
+                <InputTasty onChange={(text) => handleChange(text, 'mail')}
+                            value={inputMail.mail}
+                             placeholder = 'E.g: cooking@mail.com'/>
+                             
+                <Text style={styles.errorMessage}>{status}</Text>
+                
               </View>
               <View style = {styles.formContainerItem}>
                 <Text style = {styles.secondaryText}> Le enviaremos un codigo de 6 digitos para continuar
                 con su recuperacion de contraseña</Text>
               </View>
             </View>
+
             <View style = {styles.buttonContainer}>
-              <ButtonCustom navigation={navigation} screen='InsertCode' text = 'Continuar'/> 
+              <ButtonCustom callback={() => sentCode()} text = 'Continuar'/> 
             </View>
+            
           </View>
 
         </ScrollView>
       )
-    }
+  }
 
 const styles = StyleSheet.create(
   {
       image:{
           marginTop:"15%",
           width:"60%"
+      },
+      errorMessage:{
+        alignSelf:"center",
+        alignContent:"center",
+        fontWeight:"900",
+        fontSize:14,
+        marginTop:"2%",
+        fontStyle:'italic',
+        color:"#FF9494"
       },
   
       container:{
@@ -97,8 +139,8 @@ const styles = StyleSheet.create(
         justifyContent: 'flex-start',
     },
     buttonContainer:{
-      marginTop:"40%",
-      marginBottom:"5%",
+      marginTop:"30%",
+      marginBottom:"10%",
       flex:.5,
       flexDirection: 'column',
       justifyContent: 'flex-start',
