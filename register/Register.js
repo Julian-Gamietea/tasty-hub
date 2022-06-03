@@ -11,6 +11,8 @@ export const Register = ({navigation}) => {
         email: "",
         userName: ""
     })
+    const [errorMessage, setErrorMessage] = React.useState('');
+    const [isValid, setIsValid] = React.useState(true);
     const [checked, setChecked] = React.useState('alumno');
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
@@ -43,8 +45,17 @@ export const Register = ({navigation}) => {
                 console.log(JSON.stringify(response.data));
                 navigation.navigate('EmailSent', {mail: datos.email})
               })
-              .catch(function (error) {
-                console.log(error);
+              .catch(function async (error) {
+                console.log(error.response.data)
+                const mensaje = error.response.data;
+                if (mensaje === 'There is already a user with that username'){
+                    setIsValid(false);
+                    setErrorMessage('El alias ingresado ya existe. Pruebe ingresando otro');
+                }else if(mensaje === 'There is already a user with that email'){
+                    navigation.navigate('ExistingMail')
+                }else{
+                    navigation.navigate('UncompletedRegistry')
+                }
               });  
         }else{
             var config = {
@@ -60,13 +71,16 @@ export const Register = ({navigation}) => {
               .then(function () {
                 navigation.navigate('EmailSent', {mail: datos.email})
               })
-              .catch(function (error) {
-                console.log(error);
-              });  
+              .catch(function async (error) {
+                const mensaje = error.response.data;
+                if (mensaje === 'There is already a user with that email'){
+                    setIsValid(false);
+                    setErrorMessage('El alias ingresado ya existe. Pruebe ingresando otro');
+                }
+              });    
         }
         
     }
-   
 
     return (
         <ScrollView style ={styles.container}>
@@ -89,6 +103,8 @@ export const Register = ({navigation}) => {
                         <InputTasty 
                             onChange={(text) => handleChange(text, 'email')}
                             placeholder = 'E.g: cooking@mail.com'
+                            isValid={isValid}
+                            
                         />
                     </View>
 
@@ -97,6 +113,8 @@ export const Register = ({navigation}) => {
                         <InputTasty 
                             onChange={(text) => handleChange(text, 'userName')}
                             placeholder = 'E.g: Cooking'
+                            isValid={isValid}
+                            errorMessage={errorMessage}
                         />
                     </View >
 
