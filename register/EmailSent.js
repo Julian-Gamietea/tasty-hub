@@ -3,6 +3,7 @@ import image from "../assets/register/email.png"
 import {useFonts} from 'expo-font'
 import { ButtonCustom } from "../shared-components/ButtonCustom";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import axios from "axios";
 
 export const EmailSent = ({route, navigation}) =>{
     const Stack = createNativeStackNavigator();
@@ -15,7 +16,18 @@ export const EmailSent = ({route, navigation}) =>{
     }
 
     const {mail} = route.params;
-    
+    const checkMail = async () => {
+        await axios.get('https://tasty-hub.herokuapp.com/api/user/check/registration/completion?email=${mail}')
+        .then(()=>{
+           
+            navigation.navigate('EnterData')
+        })
+        .catch( ()=>{
+            console.log("HOLA")
+            navigation.navigate('EmailNotConfirmed', mail)
+        })
+        
+    }
     return(
         <View style = {styles.container}>
             <View style = {styles.textContainer}>
@@ -31,7 +43,7 @@ export const EmailSent = ({route, navigation}) =>{
             </View>
             <View style = {styles.button}>
                 <ButtonCustom 
-                callback={() => navigation.navigate('EnterData')}
+                callback={() => checkMail()}
                 text = 'Ya verifiqué mi correo'/>
             </View>
             
