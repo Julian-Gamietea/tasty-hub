@@ -18,6 +18,11 @@ export const SignIn = ({ navigation }) => {
 
     const [status, setStatus] = React.useState("NO LOGIN");
     const [userData, setUserData] = React.useState({});
+    const [isValid, setIsValid] = React.useState(true);
+    const [errorMessage, setErrorMessage] = React.useState({
+        userError: '',
+        passwordError: ''
+    });
 
     const handleChange = (text, input) => {
         setInputs({
@@ -33,7 +38,10 @@ export const SignIn = ({ navigation }) => {
                 await axios.get(`https://tasty-hub.herokuapp.com/api/user/check/registration/completion?email=${res.data.email}`)
                 .then(res => navigation.navigate('Dashboard', userData))
                 .catch( e => setStatus(e.response.data))})
-            .catch( e => setStatus(e.response.data));    
+            .catch( e => {
+                setIsValid(false);
+                setErrorMessage({userError: 'Usuario incorrecto', passwordError: 'Contraseña incorrecta'})
+            });    
     }
     
     const [loaded] = useFonts({
@@ -58,6 +66,8 @@ export const SignIn = ({ navigation }) => {
                             placeholder = 'E.g: cooking'
                             onChange={(text) => handleChange(text, 'alias')}
                             value={inputs.alias}
+                            isValid={isValid}
+                            errorMessage={errorMessage.userError}
                             />
                     </View>
 
@@ -67,6 +77,8 @@ export const SignIn = ({ navigation }) => {
                             placeholder = 'E.g: CookingMaster123'
                             onChange={(text) => handleChange(text, 'password')}
                             value={inputs.password}
+                            isValid={isValid}
+                            errorMessage={errorMessage.passwordError}
                             passwrd
                         />
                     </View >
