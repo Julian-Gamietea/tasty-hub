@@ -46,7 +46,6 @@ export const Register = ({navigation}) => {
                 navigation.navigate('EmailSent', {mail: datos.email})
               })
               .catch(function async (error) {
-                console.log(error.response.data)
                 const mensaje = error.response.data;
                 if (mensaje === 'There is already a user with that username'){
                     setIsValid(false);
@@ -69,6 +68,7 @@ export const Register = ({navigation}) => {
               
               axios(config)
               .then(function () {
+                
                 navigation.navigate('EmailSent', {mail: datos.email})
               })
               .catch(function async (error) {
@@ -103,8 +103,8 @@ export const Register = ({navigation}) => {
                         <InputTasty 
                             onChange={(text) => handleChange(text, 'email')}
                             placeholder = 'E.g: cooking@mail.com'
-                            isValid={isValid}
-                            
+                            isValid={true}
+                            value={datos.email}
                         />
                     </View>
 
@@ -115,6 +115,7 @@ export const Register = ({navigation}) => {
                             placeholder = 'E.g: Cooking'
                             isValid={isValid}
                             errorMessage={errorMessage}
+                            value={datos.userName}
                         />
                     </View >
 

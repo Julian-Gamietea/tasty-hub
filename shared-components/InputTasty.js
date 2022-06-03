@@ -35,7 +35,7 @@ export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, erro
                     placeholder={placeholder}
                     secureTextEntry
                 />
-                {!isValid && <Text style={{color:"#FF6D6D"}}>{errorMessage}</Text>}
+                {!isValid && <Text style={{color:"#FF6D6D", fontWeight:'bold'}}>{errorMessage}</Text>}
             </View>
             
         );
@@ -48,7 +48,7 @@ export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, erro
                     value={value}
                     placeholder={placeholder}   
                 />
-                {!isValid && <Text style={{color: "#FF6D6D"}}>{errorMessage}</Text>}
+                {!isValid && <Text style={{color: "#FF6D6D", fontWeight:'bold'}}>{errorMessage}</Text>}
             </View>
             
         );

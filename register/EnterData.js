@@ -5,6 +5,9 @@ import { InputTasty } from "../shared-components/InputTasty";
 import { ButtonCustom } from "../shared-components/ButtonCustom";
 
 export const EnterData = ({navigation}) => {
+    
+    const [errorMessage, setErrorMessage] = React.useState('');
+    const [isValid, setIsValid] = React.useState(true);
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
         InterRegular: require ('../assets/fonts/Inter-Regular.ttf')
@@ -35,6 +38,7 @@ export const EnterData = ({navigation}) => {
                         
                         <InputTasty 
                             placeholder = 'E.g: Juan Pérez'
+                            isValid={isValid}
                         />
                     </View>
 
@@ -46,6 +50,8 @@ export const EnterData = ({navigation}) => {
                         
                         <InputTasty 
                             placeholder = 'Ingrese aqui'
+                            isValid={isValid}
+                            passwrd
                         />
                     </View >
 
@@ -57,6 +63,8 @@ export const EnterData = ({navigation}) => {
                         
                         <InputTasty 
                             placeholder = 'Ingrese aqui'
+                            isValid={isValid}
+                            passwrd
                         />
                     </View >   
                     <View style = {styles.formContainerItem2}>
