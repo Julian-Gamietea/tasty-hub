@@ -4,9 +4,14 @@ import * as React from 'react';
 import { InputTasty } from "../shared-components/InputTasty";
 import { ButtonCustom } from "../shared-components/ButtonCustom";
 import { RadioButton } from 'react-native-paper';
+import axios from "axios";
 
 export const Register = ({navigation}) => {
-    const [checked, setChecked] = React.useState('first');
+    const [datos, setDatos] = React.useState({
+        email: "",
+        userName: ""
+    })
+    const [checked, setChecked] = React.useState('alumno');
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
         InterRegular: require ('../assets/fonts/Inter-Regular.ttf')
@@ -15,6 +20,53 @@ export const Register = ({navigation}) => {
         return null;
     }
 
+    const handleChange = (text, input) => {
+        setDatos({
+            ...datos,
+            [input] : text
+        })
+    }
+
+    const register = async () => {
+        if(checked ==='alumno'){
+            var config = {
+                method: 'post',
+                url: 'https://tasty-hub.herokuapp.com/api/user/student/',
+                headers: { 
+                  'Content-Type': 'application/json'
+                },
+                data : datos
+              };
+              
+              axios(config)
+              .then(function (response) {
+                console.log(JSON.stringify(response.data));
+                navigation.navigate('EmailSent', {mail: datos.email})
+              })
+              .catch(function (error) {
+                console.log(error);
+              });  
+        }else{
+            var config = {
+                method: 'post',
+                url: 'https://tasty-hub.herokuapp.com/api/user/guest/',
+                headers: { 
+                  'Content-Type': 'application/json'
+                },
+                data : datos
+              };
+              
+              axios(config)
+              .then(function () {
+                navigation.navigate('EmailSent', {mail: datos.email})
+              })
+              .catch(function (error) {
+                console.log(error);
+              });  
+        }
+        
+    }
+   
 
     return (
         <ScrollView style ={styles.container}>
@@ -35,6 +87,7 @@ export const Register = ({navigation}) => {
                     <View style = {styles.formContainerItem}>
                         <Text style = {styles.text}> Email </Text>
                         <InputTasty 
+                            onChange={(text) => handleChange(text, 'email')}
                             placeholder = 'E.g: cooking@mail.com'
                         />
                     </View>
@@ -42,6 +95,7 @@ export const Register = ({navigation}) => {
                     <View style = {styles.formContainerItem}>
                         <Text style = {styles.text}> Alias </Text>
                         <InputTasty 
+                            onChange={(text) => handleChange(text, 'userName')}
                             placeholder = 'E.g: Cooking'
                         />
                     </View >
@@ -54,18 +108,18 @@ export const Register = ({navigation}) => {
                             <View style = {styles.formContainerItemRadioHalf}>
                                 <View style = {styles.formContainerItemRadioOption}>
                                     <RadioButton
-                                        value="first"
-                                        status={ checked === 'first' ? 'checked' : 'unchecked' }
-                                        onPress={() => setChecked('first')}
+                                        value="alumno"
+                                        status={ checked === 'alumno' ? 'checked' : 'unchecked' }
+                                        onPress={() => setChecked('alumno')}
                                     
                                     /> 
                                     <Text style = {styles.textSmall}> Alumno </Text>
                                 </View>
                                 <View style = {styles.formContainerItemRadioOption} >
                                     <RadioButton
-                                        value="second"
-                                        status={ checked === 'second' ? 'checked' : 'unchecked' }
-                                        onPress={() => setChecked('second')}
+                                        value="invitado"
+                                        status={ checked === 'invitado' ? 'checked' : 'unchecked' }
+                                        onPress={() => setChecked('invitado')}
                                     />
                                      <Text style = {styles.textSmall}> Invitado </Text>  
                                 </View>
@@ -76,7 +130,10 @@ export const Register = ({navigation}) => {
                     </View>
 
                     <View style = {styles.formContainerItem2}>
-                        <ButtonCustom callback={() => navigation.navigate('EmailSent', {mail: 'Email@gmail.com'})} text = 'Continuar'/>
+                        <ButtonCustom 
+                        callback={() => register() } 
+                        text = 'Continuar'
+                        />
                     </View>
 
                     
