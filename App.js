@@ -13,7 +13,7 @@ import { EnterAvatar } from './register/EnterAvatar';
 import { RegisterSuccess } from './register/RegisterSuccess';
 import { Dashboard } from './dashboard/Dashboard';
 import { ExistingMail } from './register/ExistingMail';
-import { UncompletedRegistry } from './register/UncompletedRegistry';
+import { IncompleteRegistry } from './register/IncompleteRegistry';
 import { EmailNotConfirmed } from './register/EmailNotConfirmed';
 
 
@@ -36,7 +36,7 @@ export default function App() {
           <Stack.Screen name="RestorePassword" component={InsertMail}/>
           <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="ExistingMail" component={ExistingMail} />
-          <Stack.Screen name="UncompletedRegistry" component={UncompletedRegistry} />
+          <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry}/>
           <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
 
           {/* habría que ir agregando las screens aca */}

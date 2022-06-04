@@ -68,7 +68,7 @@ export const Register = ({navigation}) => {
                             email: "",
                             userName: ""
                         })
-                        navigation.navigate('UncompletedRegistry')
+                        navigation.navigate('IncompleteRegistry')
                     }
                   });  
             }else{
@@ -105,7 +105,7 @@ export const Register = ({navigation}) => {
                             email: "",
                             userName: ""
                         })
-                        navigation.navigate('UncompletedRegistry')
+                        navigation.navigate('IncompleteRegistry')
                     }
                   });  
             }
