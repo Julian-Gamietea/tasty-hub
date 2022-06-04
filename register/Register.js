@@ -9,11 +9,13 @@ import axios from "axios";
 export const Register = ({navigation}) => {
     const [datos, setDatos] = React.useState({
         email: "",
-        userName: ""
+        userName: "",
+        password: ""
     })
-    const [errorMessage, setErrorMessage] = React.useState('');
-    const [errorMessage2, setErrorMessage2] = React.useState('');
-    const [isValid, setIsValid] = React.useState(true);
+    const [errorMessageAlias, setErrorMessageAlias] = React.useState('');
+    const [errorMessageEmail, setErrorMessageEmail] = React.useState('');
+    const [isValidAlias, setIsValidAlias] = React.useState(true);
+    const [isValidEmail, setIsValidEmail] = React.useState(true);
     const [checked, setChecked] = React.useState('alumno');
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
@@ -29,11 +31,16 @@ export const Register = ({navigation}) => {
             [input] : text
         })
     }
-
     const register = async () => {
 
+        setIsValidEmail(true)
+        setIsValidAlias(true)
+        setErrorMessageEmail("")
+        setErrorMessageAlias("")
+        
         const status = checkBlanks();
-        if(status){
+        const mailOk = validateEmail(datos.email)
+        if(status && mailOk){
             if(checked ==='alumno'){
                 var config = {
                     method: 'post',
@@ -55,8 +62,8 @@ export const Register = ({navigation}) => {
                   .catch(function async (error) {
                     const mensaje = error.response.data;
                     if (mensaje === 'There is already a user with that username'){
-                        setIsValid(false);
-                        setErrorMessage('El alias ingresado ya existe. Pruebe ingresando otro');
+                        setIsValidAlias(false);
+                        setErrorMessageAlias('El alias ingresado ya existe. Pruebe ingresando otro');
                     }else if(mensaje === 'There is already a user with that email'){
                         setDatos({
                             email: "",
@@ -92,8 +99,8 @@ export const Register = ({navigation}) => {
                   .catch(function async (error) {
                     const mensaje = error.response.data;
                     if (mensaje === 'There is already a user with that username'){
-                        setIsValid(false);
-                        setErrorMessage('El alias ingresado ya existe. Pruebe ingresando otro');
+                        setIsValidAlias(false);
+                        setErrorMessageAlias('El alias ingresado ya existe. Pruebe ingresando otro');
                     }else if(mensaje === 'There is already a user with that email'){
                         setDatos({
                             email: "",
@@ -114,26 +121,28 @@ export const Register = ({navigation}) => {
         
     }
 
+    const validateEmail = (email) => {
+        const emailRegex = /^(([^<>()\[\]\\.,:\s@"]+(\.[^<>()\[\]\\.,:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        if(!emailRegex.test(email)){
+            setErrorMessageEmail("Por favor ingrese una direccion de email válida")
+            setIsValidEmail(false);
+            return false
+        }else{
+            setIsValidEmail(true)
+            setErrorMessageEmail("")
+            return true
+        }
+    }
 
     const checkBlanks = () => {
-        console.log("email" + datos.email)
-        console.log("username" + datos.userName)
-        if(datos.email === "" && datos.userName === ""){
-            setIsValid(false);
-            setErrorMessage2("El campo Email no puede estar vacio")
-            setErrorMessage("El campo Alias no puede estar vacio")
-            
-            return false;
-        }else if (datos.email === ""){
-            setIsValid(false);
-            setErrorMessage2("El campo Email no puede estar vacio")
-            return false;
-        }else if(datos.userName === ""){
-            setIsValid(false);
-            setErrorMessage("El campo Alias no puede estar vacio")
+    
+        if(datos.userName === ""){
+            setIsValidAlias(false);
+            setErrorMessageAlias("El campo Alias no puede estar vacío")
             return false;
         }else{
-            setIsValid(true);
+            setErrorMessageAlias("")
+            setErrorMessageEmail("")
             return true;
         }
     }
@@ -159,8 +168,8 @@ export const Register = ({navigation}) => {
                         <InputTasty 
                             onChange={(text) => handleChange(text, 'email')}
                             placeholder = 'E.g: cooking@mail.com'
-                            isValid={isValid}
-                            errorMessage={errorMessage2}
+                            isValid={isValidEmail}
+                            errorMessage={errorMessageEmail}
                             value={datos.email}
                             
                         />
@@ -171,8 +180,8 @@ export const Register = ({navigation}) => {
                         <InputTasty 
                             onChange={(text) => handleChange(text, 'userName')}
                             placeholder = 'E.g: Cooking'
-                            isValid={isValid}
-                            errorMessage={errorMessage}
+                            isValid={isValidAlias}
+                            errorMessage={errorMessageAlias}
                             value={datos.userName}
                         />
                     </View >

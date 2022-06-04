@@ -20,10 +20,10 @@ export const EmailSent = ({route, navigation}) =>{
     const checkMail = () => {
         axios.get(`https://tasty-hub.herokuapp.com/api/user/check/registration/completion?email=${mail}`)
         .then(()=>{
-            navigation.navigate('EnterData')
+            navigation.navigate('EnterData', {mail: mail})
         })
         .catch( ()=>{
-            navigation.navigate('EmailNotConfirmed', mail)
+            navigation.navigate('EmailNotConfirmed', {mail: mail})
         })
         
     }
