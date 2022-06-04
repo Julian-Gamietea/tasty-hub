@@ -24,7 +24,7 @@ export const LandingPage = ({navigation}) => {
                 <View style = {{marginHorizontal: 50}}>
                     <ButtonCustom callback={() => navigation.navigate('Register')} text={"Registrarse"}/>
                     <Text style={Styles.text}>o</Text>
-                    <ButtonCustom callback={() => navigation.navigate('SignIn')} text={"Iniciar Sesión"}/>
+                    <ButtonCustom callback={() => navigation.navigate('Login')} text={"Iniciar Sesión"}/>
                 </View>
                 
             </ImageBackground>

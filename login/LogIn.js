@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, ScrollView, Text, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-import image from '../assets/sign-in/login-image.png';
+import image from '../assets/login/login-image.png';
 import { InputTasty } from '../shared-components/InputTasty';
 import { ButtonCustom } from '../shared-components/ButtonCustom';
 import { Link } from '@react-navigation/native';
@@ -10,7 +10,7 @@ import { loginReducer, initialState } from './loginReducer';
 import axios from 'axios';
 
 
-export const SignIn = ({ navigation }) => {
+export const LogIn = ({ navigation }) => {
 
 
     const [loginState, loginDispatch] = React.useReducer(loginReducer, initialState);

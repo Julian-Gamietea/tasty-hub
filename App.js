@@ -4,7 +4,7 @@ import React from 'react';
 import { Register } from './register/Register';
 import { LandingPage } from './landing-page/LandingPage';
 import { EmailSent } from './register/EmailSent';
-import { SignIn } from './sign-in/SignIn';
+import { LogIn } from './login/LogIn';
 import {InsertMail} from './restore-password/InsertMail';
 import {InsertCode} from './restore-password/InsertCode'
 import {InsertNewPassword} from './restore-password/InsertNewPassword'
@@ -24,7 +24,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
           <Stack.Screen name="Home" component={LandingPage}/>
-          <Stack.Screen name="SignIn" component={SignIn} />
+          <Stack.Screen name="Login" component={LogIn} />
           <Stack.Screen name="Register" component={Register}/>
           <Stack.Screen name="EmailSent" component={EmailSent}/>
           <Stack.Screen name="InsertCode" component={InsertCode}/>
