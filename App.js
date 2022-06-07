@@ -15,6 +15,7 @@ import { Dashboard } from './dashboard/Dashboard';
 import { ExistingMail } from './register/ExistingMail';
 import { IncompleteRegistry } from './register/IncompleteRegistry';
 import { EmailNotConfirmed } from './register/EmailNotConfirmed';
+import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
 
 
 const Stack = createNativeStackNavigator();
@@ -33,6 +34,7 @@ export default function App() {
           <Stack.Screen name="EnterData" component={EnterData}/>
           <Stack.Screen name="EnterAvatar" component={EnterAvatar}/>
           <Stack.Screen name="RegisterSuccess" component={RegisterSuccess}/>
+          <Stack.Screen name="PasswordRecoverySuccess" component={PasswordRecoverySuccess}/>
           <Stack.Screen name="RestorePassword" component={InsertMail}/>
           <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="ExistingMail" component={ExistingMail} />

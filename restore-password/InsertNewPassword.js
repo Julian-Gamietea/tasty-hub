@@ -16,7 +16,7 @@ export const InsertNewPassword = ({navigation,route}) =>{
             marginTop:"5%"        
         },
         buttonContainer:{
-          marginTop:"20%"
+          marginTop:"10%"
         },
         formContainer:{
           zIndex: 3, 
@@ -29,6 +29,9 @@ export const InsertNewPassword = ({navigation,route}) =>{
             alignItems: 'stretch'
         }
         ,
+        newPasswordItemFormContainer:{
+          justifyContent:"center"
+        },
         primaryText:{
           marginTop:"20%",
           marginBottom:"4%",
@@ -98,7 +101,7 @@ export const InsertNewPassword = ({navigation,route}) =>{
     if(inputPassword.password===reEnterinputPassword.reEnterPassword){
       await axios.put('https://tasty-hub.herokuapp.com/api/auth/password/restore?email='+userEmail+'&password='+inputPassword.password)
         .then(()=>{
-            navigation.navigate('SignIn')
+            navigation.navigate('PasswordRecoverySuccess')
      })
      
   }else{
@@ -119,9 +122,9 @@ export const InsertNewPassword = ({navigation,route}) =>{
                       <InputTasty onChange={(text) => handleChangePassword(text, 'password')} passwrd={true} placeholder = 'Ingrese aqui'/>
                     </View>
                     <View><Text style={styles.errorMessage}>{state}</Text></View>
-                    <View>
+                    <View style = {styles.newPasswordItemFormContainer}>
                       <Text style = {styles.primaryText}> Reingrese contraseña </Text>
-                      <InputTasty onChange={(text) => handleChangeReEnterPassword(text, 'reEnterPassword')} placeholder = 'Ingrese aqui'/>
+                      <InputTasty onChange={(text) => handleChangeReEnterPassword(text, 'reEnterPassword')} passwrd={true} placeholder = 'Ingrese aqui'/>
                     </View>
                     <View style={styles.buttonContainer}>
                           <ButtonCustom callback={() => changePassword()} text = 'Continuar'/>

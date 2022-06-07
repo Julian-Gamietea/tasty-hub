@@ -7,23 +7,23 @@ import CodeInput from "react-native-confirmation-code-input";
 export const InsertCode = ({navigation,route}) =>{
     const [status, setStatus] = React.useState("");
     console.log(route)
-    const {email} = route.params.mail;
-    const [code,setCode] = React.useState({token:""});
-    const handleChange = (numeric, token) => {
-        setCode({
-            ...code,
-            [token] : numeric
-        })};
-    const validateCode = async (codigo) => {
-        
-        await axios.get('https://tasty-hub.herokuapp.com/api/auth/check?token=${code}&email=${email}')
+    var email = route.params.mail;
+    const [code,setCode] = React.useState("");
+    const handleChange = (text) => {
+        setStatus(text)
+    }
+    const validateCode =  () => {
+        console.log(email)
+         axios.get(`https://tasty-hub.herokuapp.com/api/auth/check/${parseInt(code)}?email=${email}`)
         .then(()=>{
-            navigation.navigate('InsertNewPassword')
+            navigation.navigate('InsertNewPassword',{userEmail:route.params.mail})
         })
         .catch( (e)=>{
-            setStatus("Token Invalido")
+            console.log(e)
+            setStatus("El código ingresado no es correcto")
         })
       }
+    console.log(status)
     return ( 
         <View style={styles.container}>
                 <View style = {styles.imageContainer}>
@@ -35,23 +35,21 @@ export const InsertCode = ({navigation,route}) =>{
                     <CodeInput 
                             activeColor='rgba(243, 162, 0, 1)'
                             inactiveColor='rgba(243, 162, 0, 1)'
-                            secureTextEntry
                             keyboardType="numeric"
                             codeLength={6}    
                             className='border-circle'
                             size={40}
-                            compareWithCode='123456'
                             autoFocus={true}
-                            onFulfill={()=>true}
+                            onFulfill={(code)=>setCode(code)}
                             editable={true}
                             clearButtonMode='never'
                             codeInputStyle={{ fontWeight: '800',borderWidth: 1.5 }}
                             containerStyle={{ marginTop: 30 }}/>
                             
-                    <Text></Text>
+                    <Text style={styles.errorMessage}>{status}</Text>
                 </View>
                     <View style={styles.button}>
-                        <ButtonCustom callback={() => navigation.navigate('InsertNewPassword',{userEmail:route.params.mail})} text = 'Continuar'/>
+                        <ButtonCustom callback={() => validateCode()} text = 'Continuar'/>
                     </View>
             </View>
         </View>)
@@ -127,9 +125,19 @@ const styles = StyleSheet.create(
       }
         ,
         button:{
+            marginHorizontal: "10%",
             flex: 1,
             justifyContent: 'flex-end'
-        }
+        },
+        errorMessage:{
+            alignSelf:"center",
+            alignContent:"center",
+            fontWeight:"900",
+            fontSize:16,
+            marginTop:"15%",
+            fontStyle:'bold',
+            color:"#FF9494"
+          },
     }
 )
 

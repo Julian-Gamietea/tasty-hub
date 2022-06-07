@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { InputTasty } from '../shared-components/InputTasty'
 import { ButtonCustom } from '../shared-components/ButtonCustom'
 import axios from 'axios';
+import validateEmail from '../validations/validateEmail';
 
 export const InsertMail = ({navigation}) =>{
   const [status, setStatus] = React.useState("");
@@ -14,21 +15,27 @@ export const InsertMail = ({navigation}) =>{
     });
 }
 const sentCode = async () => {
+  if(validateEmail(inputMail.mail)){
+    await axios.get('https://tasty-hub.herokuapp.com/api/auth/token?email='+inputMail.mail)
+    .then(()=>{
+        navigation.navigate('InsertCode',{mail: inputMail.mail})
+    })
+    .catch( (e)=>{
+      if (e.response.status == 422) {
+        setStatus("Ya se a generado un token para el mail ingresado")
+        navigation.navigate('InsertCode',{mail: inputMail.mail})
+      }
+      if(e.response.status == 404){
+        setStatus("El mail ingresado no se encuentra registrado")
+      }
+      })
   
-  await axios.get('https://tasty-hub.herokuapp.com/api/auth/token?email='+inputMail.mail)
-  .then(()=>{
-      navigation.navigate('InsertCode',{mail: inputMail.mail})
-  })
-  .catch( (e)=>{
-    if (e.response.status == 422) {
-      setStatus("Ya se a generado un token para el mail ingresado")
-      navigation.navigate('InsertCode',{mail: inputMail.mail})
-    }
-    if(e.response.status == 404){
-      setStatus("El mail ingresado no se encuentra registrado")
-    }
-      
-})}
+  }
+  else{
+    setStatus("El mail ingresado no es valido")
+  }
+}
+
 
       
   return (
@@ -44,7 +51,7 @@ const sentCode = async () => {
                 <Text style = {styles.primaryText}> Ingrese su email </Text>
                 <InputTasty onChange={(text) => handleChange(text, 'mail')}
                             value={inputMail.mail}
-                             placeholder = 'E.g: cooking@mail.com'/>
+                            placeholder = 'E.g: cooking@mail.com'/>
                              
                 <Text style={styles.errorMessage}>{status}</Text>
                 
@@ -75,9 +82,9 @@ const styles = StyleSheet.create(
         alignSelf:"center",
         alignContent:"center",
         fontWeight:"900",
-        fontSize:14,
+        fontSize:16,
         marginTop:"2%",
-        fontStyle:'italic',
+        fontStyle:'bold',
         color:"#FF9494"
       },
   
@@ -139,11 +146,15 @@ const styles = StyleSheet.create(
         justifyContent: 'flex-start',
     },
     buttonContainer:{
-      marginTop:"30%",
-      marginBottom:"10%",
-      flex:.5,
+      flex: 3,
       flexDirection: 'column',
-      justifyContent: 'flex-start',
+      justifyContent: 'center',
+      marginHorizontal: "10%",
+      marginTop:"20%",
+      marginBottom:"15%",
+      flex:.5,
+
+     
   }
       ,
       button:{
