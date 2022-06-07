@@ -16,15 +16,14 @@ export const EmailSent = ({route, navigation}) =>{
     }
 
     const {mail} = route.params;
-    const checkMail = async () => {
-        await axios.get('https://tasty-hub.herokuapp.com/api/user/check/registration/completion?email=${mail}')
+
+    const checkMail = () => {
+        axios.get(`https://tasty-hub.herokuapp.com/api/user/check/registration/completion?email=${mail}`)
         .then(()=>{
-           
-            navigation.navigate('EnterData')
+            navigation.navigate('EnterData', {mail: mail})
         })
         .catch( ()=>{
-            console.log("HOLA")
-            navigation.navigate('EmailNotConfirmed', mail)
+            navigation.navigate('EmailNotConfirmed', {mail: mail})
         })
         
     }

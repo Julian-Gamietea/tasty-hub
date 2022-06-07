@@ -3,8 +3,21 @@ import {useFonts} from 'expo-font'
 import * as React from 'react';
 import { InputTasty } from "../shared-components/InputTasty";
 import { ButtonCustom } from "../shared-components/ButtonCustom";
+import axios from "axios";
 
-export const EnterData = ({navigation}) => {
+export const EnterData = ({route, navigation}) => {
+    const [datos, setDatos] = React.useState({
+        nombre: "",
+        contraseña: "",
+        reingresada: ""
+    })
+    const [errorMessageContraseña, setErrorMessageContraseña] = React.useState('');
+    const [errorMessageNombre, setErrorMessageNombre] = React.useState('');
+    const [errorMessageReingrese, setErrorMessageReingrese] = React.useState('');
+    const [isValidContraseña, setIsValidContraseña] = React.useState(true);
+    const [isValidNombre, setIsValidNombre] = React.useState(true);
+    const [isValidReingrese, setIsValidReingrese] = React.useState(true);
+
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
         InterRegular: require ('../assets/fonts/Inter-Regular.ttf')
@@ -12,6 +25,77 @@ export const EnterData = ({navigation}) => {
     if(!loaded){
         return null;
     }
+    const {mail} = route.params;
+    
+    const enterData = () => {
+
+        setIsValidContraseña(true)
+        setIsValidNombre(true)
+        setIsValidReingrese(true)
+        setErrorMessageContraseña("")
+        setErrorMessageNombre("")
+        setErrorMessageReingrese("")
+
+        const status = validations()
+        if(status){
+            axios.get(`https://tasty-hub.herokuapp.com/api/user/email/${mail}`)
+            .then((res)=>{
+                const data = {
+                    name: datos.nombre,
+                    password: datos.contraseña,
+                    id: res.data.id
+                }
+                console.log(data)
+
+                var config = {
+                    method: 'post',
+                    url: 'https://tasty-hub.herokuapp.com/api/user/',
+                    headers: { 
+                      'Content-Type': 'application/json'
+                    },
+                    data : data
+                  };
+                  
+                    axios(config)
+                .then(()=> {
+                    navigation.navigate('EnterAvatar')
+                })
+                .catch((err)=> console.log(err))
+            })
+        }
+    }
+    const handleChange = (text, input) => {
+        setDatos({
+            ...datos,
+            [input] : text
+        })
+    }
+    const validations = () => {
+        if(datos.nombre === "" || !isNaN(datos.nombre)){
+            setErrorMessageNombre("Ingrese un nombre válido")
+            setIsValidNombre(false)
+            return false
+        }else if(datos.contraseña === ""){
+            setErrorMessageContraseña("Ingrese una contraseña válida")
+            setIsValidContraseña(false)
+            return false
+        }else if(datos.reingresada === ""){
+            setErrorMessageReingrese("Ingrese una contraseña válida")
+            setIsValidReingrese(false)
+            return false
+        }else{
+            if(datos.contraseña !== datos.reingresada){
+                setErrorMessageContraseña("Las contraseñas no coinciden")
+                setErrorMessageReingrese("Las contraseñas no coinciden")
+                setIsValidReingrese(false)
+                setIsValidContraseña(false)
+                return false
+            }else{
+                return true
+            }
+        }
+    }
+    
 
     return (
         <ScrollView style ={styles.container}>
@@ -35,6 +119,10 @@ export const EnterData = ({navigation}) => {
                         
                         <InputTasty 
                             placeholder = 'E.g: Juan Pérez'
+                            isValid={isValidNombre}
+                            value={datos.nombre}
+                            errorMessage={errorMessageNombre}
+                            onChange={(text) => handleChange(text, 'nombre')}
                         />
                     </View>
 
@@ -46,6 +134,10 @@ export const EnterData = ({navigation}) => {
                         
                         <InputTasty 
                             placeholder = 'Ingrese aqui'
+                            isValid={isValidContraseña}
+                            errorMessage={errorMessageContraseña}
+                            value={datos.contraseña}
+                            onChange={(text) => handleChange(text, 'contraseña')}
                         />
                     </View >
 
@@ -57,11 +149,15 @@ export const EnterData = ({navigation}) => {
                         
                         <InputTasty 
                             placeholder = 'Ingrese aqui'
+                            isValid={isValidReingrese}
+                            errorMessage={errorMessageReingrese}
+                            value={datos.reingresada}
+                            onChange={(text) => handleChange(text, 'reingresada')}
                         />
                     </View >   
                     <View style = {styles.formContainerItem2}>
                         <ButtonCustom 
-                        callback={() => navigation.navigate('EnterAvatar')}
+                        callback={() => enterData() }
                         text = 'Continuar'/>
                     </View>
                 </View>  
