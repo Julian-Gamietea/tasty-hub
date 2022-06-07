@@ -1,19 +1,53 @@
 import { TouchableOpacity ,View, StyleSheet, Text, ScrollView, Image} from "react-native"
 import {useFonts} from 'expo-font'
 import * as React from 'react';
-import { InputTasty } from "../shared-components/InputTasty";
 import { ButtonCustom } from "../shared-components/ButtonCustom";
 import camera from "../assets/register/camera.png"
 import circle from "../assets/register/cameracircle.png"
+import * as ImagePicker from 'expo-image-picker'
+
 export const EnterAvatar = ({navigation}) => {
+
+    React.useEffect( ()=> {
+        (async () => {
+            const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            setHasGalleryPermission(galleryStatus.status === 'granted');
+        });
+    }, [] );
+    const [hasGalleryPermission, setHasGalleryPermission] = React.useState(null);
+    const [image, setImage] = React.useState(null);
+    const [hasImage, setHasImage] = React.useState(false);
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
         InterLight: require ('../assets/fonts/Inter-Light.ttf')
     });
+   
     if(!loaded){
         return null;
     }
+    
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4,3],
+            quality: 1,
+        });
 
+        console.log(result);
+
+        if(!result.cancelled){
+            setImage(result.uri);
+            setHasImage(true);
+        }  
+    };
+
+    if(hasGalleryPermission === false){
+        return <Text> No access to Internal Storage </Text>
+    }
+    
+    
+    
     return (
         <ScrollView style ={styles.container}>
             
@@ -29,9 +63,24 @@ export const EnterAvatar = ({navigation}) => {
                     <Text style = {styles.text3}> Cargue su avatar </Text>
                     <Text style = {styles.text4} > Opcional </Text>
                     <View style = {{alignItems: 'center'}}>
-                        <TouchableOpacity style = {styles.camera}>
-                            <Image style = {{position: 'absolute', zIndex: 100, top: 55}} source = {camera}></Image>
-                            <Image style = {{height: 200, width: 200}} source = {circle}></Image>
+                        <TouchableOpacity 
+                            style = {styles.camera}
+                            onPress = {()=> pickImage()}>
+                                {hasImage 
+                            
+                                ?   <View>
+
+                                        <Image style = {{height: 180, width: 180, position: 'absolute', top:21, left: 21.5, borderRadius: 100, zIndex: 100,}} source = {{uri: image}}></Image> 
+                                        <Image style = {{height: 220, width: 220}} source = {circle}></Image> 
+                                    </View> 
+                                
+                                :   <View style = {styles.camera}>
+                                        <Image style = {{position: 'absolute', zIndex: 100, top: 55}} source = {camera}></Image>   
+                                        <Image style = {{height: 200, width: 200}} source = {circle}></Image>     
+                                    </View>
+                 
+                                }
+                           
                         </TouchableOpacity>
                     </View>
                     <Text style = {styles.text5} > Si no desea cargar un avatar, se le asignará {'\n'} uno predeterminado </Text>
@@ -94,6 +143,12 @@ const styles = StyleSheet.create(
             height: 200,
             width: 200,
             borderRadius: 200
+        }
+        ,
+        image:{
+            flex: 1,
+            height: 180,
+            width: 180,
         }
         ,
         textContainer:{

@@ -5,7 +5,9 @@ import { InputTasty } from "../shared-components/InputTasty";
 import { ButtonCustom } from "../shared-components/ButtonCustom";
 import axios from "axios";
 
+
 export const EnterData = ({route, navigation}) => {
+   
     const [datos, setDatos] = React.useState({
         nombre: "",
         contraseña: "",
@@ -26,7 +28,7 @@ export const EnterData = ({route, navigation}) => {
         return null;
     }
     const {mail} = route.params;
-    
+
     const enterData = () => {
 
         setIsValidContraseña(true)
@@ -43,12 +45,17 @@ export const EnterData = ({route, navigation}) => {
                 const data = {
                     name: datos.nombre,
                     password: datos.contraseña,
-                    id: res.data.id
+                    id: res.data.id,
+                    email: res.data.email,
+                    enabled: res.data.enabled,
+                    role: res.data.role,
+                    userName: res.data.userName,
+                    registrationTimestamp: res.data.registrationTimestamp
                 }
                 console.log(data)
 
                 var config = {
-                    method: 'post',
+                    method: 'put',
                     url: 'https://tasty-hub.herokuapp.com/api/user/',
                     headers: { 
                       'Content-Type': 'application/json'
