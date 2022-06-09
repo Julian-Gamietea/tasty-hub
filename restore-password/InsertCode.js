@@ -6,21 +6,15 @@ import CodeInput from "react-native-confirmation-code-input";
 
 export const InsertCode = ({navigation,route}) =>{
     const [status, setStatus] = React.useState("");
-    console.log(route)
     var email = route.params.mail;
     const [code,setCode] = React.useState("");
-    const handleChange = (text) => {
-        setStatus(text)
-    }
     const validateCode =  () => {
-        console.log(email)
          axios.get(`https://tasty-hub.herokuapp.com/api/auth/check/${parseInt(code)}?email=${email}`)
         .then(()=>{
             navigation.navigate('InsertNewPassword',{userEmail:route.params.mail})
         })
         .catch( (e)=>{
-            console.log(e)
-            setStatus("El código ingresado no es correcto")
+            setStatus("El código ingresado no coincede con el enviado a su mail.Por favor reingresar")
         })
       }
     console.log(status)
@@ -72,22 +66,15 @@ const styles = StyleSheet.create(
         primaryText:{
           marginTop:"30%",
           marginBottom:"4%",
-          // whiteSpace: "pre-wrap",
-          // wordWrap: "break-word",
-          // wordBreak: "break-word",
            fontWeight: "600",
             color: "#000000",
             fontSize: 28,
             letterSpacing: 0,
-          //  lineHeight: 1.2,
            textAlign: "center"
   
         },
         secondaryText:{
           width:"92%",
-          //whiteSpace: "pre-wrap",
-          //wordWrap: "break-word",
-          //wordBreak: "break-word",
           fontWeight: "600",
           fontFamily: "InterSemiBold",
           color: "#000000",
