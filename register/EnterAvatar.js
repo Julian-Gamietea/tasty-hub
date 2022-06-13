@@ -31,7 +31,7 @@ export const EnterAvatar = ({route, navigation}) => {
     }
 
     const {id} = route.params;
-    
+    console.log(id)
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -68,7 +68,7 @@ export const EnterAvatar = ({route, navigation}) => {
             console.log(dataFinal);
             var config = {
                 method: 'post',
-                url: `https://tasty-hub.herokuapp.com/api/userPhotos?userId=${id}`,
+                url: `https://tasty-hub.herokuapp.com/api/user/photo?userId=${id}`,
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
