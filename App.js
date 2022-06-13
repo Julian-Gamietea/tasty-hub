@@ -15,7 +15,12 @@ import { Dashboard } from './dashboard/Dashboard';
 import { ExistingMail } from './register/ExistingMail';
 import { IncompleteRegistry } from './register/IncompleteRegistry';
 import { EmailNotConfirmed } from './register/EmailNotConfirmed';
+
 import { Recipe } from './recipe/Recipe';
+
+import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
+import { UserStudentConflict } from './restore-password/UserStudentConflict';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -34,13 +39,18 @@ export default function App() {
           <Stack.Screen name="EnterData" component={EnterData}/>
           <Stack.Screen name="EnterAvatar" component={EnterAvatar}/>
           <Stack.Screen name="RegisterSuccess" component={RegisterSuccess}/>
+          <Stack.Screen name="PasswordRecoverySuccess" component={PasswordRecoverySuccess}/>
           <Stack.Screen name="RestorePassword" component={InsertMail}/>
           <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="ExistingMail" component={ExistingMail} />
           <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry}/>
           <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
 
+
           <Stack.Screen name="Recipe" component={Recipe}/>
+
+          <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
+
           {/* habría que ir agregando las screens aca */}
         </Stack.Navigator>
       </NavigationContainer>
