@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable } from "react-native";
 import {useFonts} from 'expo-font'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons'; 
@@ -8,8 +8,11 @@ import salad from "../assets/saladpic.png"
 import StarRating from 'react-native-star-rating';
 import * as React from 'react';
 import { AntDesign } from '@expo/vector-icons'; 
+import { InputTasty } from "../shared-components/InputTasty";
 
 export const Recipe = () => {
+    const [comments, setComments] = React.useState("")
+    const [modalVisible, setModalVisible] = React.useState(false);
     const [starCount, setStarCount] = React.useState(0);
     const [loaded] = useFonts({
         InterBlack: require ('../assets/fonts/Inter-Black.ttf'),
@@ -29,6 +32,15 @@ export const Recipe = () => {
 
     const onStarRatingPress = (rating) => {
         setStarCount(rating)
+    }
+
+    const enviar = () => {
+        setModalVisible(true)
+    }
+
+    const closeModal = () => {
+        setModalVisible(!modalVisible)
+        setComments("");
     }
     return(
         <ScrollView style={styles.container}>
@@ -145,10 +157,40 @@ export const Recipe = () => {
                     />
                 </View>
 
-                <TouchableOpacity style={styles.sendButton}>
+                <TouchableOpacity 
+                    style={styles.sendButton}
+                    onPress={()=> enviar()}>
                     <Text style={styles.buttonTextSend}>Enviar</Text>
                 </TouchableOpacity>
             </View>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>¿Desea dejar algun comentario a la receta?</Text>
+                        <InputTasty
+                            placeholder = 'Ingrese aqui (opcional)'
+                            value =  {comments}
+                            onChange={(text) => setComments(text)}
+                            isValid = {true}   
+                        />
+                        <Pressable
+                        style={[styles.button, styles.buttonClose]}
+                        onPress={() => closeModal()}
+                        >
+                        <Text style={styles.textStyle}>Continuar</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
+            
         </ScrollView>
     );
 }
@@ -351,6 +393,51 @@ const styles = StyleSheet.create({
     },
 
 
+
+
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+      },
+      button: {
+        borderRadius: 18,
+        padding: 10,
+        elevation: 2,
+        backgroundColor:'#5D420C' 
+      },
+      
+      buttonClose: {
+        marginTop: 20,
+        backgroundColor: '#5D420C',
+      },
+      textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+        fontFamily: 'InterLight',
+        fontSize: 20
+      }
    
 
 
