@@ -15,6 +15,7 @@ import { Dashboard } from './dashboard/Dashboard';
 import { ExistingMail } from './register/ExistingMail';
 import { IncompleteRegistry } from './register/IncompleteRegistry';
 import { EmailNotConfirmed } from './register/EmailNotConfirmed';
+import { Recipe } from './recipe/Recipe';
 
 
 const Stack = createNativeStackNavigator();
@@ -39,6 +40,7 @@ export default function App() {
           <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry}/>
           <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
 
+          <Stack.Screen name="Recipe" component={Recipe}/>
           {/* habría que ir agregando las screens aca */}
         </Stack.Navigator>
       </NavigationContainer>
