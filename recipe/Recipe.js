@@ -9,11 +9,74 @@ import StarRating from 'react-native-star-rating';
 import * as React from 'react';
 import { AntDesign } from '@expo/vector-icons'; 
 import { InputTasty } from "../shared-components/InputTasty";
+import axios from "axios";
+import { add } from "react-native-reanimated";
 
-export const Recipe = () => {
+export const Recipe = ({route,navigation}) => {
+    React.useEffect(() => {
+        const fetchData = () => {
+            var axios = require('axios');
+            var config = {
+            method: 'get',
+            url: `https://tasty-hub.herokuapp.com/api/recipes/${id}`,
+            headers: { }
+            };
+
+            axios(config)
+            .then(function (response) {
+                setDatos(response.data)
+                const id = response.data.id
+                console.log(datos)
+                var config2 = {
+                    method: 'get',
+                    url: `https://tasty-hub.herokuapp.com/api/ingredientQuantity?recipeId=${id}`,
+                    headers: { }
+                };
+    
+                axios(config2)
+                .then((response) => {
+                    setIngredientes(response.data)
+                    console.log(ingredientes)
+                    var config3 = {
+                        method: 'get',
+                        url: `https://tasty-hub.herokuapp.com/api/rating/average/${id}`,
+                        headers: { }
+                        };
+                        
+                        axios(config3)
+                        .then(function (response) {
+                            if(!isNaN(response.data)){
+                                setStarCount2(response.data)
+                            }
+                        
+                        })
+                        .catch(function (error) {
+                        console.log(error);
+                        });
+                })
+                .catch((error) => {
+                    console.log(error)
+                }) 
+            })
+            .catch(function (error) {
+                console.log(error);
+            });   
+        }
+        fetchData();
+    }, [starCount2]);
+
+    const userId = 11
+    // const {id} = route.params;
+    const id = 5;
+    const [datos, setDatos] = React.useState([])
+    const [ingredientes, setIngredientes] = React.useState([])
     const [comments, setComments] = React.useState("")
     const [modalVisible, setModalVisible] = React.useState(false);
     const [starCount, setStarCount] = React.useState(0);
+    const [starCount2, setStarCount2] = React.useState(0);
+    const [addedFavorites, setAddedFavorites] = React.useState(false)
+    const [saved, setSaved] = React.useState(false) 
+    const [calificationSent, setCalificationSent] = React.useState(false)
     const [loaded] = useFonts({
         InterBlack: require ('../assets/fonts/Inter-Black.ttf'),
         InterLight: require ('../assets/fonts/Inter-Light.ttf'),
@@ -23,8 +86,10 @@ export const Recipe = () => {
     if(!loaded){
         return null;
     }
+
+
     const rating = 5;
-    
+
     let arrayRating = [];
     for (let index = 0; index < rating; index++) {
         arrayRating.push(1);
@@ -39,27 +104,99 @@ export const Recipe = () => {
     }
 
     const closeModal = () => {
-        setModalVisible(!modalVisible)
-        setComments("");
+        
+        var axios = require('axios');
+        var data = JSON.stringify({
+        "comments": comments,
+        "rating": starCount,
+        "recipeId": id,
+        "userId": userId
+        });
+
+        var config = {
+        method: 'post',
+        url: 'https://tasty-hub.herokuapp.com/api/rating',
+        headers: { 
+            'Content-Type': 'application/json'
+        },
+        data : data
+        };
+
+        axios(config)
+        .then(function () {
+            setTimeout(() => {
+                setCalificationSent(true)
+            }, 1500);
+            setModalVisible(!modalVisible)
+            setComments("");
+            setCalificationSent(false)
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+        
+    }
+
+    const addFavorites = () => {
+        if(!addedFavorites){
+            axios.post(`https://tasty-hub.herokuapp.com/api/favorite?recipeId=${id}&userId=${userId}`)
+            .then(()=>{
+                setAddedFavorites(true)
+            })
+            .catch((error)=>{
+                console.log(error)
+            })
+        }else{
+            axios.delete(`https://tasty-hub.herokuapp.com/api/favorite/delete?recipeId=${id}&userId=${userId}`)
+            .then(()=>{
+                setAddedFavorites(false)
+            })
+            .catch((error)=>{
+                console.log(error)
+            })
+        }
+       
+    }
+
+    const save = () => {
+        if (!saved){
+            setSaved(true)
+        }else{
+            setSaved(false)
+        }
     }
     return(
         <ScrollView style={styles.container}>
             <View style={styles.titleContainer}>
-                <Text style={styles.title}>  Ensalada César </Text>
+                <Text style={styles.title}> {datos.name} </Text>
                 <View style={styles.ratings}>
-                {
+                {/* {
                     arrayRating.map((_, index) => {
                         return (
                             <Feather key={index} name="star" size={20} color="#553900" />
                         );
                     })
-                }
+                } */}
+                    <StarRating
+                        disabled={true}
+                        emptyStar={'star'}
+                        fullStar={'star'}
+                        halfStar={'star'}
+                        iconSet={'Feather'}
+                        maxStars={starCount2}
+                        rating={starCount2}
+                        fullStarColor={'#553900'}
+                        starSize={26}
+                        halfStarEnabled={true}
+                    />
+
                 </View>
                
             </View>
             <View style={styles.profile}>
                 <MaterialIcons name="person" size={24} color="#5D420C" />
-                <Text style={styles.profileName}> GermanMartitegui </Text> 
+                <Text style={styles.profileName}> {datos.ownerUserName} </Text> 
                 <TouchableOpacity style={styles.profileButton}>
                     <MaterialIcons name="portrait" size={24} color="white" />
                     <Text style={styles.buttonText}> Ver perfil</Text>
@@ -69,40 +206,43 @@ export const Recipe = () => {
                 <View style={styles.infoItem1}>
                     <View style={{flexDirection:'row', marginBottom: 5}}>
                         <MaterialIcons name="group" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> 2 personas </Text>
+                        <Text style={styles.infoText}> {datos.peopleAmount} personas </Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                         <Feather name="pie-chart" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> 4 porciones </Text>
+                        <Text style={styles.infoText}> {datos.portions} porciones </Text>
                     </View>  
                 </View>
                 <View style={styles.infoItem2}>
                     <Feather name="clock" size={24} color="#5D420C" />
-                    <Text style={styles.infoText}> 4 min </Text>
+                    <Text style={styles.infoText}> {datos.duration} min </Text>
                 </View>
             </View>
             
             <View style={styles.buttons}>
-                <TouchableOpacity style={styles.favouritesButton}>
-                        {/* <Ionicons name="bookmark" size={24} color="#fff" /> */}
-                        <Ionicons name="bookmark-outline" size={24} color="#fff" />
+                <TouchableOpacity onPress={()=> addFavorites()} style={styles.favouritesButton}>
+                    {addedFavorites
+                        ? <Ionicons name="bookmark" size={24} color="#fff" /> 
+                        : <Ionicons name="bookmark-outline" size={24} color="#fff" />
+                    }
                         <Text style={styles.buttonText}> Añadir a {'\n'} favoritos </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.profileButton}>
-                    {/* <Ionicons name="download" size={24} color="black" /> */}
-                    <Ionicons name="download-outline" size={24} color="white" />
+                <TouchableOpacity onPress={()=> save()}  style={styles.profileButton}>
+                    {saved
+                        ? <Ionicons name="download" size={24} color="white" /> 
+                        : <Ionicons name="download-outline" size={24} color="white" />
+                    }
                     <Text style={styles.buttonText}> Guardar </Text>
                 </TouchableOpacity>
             </View>
-            <Image source={salad} style={styles.image} />
+            <Image source={{uri:datos.mainPhoto}} style={styles.image} />
 
             <View style={styles.descriptionContainer}>
                 <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8}}>
                     <MaterialIcons name="info" size={24} color="#5D420C" />
                     <Text style={styles.descriptionTitle} > Descripción </Text>
                 </View>
-                <Text style={styles.descripcionContent}>Ensalada césar que contiene pollo, tomate, lechuga, palta,
-                remolacha y choclo, condimentada con aceite y jugo de 2 limones </Text>
+                <Text style={styles.descripcionContent}> {datos.description}</Text>
             </View>
 
             <View style={styles.descriptionContainer}>
@@ -111,9 +251,12 @@ export const Recipe = () => {
                     <Text style={styles.descriptionTitle}> Ingredientes </Text> 
                 </View>
                 <View style={{flexDirection:'column'}}>
-                    <Text style={styles.ingredientItemText}> - 1 Tomate </Text>
-                    <Text style={styles.ingredientItemText}> - 2 Huevos </Text>
-                    <Text style={styles.ingredientItemText}> - 100g Lechuga </Text>
+                    {ingredientes.map((element, index) => {
+                        return( <Text key={index} style={styles.ingredientItemText}> - {element.quantity} {element.unitName} de {element.ingredientName} </Text>);
+                       
+                    })
+                    }
+                    
                 </View>
                
             </View>
@@ -174,19 +317,27 @@ export const Recipe = () => {
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>¿Desea dejar algun comentario a la receta?</Text>
-                        <InputTasty
-                            placeholder = 'Ingrese aqui (opcional)'
-                            value =  {comments}
-                            onChange={(text) => setComments(text)}
-                            isValid = {true}   
-                        />
-                        <Pressable
-                        style={[styles.button, styles.buttonClose]}
-                        onPress={() => closeModal()}
-                        >
-                        <Text style={styles.textStyle}>Continuar</Text>
-                        </Pressable>
+                        {!calificationSent
+                            ?   <View> 
+                                    <Text style={styles.modalText}>¿Desea dejar algun comentario a la receta?</Text>
+                                    <InputTasty
+                                        placeholder = 'Ingrese aqui (opcional)'
+                                        value =  {comments}
+                                        onChange={(text) => setComments(text)}
+                                        isValid = {true}   
+                                    />
+                                    <Pressable
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => closeModal()}
+                                    >
+                                    <Text style={styles.textStyle}>Continuar</Text>
+                                    </Pressable>
+                                </View>
+                            :   <View> 
+                                    <Text style={styles.modalText} > ¡Gracias por tu {'\n'} calificación! </Text> 
+                                </View>
+                        }
+                        
                     </View>
                 </View>
             </Modal>
