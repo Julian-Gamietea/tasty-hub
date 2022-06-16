@@ -3,15 +3,14 @@ import {useFonts} from 'expo-font'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons'; 
 import { Ionicons } from "@expo/vector-icons";
-import { Rating } from 'react-native-ratings';
-import salad from "../assets/saladpic.png"
 import StarRating from 'react-native-star-rating';
 import * as React from 'react';
 import { AntDesign } from '@expo/vector-icons'; 
 import { InputTasty } from "../shared-components/InputTasty";
 import axios from "axios";
-import { add } from "react-native-reanimated";
+import { add, not } from "react-native-reanimated";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NotificationModal } from "../shared-components/NotificationModal";
 
 export const Recipe = ({route,navigation}) => {
 
@@ -86,7 +85,7 @@ export const Recipe = ({route,navigation}) => {
     },[starCount]);
 
     const userId = 11
-    // const {id} = route.params;
+    //const {id} = route.params;
     const id = 5;
     const [datos, setDatos] = React.useState([])
     const [ingredientes, setIngredientes] = React.useState([])
@@ -95,6 +94,8 @@ export const Recipe = ({route,navigation}) => {
     const [starCount, setStarCount] = React.useState(0);
     const [starCount2, setStarCount2] = React.useState(0);
     const [addedFavorites, setAddedFavorites] = React.useState(false)
+    const [notificationText, setNotificationText] = React.useState("")
+    const [notification, setNotification] = React.useState(false)
     const [saved, setSaved] = React.useState(false) 
     const [loaded] = useFonts({
         InterBlack: require ('../assets/fonts/Inter-Black.ttf'),
@@ -158,8 +159,8 @@ export const Recipe = ({route,navigation}) => {
         if(!addedFavorites){
             axios.post(`https://tasty-hub.herokuapp.com/api/favorite?recipeId=${id}&userId=${userId}`)
             .then(()=>{
-                setAddedFavorites(true)
-                alert('Receta agregada a favoritos')
+                setAddedFavorites(true)    
+                showNotification()
             })
             .catch((error)=>{
                 console.log(error)
@@ -168,13 +169,20 @@ export const Recipe = ({route,navigation}) => {
             axios.delete(`https://tasty-hub.herokuapp.com/api/favorite/delete?recipeId=${id}&userId=${userId}`)
             .then(()=>{
                 setAddedFavorites(false)
-                alert('Receta eliminada de favoritos')
+                showNotification()
             })
             .catch((error)=>{
                 console.log(error)
             })
         }
-       
+    
+    }
+
+    const showNotification = () => {
+        setNotification(true);
+        setTimeout(() => {
+            setNotification(false);
+        }, 1500);
     }
 
     
@@ -357,6 +365,13 @@ export const Recipe = ({route,navigation}) => {
                 </View>
             </Modal>
             
+
+            <NotificationModal
+                visible={notification}
+                onRequestClose={()=>setNotification(!notification)}
+                onPress={()=>setNotification(!notification)}
+                message={addedFavorites ? "Receta agregada a Favoritos!" : "Receta eliminada de Favoritos!"}
+            />
         </ScrollView>
     );
 }
