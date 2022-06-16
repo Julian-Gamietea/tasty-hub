@@ -1,8 +1,4 @@
-import { View, Image, StyleSheet, Text, TouchableOpacity, Modal, Pressable } from "react-native";
-import { useFonts } from 'expo-font';
-import { MaterialIcons } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
+import { View, StyleSheet, Text, Modal, Pressable } from "react-native";
 import { Entypo } from '@expo/vector-icons';
 import React from 'react';
 
