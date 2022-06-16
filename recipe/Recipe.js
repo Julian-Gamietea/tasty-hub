@@ -9,7 +9,6 @@ import { AntDesign } from '@expo/vector-icons';
 import { InputTasty } from "../shared-components/InputTasty";
 import axios from "axios";
 import { add, not } from "react-native-reanimated";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NotificationModal } from "../shared-components/NotificationModal";
 
 export const Recipe = ({route,navigation}) => {
@@ -194,6 +193,7 @@ export const Recipe = ({route,navigation}) => {
             setSaved(false)
         }
     }
+    console.log(datos)
     return(
         <ScrollView style={styles.container}>
             <View style={styles.titleContainer}>
