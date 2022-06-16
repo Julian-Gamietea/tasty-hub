@@ -20,6 +20,7 @@ import { Recipe } from './recipe/Recipe';
 
 import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
 import { UserStudentConflict } from './restore-password/UserStudentConflict';
+import {Carrousel} from './carrousel-instructions/Carrousel'
 
 
 
@@ -28,7 +29,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
+        <Stack.Navigator initialRouteName="Carrousel" screenOptions={{headerShown: false}}>
           <Stack.Screen name="Home" component={LandingPage}/>
           <Stack.Screen name="Login" component={LogIn} />
           <Stack.Screen name="Register" component={Register}/>
@@ -45,6 +46,7 @@ export default function App() {
           <Stack.Screen name="ExistingMail" component={ExistingMail} />
           <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry}/>
           <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
+          <Stack.Screen name="Carrousel" component={Carrousel}/>
 
 
           <Stack.Screen name="Recipe" component={Recipe}/>
