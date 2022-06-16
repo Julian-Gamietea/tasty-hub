@@ -11,8 +11,10 @@ import { AntDesign } from '@expo/vector-icons';
 import { InputTasty } from "../shared-components/InputTasty";
 import axios from "axios";
 import { add } from "react-native-reanimated";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const Recipe = ({route,navigation}) => {
+
     React.useEffect(() => {
         const fetchData = () => {
             var axios = require('axios');
@@ -24,9 +26,11 @@ export const Recipe = ({route,navigation}) => {
 
             axios(config)
             .then(function (response) {
+
+                // SETTING THE RECIPE INFORMATION 
+
                 setDatos(response.data)
                 const id = response.data.id
-                console.log(datos)
                 var config2 = {
                     method: 'get',
                     url: `https://tasty-hub.herokuapp.com/api/ingredientQuantity?recipeId=${id}`,
@@ -36,7 +40,6 @@ export const Recipe = ({route,navigation}) => {
                 axios(config2)
                 .then((response) => {
                     setIngredientes(response.data)
-                    console.log(ingredientes)
                     var config3 = {
                         method: 'get',
                         url: `https://tasty-hub.herokuapp.com/api/rating/average/${id}`,
@@ -45,6 +48,9 @@ export const Recipe = ({route,navigation}) => {
                         
                         axios(config3)
                         .then(function (response) {
+
+                            // SETTING THE RECIPE RATING
+
                             if(!isNaN(response.data)){
                                 setStarCount2(response.data)
                             }
@@ -60,10 +66,24 @@ export const Recipe = ({route,navigation}) => {
             })
             .catch(function (error) {
                 console.log(error);
-            });   
+            }); 
+            
+            //ASKING IF THE RECIPE IS ALREADY ADDED TO FAVORITES
+
+            axios.get(`https://tasty-hub.herokuapp.com/api/favorite/${userId}`)
+            .then((response)=>{
+                const favorites = response.data;
+                favorites.forEach(element => {
+                    console.log(element)
+                    if(element.recipeId === id){
+                        setAddedFavorites(true)
+                    }
+                });
+            })
+              
         }
         fetchData();
-    }, [starCount2]);
+    },[starCount]);
 
     const userId = 11
     // const {id} = route.params;
@@ -76,7 +96,6 @@ export const Recipe = ({route,navigation}) => {
     const [starCount2, setStarCount2] = React.useState(0);
     const [addedFavorites, setAddedFavorites] = React.useState(false)
     const [saved, setSaved] = React.useState(false) 
-    const [calificationSent, setCalificationSent] = React.useState(false)
     const [loaded] = useFonts({
         InterBlack: require ('../assets/fonts/Inter-Black.ttf'),
         InterLight: require ('../assets/fonts/Inter-Light.ttf'),
@@ -90,11 +109,6 @@ export const Recipe = ({route,navigation}) => {
 
     const rating = 5;
 
-    let arrayRating = [];
-    for (let index = 0; index < rating; index++) {
-        arrayRating.push(1);
-    }
-
     const onStarRatingPress = (rating) => {
         setStarCount(rating)
     }
@@ -103,7 +117,7 @@ export const Recipe = ({route,navigation}) => {
         setModalVisible(true)
     }
 
-    const closeModal = () => {
+    const closeModalSend = () => {
         
         var axios = require('axios');
         var data = JSON.stringify({
@@ -124,12 +138,9 @@ export const Recipe = ({route,navigation}) => {
 
         axios(config)
         .then(function () {
-            setTimeout(() => {
-                setCalificationSent(true)
-            }, 1500);
             setModalVisible(!modalVisible)
             setComments("");
-            setCalificationSent(false)
+            setStarCount(0)       
         })
         .catch(function (error) {
             console.log(error);
@@ -138,11 +149,17 @@ export const Recipe = ({route,navigation}) => {
         
     }
 
+    const closeModalNoSend = () => {
+        setModalVisible(!modalVisible)
+        setStarCount(0)
+    }
+
     const addFavorites = () => {
         if(!addedFavorites){
             axios.post(`https://tasty-hub.herokuapp.com/api/favorite?recipeId=${id}&userId=${userId}`)
             .then(()=>{
                 setAddedFavorites(true)
+                alert('Receta agregada a favoritos')
             })
             .catch((error)=>{
                 console.log(error)
@@ -151,6 +168,7 @@ export const Recipe = ({route,navigation}) => {
             axios.delete(`https://tasty-hub.herokuapp.com/api/favorite/delete?recipeId=${id}&userId=${userId}`)
             .then(()=>{
                 setAddedFavorites(false)
+                alert('Receta eliminada de favoritos')
             })
             .catch((error)=>{
                 console.log(error)
@@ -158,6 +176,8 @@ export const Recipe = ({route,navigation}) => {
         }
        
     }
+
+    
 
     const save = () => {
         if (!saved){
@@ -171,13 +191,6 @@ export const Recipe = ({route,navigation}) => {
             <View style={styles.titleContainer}>
                 <Text style={styles.title}> {datos.name} </Text>
                 <View style={styles.ratings}>
-                {/* {
-                    arrayRating.map((_, index) => {
-                        return (
-                            <Feather key={index} name="star" size={20} color="#553900" />
-                        );
-                    })
-                } */}
                     <StarRating
                         disabled={true}
                         emptyStar={'star'}
@@ -190,7 +203,6 @@ export const Recipe = ({route,navigation}) => {
                         starSize={26}
                         halfStarEnabled={true}
                     />
-
                 </View>
                
             </View>
@@ -317,27 +329,30 @@ export const Recipe = ({route,navigation}) => {
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        {!calificationSent
-                            ?   <View> 
-                                    <Text style={styles.modalText}>¿Desea dejar algun comentario a la receta?</Text>
-                                    <InputTasty
-                                        placeholder = 'Ingrese aqui (opcional)'
-                                        value =  {comments}
-                                        onChange={(text) => setComments(text)}
-                                        isValid = {true}   
-                                    />
-                                    <Pressable
-                                    style={[styles.button, styles.buttonClose]}
-                                    onPress={() => closeModal()}
-                                    >
-                                    <Text style={styles.textStyle}>Continuar</Text>
-                                    </Pressable>
-                                </View>
-                            :   <View> 
-                                    <Text style={styles.modalText} > ¡Gracias por tu {'\n'} calificación! </Text> 
-                                </View>
-                        }
-                        
+                        <View> 
+                            <Text style={styles.modalText}>¿Desea dejar algun comentario a la receta?</Text>
+                            <InputTasty
+                                placeholder = 'Ingrese aqui (opcional)'
+                                value =  {comments}
+                                onChange={(text) => setComments(text)}
+                                isValid = {true}   
+                            />
+                            <View style={{flexDirection: 'row', justifyContent:'center', backgroundColor: '#fff'}}> 
+                                <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => closeModalSend()}
+                                >
+                                <Text style={styles.textStyle}>Continuar</Text>
+                                </Pressable>
+                                <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => closeModalNoSend()}
+                                >
+                                <Text style={styles.textStyle}>Volver</Text>
+                                </Pressable>
+                            </View>
+                            
+                        </View>
                     </View>
                 </View>
             </Modal>
@@ -576,6 +591,9 @@ const styles = StyleSheet.create({
       
       buttonClose: {
         marginTop: 20,
+        marginLeft:10,
+        marginRight: 10,
+        width: 100,
         backgroundColor: '#5D420C',
       },
       textStyle: {
