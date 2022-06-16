@@ -28,7 +28,7 @@ export const LogIn = ({ navigation }) => {
         }
     }
 
-    const login = async () => {
+    const login = () => {
         if (areInputsValid()) {
             axios.get(`https://tasty-hub.herokuapp.com/api/user/username/${alias}`)
                 .then((res) => {
@@ -37,7 +37,7 @@ export const LogIn = ({ navigation }) => {
                             axios.get(`https://tasty-hub.herokuapp.com/api/auth/login?alias=${alias}&password=${password}`)
                                 .then((res) => {
                                     loginDispatch({ type: "reset" })
-                                    navigation.navigate('Dashboard', res.data);
+                                    navigation.navigate('Dashboard', {params : res.data, screen: 'Dashboard'});
                                 })
                                 .catch(e => {
                                     loginDispatch({ type: "aliasError", error: "Usuario Incorrecto" });
@@ -106,7 +106,7 @@ export const LogIn = ({ navigation }) => {
                 <Link to={{ screen: 'RestorePassword' }} style={styles.link} >¿Olvidaste tu contraseña?</Link>
 
                 <View style={styles.formContainerItem2}>
-                    <ButtonCustom callback={() => login()} text='Iniciar Sesión' />
+                    <ButtonCustom callback={login} text='Iniciar Sesión' />
                 </View>
             </View>
         </ScrollView>
