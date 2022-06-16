@@ -5,11 +5,14 @@ import { InputTasty } from "../shared-components/InputTasty";
 import { ButtonCustom } from "../shared-components/ButtonCustom";
 import axios from "axios";
 
+
 export const EnterData = ({route, navigation}) => {
+   
     const [datos, setDatos] = React.useState({
         nombre: "",
         contraseña: "",
-        reingresada: ""
+        reingresada: "",
+        id: ""
     })
     const [errorMessageContraseña, setErrorMessageContraseña] = React.useState('');
     const [errorMessageNombre, setErrorMessageNombre] = React.useState('');
@@ -26,7 +29,7 @@ export const EnterData = ({route, navigation}) => {
         return null;
     }
     const {mail} = route.params;
-    
+
     const enterData = () => {
 
         setIsValidContraseña(true)
@@ -40,16 +43,29 @@ export const EnterData = ({route, navigation}) => {
         if(status){
             axios.get(`https://tasty-hub.herokuapp.com/api/user/email/${mail}`)
             .then((res)=>{
+                
+                setDatos({
+                    ...datos,
+                    id: res.data.id
+                })
+                
                 const data = {
                     name: datos.nombre,
                     password: datos.contraseña,
-                    id: res.data.id
+                    id: res.data.id,
+            
+                    // email: res.data.email,
+                    // enabled: res.data.enabled,
+                    // role: res.data.role,
+                    // userName: res.data.userName,
+                    // registrationTimestamp: res.data.registrationTimestamp
+
                 }
                 console.log(data)
 
                 var config = {
-                    method: 'post',
-                    url: 'https://tasty-hub.herokuapp.com/api/user/',
+                    method: 'put',
+                    url: 'https://tasty-hub.herokuapp.com/api/user',
                     headers: { 
                       'Content-Type': 'application/json'
                     },
@@ -58,7 +74,7 @@ export const EnterData = ({route, navigation}) => {
                   
                     axios(config)
                 .then(()=> {
-                    navigation.navigate('EnterAvatar')
+                    navigation.navigate('EnterAvatar', {id: datos.id})
                 })
                 .catch((err)=> console.log(err))
             })
@@ -135,6 +151,7 @@ export const EnterData = ({route, navigation}) => {
                         <InputTasty 
                             placeholder = 'Ingrese aqui'
                             isValid={isValidContraseña}
+                            passwrd
                             errorMessage={errorMessageContraseña}
                             value={datos.contraseña}
                             onChange={(text) => handleChange(text, 'contraseña')}
@@ -150,6 +167,7 @@ export const EnterData = ({route, navigation}) => {
                         <InputTasty 
                             placeholder = 'Ingrese aqui'
                             isValid={isValidReingrese}
+                            passwrd
                             errorMessage={errorMessageReingrese}
                             value={datos.reingresada}
                             onChange={(text) => handleChange(text, 'reingresada')}
@@ -157,7 +175,7 @@ export const EnterData = ({route, navigation}) => {
                     </View >   
                     <View style = {styles.formContainerItem2}>
                         <ButtonCustom 
-                        callback={() => enterData() }
+                        callback={()=> enterData()}
                         text = 'Continuar'/>
                     </View>
                 </View>  

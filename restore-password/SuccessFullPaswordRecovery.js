@@ -2,9 +2,8 @@ import { View, Text ,Image, StyleSheet } from "react-native";
 import ok from '../assets/register/ok.png'
 import {useFonts} from 'expo-font'
 import { ButtonCustom } from "../shared-components/ButtonCustom";
-import { NavigationHelpersContext } from "@react-navigation/native";
 
-export const RegisterSuccess = ({navigation}) => {
+export const PasswordRecoverySuccess = ({navigation}) => {
 
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
@@ -17,10 +16,9 @@ export const RegisterSuccess = ({navigation}) => {
     return(
         <View style = {styles.container}>
             <Image style = {styles.image} source = {ok} />
-            <Text style = {styles.text}>  El registro fue {'\n'} realizado con éxito.</Text>
-            <Text style = {styles.text2}>  ¡Bienvenido a Tasty {'\n'} Hub!</Text>
+            <Text style = {styles.text}>  El recupero de contraseña fue {'\n'} realizado con éxito.</Text>
             <View style = {styles.button}>
-                <ButtonCustom callback={()=>navigation.navigate("Login")} text = 'Iniciar Sesion'/>
+                <ButtonCustom callback={() => navigation.navigate("Login")} text = 'Iniciar Sesion'/>
             </View>
         </View>
     );

@@ -24,6 +24,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 
 
+import { Recipe } from './recipe/Recipe';
+
+import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
+import { UserStudentConflict } from './restore-password/UserStudentConflict';
+
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -136,9 +142,14 @@ export default function App() {
         <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry} />
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
 
+        <Stack.Screen name="Recipe" component={Recipe} />
+
+        <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         {/* habría que ir agregando las screens aca */}
       </Stack.Navigator>
     </NavigationContainer>
+
+
   );
 }
 
