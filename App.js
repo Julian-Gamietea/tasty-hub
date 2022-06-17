@@ -21,6 +21,7 @@ import { Recipe } from './recipe/Recipe';
 import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
 import { UserStudentConflict } from './restore-password/UserStudentConflict';
 import {Carrousel} from './carrousel-instructions/Carrousel'
+import { CarrouselMultimedia } from './carrousel-instructions/CarrouselMultimedia';
 
 
 
@@ -47,6 +48,7 @@ export default function App() {
           <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry}/>
           <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
           <Stack.Screen name="Carrousel" component={Carrousel}/>
+          <Stack.Screen name="CarrouselMultimedia" component={CarrouselMultimedia}/>
 
 
           <Stack.Screen name="Recipe" component={Recipe}/>
