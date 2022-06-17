@@ -35,12 +35,12 @@ export const CarrouselMultimedia = ({ id }) => {
   console.log("Renderizamos la flatlist fachera facherita")
   return (
 
-    <ScrollView  horizontal nestedScrollEnabled={true}>
+    <ScrollView  horizontal nestedScrollEnabled={true} style={{width: '90%'}}>
       {multimedia.map((elem, index) => {
         return (<Image
         key={index}
         source={{uri: elem.urlContent}}
-        style={{width:200, height: 150}}
+        style={{width:300, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10}}
         />  )
       })}
     </ScrollView>
