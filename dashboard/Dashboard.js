@@ -1,49 +1,60 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions, RefreshControl, SafeAreaView, FlatList, KeyboardAvoidingView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { StatusBar } from 'expo-status-bar';
+
 import { useFonts } from 'expo-font';
 import { RecipeDashboardCard } from '../shared-components/RecipeDashboardCard';
 import { Feather } from '@expo/vector-icons';
 import { DashboardInput } from './DashboardInput';
-import { Dropdown } from './Dropdown';
-import SelectDropdown from 'react-native-select-dropdown';
-import { Entypo } from '@expo/vector-icons';
+
+import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 
 
-export const Dashboard = ({ route, navigation }) => {
-    const user = route.params;
 
+export const Dashboard = ({ route, navigation }) => {
+
+    const [user, setUser] = React.useState(null);
     const [recipeList, setRecipeList] = React.useState([]);
-    const [favouriteRecipes, setFavouriteRecipes] = React.useState([]);
     const [dataLoaded, setDataLoaded] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState('plato');
     const [inputValue, setInputValue] = React.useState("");
+    const [isFetching, setIsFetching] = React.useState(false);
+    
 
     React.useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await axios.get("https://tasty-hub.herokuapp.com/api/recipes");
-                setRecipeList(res.data.slice(0, 5));
-                const fres = await axios.get(`https://tasty-hub.herokuapp.com/api/favorite/${user.id}`);
-                setFavouriteRecipes(fres.data.map(x => x));
-                setDataLoaded(true);
-            } catch (error) {
-                console.log(error);
-            }
+        const fetchUserData = async () => {
+            const userData = await SecureStore.getItemAsync("user");
+            setUser(JSON.parse(userData));
         }
-        fetchData();
+        fetchUserData();
     }, [])
 
-    const checkFavouriteRecipe = (id) => {
-        for (const recipe of favouriteRecipes) {
-            if (recipe.recipeId === id) {
-                return true;
-            }
-        }
-        return false;
+    const onRefresh = () => {
+        setIsFetching(true);
+        fetchData();
     }
+
+    const fetchData = async () => {
+        try {
+            const res = await axios.get("https://tasty-hub.herokuapp.com/api/recipes");
+            setRecipeList(res.data.slice(0, 5));
+            setDataLoaded(true);
+            setIsFetching(false);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const checkFavourite = async (id) => {
+        const resf = await axios.get(`https://tasty-hub.herokuapp.com/api/favorite/isfavourite?recipeId=${id}&userId=${user.id}`)
+        return resf.data;
+    }
+
+    React.useEffect(() => {
+        fetchData();
+    }, [user])
+
 
     const [loaded] = useFonts({
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf'),
@@ -55,80 +66,84 @@ export const Dashboard = ({ route, navigation }) => {
     }
 
     return (
-        
 
-            <ScrollView style={styles.mainContainer} nestedScrollEnabled={true}>
-                <Text style={styles.welcomeMessage}>¡Bienvenido de nuevo, <Text style={styles.username}>{user.name.split(" ")[0]}</Text>!</Text>
-                <View style={styles.ddcontainer}>
-                    <Text>Buscar por </Text>
-                    <View style={styles.pickerContainer}>
-                        <Picker style={styles.picker}
-                            selectedValue={selectedValue}
-                            onValueChange={(value) => setSelectedValue(value)}
-                        >
-                            <Picker.Item style={styles.item} label='Plato' value='plato' />
-                            <Picker.Item style={styles.item} label='Usuario' value='usuario' />
-                        </Picker>
-                    </View>
+        <KeyboardAvoidingView style={{...styles.mainContainer, paddingTop: StatusBar.currentHeight+5}} >
+            <StatusBar backgroundColor={"#fff"}/>
+            
+            <Text style={styles.welcomeMessage}>¡Bienvenido de nuevo, <Text style={styles.username}>{user.name.split(" ")[0]}</Text>!</Text>
+            <View style={styles.ddcontainer}>
+                <Text>Buscar por </Text>
+                <View style={styles.pickerContainer}>
+                    <Picker style={styles.picker}
+                        selectedValue={selectedValue}
+                        onValueChange={(value) => setSelectedValue(value)}
+                    >
+                        <Picker.Item style={styles.item} label='Plato' value='plato' />
+                        <Picker.Item style={styles.item} label='Usuario' value='usuario' />
+                    </Picker>
+                </View>
 
-                </View>
-                <View style={styles.inputContainer}>
-                    <DashboardInput
-                        onChange={(value) => setInputValue(value)}
-                        value={inputValue}
-                        onClick={() => console.log("searched")}
-                        placeholder={selectedValue === 'plato' ? "Buscar por plato..." : "Buscar por usuario..."}
-                    />
-                </View>
-                <View style={styles.filtersContainer}>
-                    <TouchableOpacity style={styles.filterButton}>
-                        <Text style={styles.filterText}>Filtrar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                        <Feather name="filter" size={32} color="#553900" />
-                    </TouchableOpacity>
-                </View>
-                <Text style={styles.text}>Recomendados</Text>
-                <StatusBar style='dark' />
-                <ScrollView style={styles.recipesContainer} nestedScrollEnabled={true}>
-                    {recipeList.map((elem, index) => {
-                        return (<RecipeDashboardCard
-                            key={index}
-                            id={elem.id}
-                            title={elem.name}
-                            author={elem.ownerUserName}
-                            image={elem.mainPhoto}
-                            shortDescription={elem.description}
-                            timeToMake={elem.duration}
-                            userId={user.id}
-                            isFav={checkFavouriteRecipe(elem.id)}
-                        />);
-                    })}
-                </ScrollView>
-            </ScrollView>
-        
+            </View>
+            <View style={styles.inputContainer}>
+                <DashboardInput
+                    onChange={(value) => setInputValue(value)}
+                    value={inputValue}
+                    onClick={() => console.log("searched")}
+                    placeholder={selectedValue === 'plato' ? "Buscar por plato..." : "Buscar por usuario..."}
+                />
+            </View>
+            <View style={styles.filtersContainer}>
+                <TouchableOpacity style={styles.filterButton}>
+                    <Text style={styles.filterText}>Filtrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <Feather name="filter" size={32} color="#553900" />
+                </TouchableOpacity>
+            </View>
+            
+            <StatusBar style='dark' />
+            <Text style={styles.text}>Recomendados</Text>
+            <FlatList
+                onRefresh={onRefresh}
+                refreshing={isFetching}
+                data={recipeList}
+                style={{...styles.recipesContainer}}
+                nestedScrollEnabled={true}
+                key={item => item.id}
+                renderItem={(recipe) => {
+                    const elem = recipe.item;
+                    return (<RecipeDashboardCard
+                        key={elem.id}
+                        onPress={() => navigation.navigate('Recipe', { id: elem.id, userId: user.id })}
+                        id={elem.id}
+                        title={elem.name}
+                        author={elem.ownerUserName}
+                        image={elem.mainPhoto}
+                        shortDescription={elem.description}
+                        timeToMake={elem.duration}
+                        userId={user.id}
+                        isFav={isFetching}
+                    />);
+                }}
+            />
+        </KeyboardAvoidingView>
+
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#fff',
-        paddingTop: '9%'
-    },
+    
     mainContainer: {
         flex: 1,
-        paddingTop: '9%',
-        backgroundColor: '#fff'
+        justifyContent: 'space-around',
+        backgroundColor: '#fff',
     },
     recipesContainer: {
         flex: 1,
-        maxHeight: "40%",
     },
     text: {
         fontSize: 30,
-        marginBottom: 40,
+        marginBottom: 30,
         marginLeft: 30,
         fontFamily: "InterSemiBold"
     },

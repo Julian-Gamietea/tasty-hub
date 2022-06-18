@@ -14,6 +14,10 @@ import { NotificationModal } from "../shared-components/NotificationModal";
 
 export const Recipe = ({route,navigation}) => {
 
+    
+    const {userId} = route.params;
+    const {id} = route.params;
+
     React.useEffect(() => {
         const fetchData = () => {
             var axios = require('axios');
@@ -73,7 +77,7 @@ export const Recipe = ({route,navigation}) => {
             .then((response)=>{
                 const favorites = response.data;
                 favorites.forEach(element => {
-                    console.log(element)
+                    
                     if(element.recipeId === id){
                         setAddedFavorites(true)
                     }
@@ -84,9 +88,7 @@ export const Recipe = ({route,navigation}) => {
         fetchData();
     },[starCount]);
 
-    const userId = 11
-    //const {id} = route.params;
-    const id = 5;
+    
     const [datos, setDatos] = React.useState([])
     const [ingredientes, setIngredientes] = React.useState([])
     const [comments, setComments] = React.useState("")
@@ -194,7 +196,7 @@ export const Recipe = ({route,navigation}) => {
             setSaved(false)
         }
     }
-    console.log(datos)
+    
     return(
         <ScrollView style={styles.container}>
             <View style={styles.titleContainer}>
@@ -471,7 +473,7 @@ const styles = StyleSheet.create({
 
     image:{
         marginTop: 30,
-        width: 400,
+        width: '100%',
         height: 400
     },
 
