@@ -14,15 +14,15 @@ import axios from 'axios';
 
 export const SearchResults = ({ route, navigation }) => {
 
+    const { query } = route.params;
+    const { type } = route.params;
+
     const [user, setUser] = React.useState(null);
     const [recipeList, setRecipeList] = React.useState([]);
     const [dataLoaded, setDataLoaded] = React.useState(false);
-    const [selectedValue, setSelectedValue] = React.useState('plato');
-    const [inputValue, setInputValue] = React.useState("");
+    const [selectedValue, setSelectedValue] = React.useState(type);
+    const [inputValue, setInputValue] = React.useState(query);
     const [isFetching, setIsFetching] = React.useState(false);
-    const { query } = route.params;
-    const { type } = route.params;
-    console.log(type);
     React.useEffect(() => {
         const fetchUserData = async () => {
             const userData = await SecureStore.getItemAsync("user");
@@ -39,14 +39,12 @@ export const SearchResults = ({ route, navigation }) => {
     const fetchData = async () => {
         try {
             let res;
-            if (type === 'plato') {
-                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/like?name=${query}`);
+            if (selectedValue === 'plato') {
+                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/like?name=${inputValue}`);
             } else {
-                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/username/like?username=${query}`)
+                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/username/like?username=${inputValue}`)
             }
             setRecipeList(res.data.slice(0, res.data.length));
-            setSelectedValue(type);
-            setInputValue(query);
             setDataLoaded(true);
             setIsFetching(false);
         } catch (error) {
@@ -90,7 +88,7 @@ export const SearchResults = ({ route, navigation }) => {
                 <DashboardInput
                     onChange={(value) => setInputValue(value)}
                     value={inputValue}
-                    onClick={() => console.log("searched")}
+                    onClick={() => fetchData()}
                     placeholder={selectedValue === 'plato' ? "Buscar por plato..." : "Buscar por usuario..."}
                 />
             </View>

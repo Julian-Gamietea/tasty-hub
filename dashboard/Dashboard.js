@@ -88,7 +88,10 @@ export const Dashboard = ({ route, navigation }) => {
                 <DashboardInput
                     onChange={(value) => setInputValue(value)}
                     value={inputValue}
-                    onClick={() => navigation.navigate("SearchResults", {query: inputValue, type: selectedValue})}
+                    onClick={() => {
+                        setInputValue("");
+                        navigation.navigate("SearchResults", {query: inputValue, type: selectedValue})
+                    }}
                     placeholder={selectedValue === 'plato' ? "Buscar por plato..." : "Buscar por usuario..."}
                 />
             </View>
