@@ -22,7 +22,7 @@ import { RecipeIcon } from '../tasty-hub/assets/icons/recipe-button-icon.png';
 import { Image, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
-
+import { SearchResults } from '../tasty-hub/search-results/SearchResults'
 
 import { Recipe } from './recipe/Recipe';
 
@@ -38,6 +38,7 @@ function TabStack() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Dashboard">
       <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="SearchResults" component={SearchResults}/>
       <Stack.Screen name="Dashboard" component={Dashboard} />
     </Stack.Navigator>
     );
@@ -150,7 +151,7 @@ export default function App() {
         <Stack.Screen name="ExistingMail" component={ExistingMail} />
         <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry} />
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
-
+        
         <Stack.Screen name="Recipe" component={Recipe}/>
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
