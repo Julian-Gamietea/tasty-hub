@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable } from "react-native";
 import {useFonts} from 'expo-font'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons'; 
@@ -11,6 +11,8 @@ import axios from "axios";
 import { add, not } from "react-native-reanimated";
 
 import { NotificationModal } from "../shared-components/NotificationModal";
+import { CarrouselImages } from "../shared-components/CarrouselImages";
+
 
 export const Recipe = ({route,navigation}) => {
 
@@ -19,6 +21,8 @@ export const Recipe = ({route,navigation}) => {
     const {id} = route.params;
 
     React.useEffect(() => {
+        const array = []
+
         const fetchData = () => {
             var axios = require('axios');
             var config = {
@@ -33,6 +37,9 @@ export const Recipe = ({route,navigation}) => {
                 // SETTING THE RECIPE INFORMATION 
 
                 setDatos(response.data)
+            
+                array.push(response.data.mainPhoto)
+
                 const id = response.data.id
                 var config2 = {
                     method: 'get',
@@ -83,12 +90,40 @@ export const Recipe = ({route,navigation}) => {
                     }
                 });
             })
-              
+            .catch((error) => console.log(error))
+
+            //ASKING IF THE USER HAVE A RATING FOR THE CURRENT RECIPE
+
+            axios.get(`https://tasty-hub.herokuapp.com/api/rating/user?recipeId=${id}&userId=${userId}`)
+            .then((response)=>{
+                setStarCount(response.data.rating)
+                setComments(response.data.comments)
+            
+            })
+            .catch((error)=>console.log(error))
+            
+
+            // GETTING THE REST OF THE RECIPE IMAGES
+
+            axios.get(`https://tasty-hub.herokuapp.com/api/recipePhotos/recipe/${id}`)
+            .then((response)=>{
+                response.data.forEach(element => {
+                    array.push(element.photoUrl)
+                });
+
+            })
+            .catch((error)=> console.log(error))
+
+
+            setRecipeImages(array)
+            console.log(recipeImages)
+
         }
         fetchData();
     },[starCount]);
 
-    
+    const [imgActive, setImgActive] = React.useState(0)
+    const [recipeImages, setRecipeImages] = React.useState([])
     const [datos, setDatos] = React.useState([])
     const [ingredientes, setIngredientes] = React.useState([])
     const [comments, setComments] = React.useState("")
@@ -120,6 +155,15 @@ export const Recipe = ({route,navigation}) => {
         setModalVisible(true)
     }
 
+    const onChangeImg = (nativeEvent) => {
+        if(nativeEvent){
+            const slide = Math.ceil(nativeEvent.contentOffset.x / nativeEvent.layoutMeasurement.width);
+            if(slide != imgActive){
+                setImgActive(slide);
+            }
+        }
+    }
+
     const closeModalSend = () => {
         
         var axios = require('axios');
@@ -131,7 +175,7 @@ export const Recipe = ({route,navigation}) => {
         });
 
         var config = {
-        method: 'post',
+        method: 'put',
         url: 'https://tasty-hub.herokuapp.com/api/rating',
         headers: { 
             'Content-Type': 'application/json'
@@ -197,6 +241,11 @@ export const Recipe = ({route,navigation}) => {
         }
     }
     
+    const images = [
+        "http://res.cloudinary.com/fransiciliano/image/upload/v1655523850/umat3ffelauncrewqe47.jpg",
+        "http://res.cloudinary.com/fransiciliano/image/upload/v1655523851/ai7niswnoc8cdac8rtbc.jpg",
+        "http://res.cloudinary.com/fransiciliano/image/upload/v1655523852/awrinhawppeu88tx4lzt.png",
+    ];
     return(
         <ScrollView style={styles.container}>
             <View style={styles.titleContainer}>
@@ -258,8 +307,9 @@ export const Recipe = ({route,navigation}) => {
                     <Text style={styles.buttonText}> Guardar </Text>
                 </TouchableOpacity>
             </View>
-            <Image source={{uri:datos.mainPhoto}} style={styles.image} />
-
+            
+            <CarrouselImages recipeImages = {recipeImages}/>
+            
             <View style={styles.descriptionContainer}>
                 <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8}}>
                     <MaterialIcons name="info" size={24} color="#5D420C" />
@@ -275,8 +325,7 @@ export const Recipe = ({route,navigation}) => {
                 </View>
                 <View style={{flexDirection:'column'}}>
                     {ingredientes.map((element, index) => {
-                        return( <Text key={index} style={styles.ingredientItemText}> - {element.quantity} {element.unitName} de {element.ingredientName} </Text>);
-                       
+                        return( <Text key={index} style={styles.ingredientItemText}> - {element.quantity} {element.unitName} de {element.ingredientName} </Text>);  
                     })
                     }
                     
@@ -401,7 +450,6 @@ const styles = StyleSheet.create({
     },
 
 
-
     profile:{
         flex:1,
         flexDirection: 'row',
@@ -472,9 +520,23 @@ const styles = StyleSheet.create({
     },
 
     image:{
-        marginTop: 30,
-        width: '100%',
+        width: "400",
         height: 400
+    },
+    imageDot:{
+        position:'absolute',
+        bottom: 0,
+        flexDirection: 'row',
+        alignSelf: 'center'
+    },
+
+    dotActive:{
+        margin: 3,
+        color: 'black'
+    },
+    dot:{
+        margin: 3,
+        color: 'white'
     },
 
     descriptionContainer:{

@@ -30,8 +30,8 @@ export const EnterAvatar = ({route, navigation}) => {
         return null;
     }
 
-    //const {id} = ;
-    console.log(" ID  " + route.params.data)
+    const {id} = route.params;
+
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
