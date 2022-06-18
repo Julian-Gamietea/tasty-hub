@@ -6,29 +6,34 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import React from 'react';
 import { NotificationModal } from "./NotificationModal";
+import { useIsFocused } from "@react-navigation/native";
 
-export const RecipeDashboardCard = ({ image, title, shortDescription, timeToMake, author, id, isFav, userId }) => {
+export const RecipeDashboardCard = ({ onPress, image, title, shortDescription, timeToMake, author, id, isFav, userId }) => {
 
-    const [isBookmarked, setIsBookmarked] = React.useState(Boolean(isFav));
+    const [isBookmarked, setIsBookmarked] = React.useState(false);
     const [rating, setRating] = React.useState(0);
     const [isLoading, setIsLoading] = React.useState(true);
     const [modalVisible, setModalVisible] = React.useState(false);
+    
     const [loaded] = useFonts({
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf'),
         InterRegular: require('../assets/fonts/Inter-Regular.ttf')
     });
+      
     React.useEffect(() => {
         const getRating = async () => {
             try {
                 const res = await axios.get(`https://tasty-hub.herokuapp.com/api/rating/average/${id}`);
                 setRating(parseInt(res.data));
                 setIsLoading(false);
+                const resf = await axios.get(`https://tasty-hub.herokuapp.com/api/favorite/isfavourite?recipeId=${id}&userId=${userId}`);
+                setIsBookmarked(Boolean(resf.data));
             } catch (e) {
                 console.log(e);
             }
         }
         getRating();
-    }, []);
+    }, [isFav]);
 
     if (!loaded) {
         return null;
@@ -68,7 +73,7 @@ export const RecipeDashboardCard = ({ image, title, shortDescription, timeToMake
 
     return (
 
-        <TouchableOpacity style={styles.container}>
+        <TouchableOpacity style={styles.container} onPress={onPress}>
             <NotificationModal 
             visible={modalVisible} 
             onRequestClose={() => {

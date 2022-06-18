@@ -34,6 +34,15 @@ import { UserStudentConflict } from './restore-password/UserStudentConflict';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+function TabStack() {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Dashboard">
+      <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="Dashboard" component={Dashboard} />
+    </Stack.Navigator>
+    );
+}
+
 function Tabs() {
   const [loaded] = useFonts({
     InterSemiBold: require('../tasty-hub/assets/fonts/Inter-SemiBold.ttf'),
@@ -44,7 +53,7 @@ function Tabs() {
   }
 
   return (
-    <Tab.Navigator initialRouteName="Inicio"
+    <Tab.Navigator initialRouteName='Dashboard'
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -59,7 +68,7 @@ function Tabs() {
     >
       <Tab.Screen
         name="Dashboard"
-        component={Dashboard}
+        component={TabStack}
         options={{
           tabBarLabel: 'Inicio',
           tabBarIcon: ({ color }) => (
@@ -142,7 +151,7 @@ export default function App() {
         <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry} />
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
 
-        <Stack.Screen name="Recipe" component={Recipe} />
+        <Stack.Screen name="Recipe" component={Recipe}/>
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         {/* habría que ir agregando las screens aca */}
