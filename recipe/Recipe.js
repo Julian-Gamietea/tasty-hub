@@ -9,6 +9,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { InputTasty } from "../shared-components/InputTasty";
 import axios from "axios";
 import { add, not } from "react-native-reanimated";
+
 import { NotificationModal } from "../shared-components/NotificationModal";
 
 export const Recipe = ({route,navigation}) => {
