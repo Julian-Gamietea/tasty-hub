@@ -22,19 +22,29 @@ import { RecipeIcon } from '../tasty-hub/assets/icons/recipe-button-icon.png';
 import { Image, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
-
-
+import { SearchResults } from '../tasty-hub/search-results/SearchResults'
 import { Recipe } from './recipe/Recipe';
-
 import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
 import { UserStudentConflict } from './restore-password/UserStudentConflict';
 import {Carrousel} from './carrousel-instructions/Carrousel'
 import { CarrouselMultimedia } from './carrousel-instructions/CarrouselMultimedia';
+import { CarrouselImages } from './shared-components/CarrouselImages';
+
 
 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+function TabStack() {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Dashboard">
+      <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="SearchResults" component={SearchResults}/>
+      <Stack.Screen name="Dashboard" component={Dashboard} />
+    </Stack.Navigator>
+    );
+}
 
 function Tabs() {
   const [loaded] = useFonts({
@@ -46,7 +56,7 @@ function Tabs() {
   }
 
   return (
-    <Tab.Navigator initialRouteName="Inicio"
+    <Tab.Navigator initialRouteName='Dashboard'
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -61,7 +71,7 @@ function Tabs() {
     >
       <Tab.Screen
         name="Dashboard"
-        component={Dashboard}
+        component={TabStack}
         options={{
           tabBarLabel: 'Inicio',
           tabBarIcon: ({ color }) => (
@@ -116,8 +126,6 @@ function Tabs() {
           tabBarIcon: ({ color }) => (
             <Feather name="user" size={24} color={color} />
           ),
-
-
         }}
       />
     </Tab.Navigator>
@@ -127,7 +135,9 @@ function Tabs() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Recipe" screenOptions={{ headerShown: false }}>
+
+      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+        
         <Stack.Screen name="Home" component={LandingPage} />
         <Stack.Screen name="Login" component={LogIn} />
         <Stack.Screen name="Register" component={Register} />
@@ -144,7 +154,8 @@ export default function App() {
         <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry} />
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
         
-        <Stack.Screen name="Recipe" component={Recipe} />
+        <Stack.Screen name="Recipe" component={Recipe}/>
+        <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         {/* habría que ir agregando las screens aca */}

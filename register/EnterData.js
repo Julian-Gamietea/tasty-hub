@@ -74,7 +74,8 @@ export const EnterData = ({route, navigation}) => {
                   
                     axios(config)
                 .then(()=> {
-                    navigation.navigate('EnterAvatar', {id: datos.id})
+                    console.log(datos)
+                    navigation.navigate('EnterAvatar', {id: data.id})
                 })
                 .catch((err)=> console.log(err))
             })
