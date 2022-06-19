@@ -30,7 +30,7 @@ export const UserProfile = ({route, navigation}) => {
                 const res = await axios.get(`https://tasty-hub.herokuapp.com/api/user/${id}`);
                 setUser(res.data);
 
-                const resr = await axios.get(`https://tatsy-hub.herokuapp.com/api/rating/user/${id}`)
+                const resr = await axios.get(`https://tasty-hub.herokuapp.com/api/rating/user/${id}`)
                 setUserRating(resr.data);
             } catch (e) {
                 console.log("u: " + e);
