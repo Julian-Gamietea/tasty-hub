@@ -5,7 +5,6 @@ import { Feather } from '@expo/vector-icons';
 import { Ionicons } from "@expo/vector-icons";
 import StarRating from 'react-native-star-rating';
 import * as React from 'react';
-import { AntDesign } from '@expo/vector-icons'; 
 import { InputTasty } from "../shared-components/InputTasty";
 import axios from "axios";
 import { add, not } from "react-native-reanimated";
@@ -344,7 +343,7 @@ export const Recipe = ({route,navigation}) => {
                     <Text style={styles.descriptionTitle}>  Instrucciones </Text>
                 </View>
                 <View style={styles.instructionGreyContainer}>
-                    {/* aca va el carrousel */}
+                    <Carrousel id={id}/>
                 </View>
             </View>
 
