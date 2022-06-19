@@ -269,7 +269,7 @@ export const Recipe = ({route,navigation}) => {
             <View style={styles.profile}>
                 <MaterialIcons name="person" size={24} color="#5D420C" />
                 <Text style={styles.profileName}> {datos.ownerUserName} </Text> 
-                <TouchableOpacity style={styles.profileButton}>
+                <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("UserProfile", {id: datos.ownerId})}>
                     <MaterialIcons name="portrait" size={24} color="white" />
                     <Text style={styles.buttonText}> Ver perfil</Text>
                 </TouchableOpacity>

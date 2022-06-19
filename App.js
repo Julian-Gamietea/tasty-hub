@@ -29,7 +29,7 @@ import { Recipe } from './recipe/Recipe';
 import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
 import { UserStudentConflict } from './restore-password/UserStudentConflict';
 import { CarrouselImages } from './shared-components/CarrouselImages';
-
+import { UserProfile } from './profiles/UserProfile';
 
 
 const Stack = createNativeStackNavigator();
@@ -41,6 +41,7 @@ function TabStack() {
       <Stack.Screen name="Recipe" component={Recipe} />
       <Stack.Screen name="SearchResults" component={SearchResults}/>
       <Stack.Screen name="Dashboard" component={Dashboard} />
+      <Stack.Screen name="UserProfile" component={UserProfile}/>
     </Stack.Navigator>
     );
 }
