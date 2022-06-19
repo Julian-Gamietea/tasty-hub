@@ -9,9 +9,9 @@ import { AntDesign } from '@expo/vector-icons';
 import { InputTasty } from "../shared-components/InputTasty";
 import axios from "axios";
 import { add, not } from "react-native-reanimated";
-
 import { NotificationModal } from "../shared-components/NotificationModal";
 import { CarrouselImages } from "../shared-components/CarrouselImages";
+import * as FileSystem from 'expo-file-system'
 
 
 export const Recipe = ({route,navigation}) => {
@@ -116,12 +116,10 @@ export const Recipe = ({route,navigation}) => {
 
 
             setRecipeImages(array)
-            console.log(recipeImages)
 
         }
         fetchData();
     },[starCount]);
-
     const [imgActive, setImgActive] = React.useState(0)
     const [recipeImages, setRecipeImages] = React.useState([])
     const [datos, setDatos] = React.useState([])
@@ -134,6 +132,7 @@ export const Recipe = ({route,navigation}) => {
     const [notificationText, setNotificationText] = React.useState("")
     const [notification, setNotification] = React.useState(false)
     const [saved, setSaved] = React.useState(false) 
+    const [uri, setUri] = React.useState("")
     const [loaded] = useFonts({
         InterBlack: require ('../assets/fonts/Inter-Black.ttf'),
         InterLight: require ('../assets/fonts/Inter-Light.ttf'),
@@ -232,20 +231,19 @@ export const Recipe = ({route,navigation}) => {
     }
 
     
-
-    const save = () => {
+    const save = async () => {
+        const filename = `Receta_${datos.id}`
+        
         if (!saved){
             setSaved(true)
+
         }else{
             setSaved(false)
         }
     }
     
-    const images = [
-        "http://res.cloudinary.com/fransiciliano/image/upload/v1655523850/umat3ffelauncrewqe47.jpg",
-        "http://res.cloudinary.com/fransiciliano/image/upload/v1655523851/ai7niswnoc8cdac8rtbc.jpg",
-        "http://res.cloudinary.com/fransiciliano/image/upload/v1655523852/awrinhawppeu88tx4lzt.png",
-    ];
+    
+    
     return(
         <ScrollView style={styles.container}>
             <View style={styles.titleContainer}>
