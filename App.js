@@ -23,12 +23,13 @@ import { Image, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { SearchResults } from '../tasty-hub/search-results/SearchResults'
-
 import { Recipe } from './recipe/Recipe';
-
 import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
 import { UserStudentConflict } from './restore-password/UserStudentConflict';
+import {Carrousel} from './carrousel-instructions/Carrousel'
+import { CarrouselMultimedia } from './carrousel-instructions/CarrouselMultimedia';
 import { CarrouselImages } from './shared-components/CarrouselImages';
+
 
 
 
@@ -134,6 +135,7 @@ function Tabs() {
 export default function App() {
   return (
     <NavigationContainer>
+
       <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
         
         <Stack.Screen name="Home" component={LandingPage} />
