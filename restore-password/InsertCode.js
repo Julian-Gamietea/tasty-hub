@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text,Image } from "react-native"
+import { View, StyleSheet, Text,Image, Dimensions } from "react-native"
 import React from 'react'
 import { ButtonCustom } from '../shared-components/ButtonCustom';
 import axios from 'axios';
@@ -22,10 +22,11 @@ export const InsertCode = ({navigation,route}) =>{
         <View style={styles.container}>
                 <View style = {styles.imageContainer}>
                     <Image source={require('../assets/restore-password/encrypted-code.png')} style = {styles.image}/>
+                    <Text style ={styles.primaryText}> Ingrese los 6 digitos</Text>
+
                 </View>
             <View style={styles.formContainer} >
                 <View style={styles.formContainerItem}>
-                    <Text style ={styles.primaryText}> Ingrese los 6 digitos</Text>
                     <CodeInput 
                             activeColor='rgba(243, 162, 0, 1)'
                             inactiveColor='rgba(243, 162, 0, 1)'
@@ -66,11 +67,11 @@ const styles = StyleSheet.create(
         primaryText:{
           marginTop:"30%",
           marginBottom:"4%",
-           fontWeight: "600",
-            color: "#000000",
-            fontSize: 28,
-            letterSpacing: 0,
-           textAlign: "center"
+          fontWeight: "600",
+          color: "#000000",
+          fontSize: 28,
+          letterSpacing: 0,
+          textAlign: "center"
   
         },
         secondaryText:{
@@ -105,8 +106,7 @@ const styles = StyleSheet.create(
             justifyContent: 'flex-start',
         },
         formContainerItem:{
-          zIndex:2,
-          flex:.5,
+          flex:.6,
           flexDirection: 'column',
           justifyContent: 'flex-start',
       }
@@ -122,8 +122,9 @@ const styles = StyleSheet.create(
             fontWeight:"900",
             fontSize:16,
             marginTop:"15%",
-            fontStyle:'bold',
-            color:"#FF9494"
+            fontStyle:'italic',
+            color:"#FF9494",
+            width:Dimensions.get("screen").width-100
           },
     }
 )
