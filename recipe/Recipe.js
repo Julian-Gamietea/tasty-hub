@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable, Carrousel } from "react-native";
 import {useFonts} from 'expo-font'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons'; 
@@ -7,7 +7,6 @@ import StarRating from 'react-native-star-rating';
 import * as React from 'react';
 import { InputTasty } from "../shared-components/InputTasty";
 import axios from "axios";
-import { add, not } from "react-native-reanimated";
 import { NotificationModal } from "../shared-components/NotificationModal";
 import { CarrouselImages } from "../shared-components/CarrouselImages";
 import * as FileSystem from 'expo-file-system'
