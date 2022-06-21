@@ -332,7 +332,7 @@ export const Recipe = ({route,navigation}) => {
             <View style={styles.recalculateContainer}>
                 <Text style={styles.recalculateText}>¿Necesitas {'\n'} otras {'\n'} proporciones {'\n'} de esta receta? </Text>
                 <TouchableOpacity style={styles.profileButton}>
-                    <Text style={styles.buttonTextRecalculate}>Recalcular {'\n'} receta</Text>
+                    <Text onPress={() => navigation.navigate('RecalculateRecipe')} style={styles.buttonTextRecalculate}>Recalcular {'\n'} receta</Text>
                 </TouchableOpacity>
             </View>
 

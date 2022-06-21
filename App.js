@@ -30,7 +30,7 @@ import {Carrousel} from './carrousel-instructions/Carrousel'
 import { CarrouselMultimedia } from './carrousel-instructions/CarrouselMultimedia';
 import { CarrouselImages } from './shared-components/CarrouselImages';
 import { UserProfile } from './profiles/UserProfile';
-
+import { RecalculateRecipe } from './recalcular-recipe/RecalculateRecipe';
 
 
 const Stack = createNativeStackNavigator();
@@ -159,6 +159,10 @@ export default function App() {
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
+
+        <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe} />
+
+
         {/* habría que ir agregando las screens aca */}
       </Stack.Navigator>
     </NavigationContainer>
