@@ -19,7 +19,6 @@ export const Recipe = ({route, navigation}) => {
     const {userId} = route.params;
     const {id} = route.params;
     const {recalculated} = route.params;
-
     React.useEffect(() => {
         const array = []
 

@@ -7,9 +7,9 @@ export const Portions = ({userId,recipeId,navigation}) => {
     const [ portionsQty, setPortionsQty ] = useState();
 	const [recipe ,setRecipe]= useState([]);
 
-	const recalculateRecipeByPortions =  () => {
-		var conversionFactor = recipe.portions/portionsQty
-		axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
+	const recalculateRecipeByPortions =  async () => {
+		var conversionFactor = portionsQty/recipe.portions
+		await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
 	   .then((ingredientQuantityList)=>{
 		   navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList.data})
 	   })
@@ -36,7 +36,7 @@ export const Portions = ({userId,recipeId,navigation}) => {
 				<TextInput style={styles.input} keyboardType="numeric" maxLength={2} onChangeText={(cantidad) => setPortionsQty(cantidad)} />
 				<Text style={styles.inputText}>porciones</Text>
 			</View>
-			<TouchableOpacity onPress={recalculateRecipeByPortions()} style={styles.button}>
+			<TouchableOpacity onPress={()=> recalculateRecipeByPortions()} style={styles.button}>
 					<Text style={styles.buttonText}>Recalcular</Text>
 			</TouchableOpacity>
 		</View>
