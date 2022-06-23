@@ -24,7 +24,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { SearchResults } from '../tasty-hub/search-results/SearchResults'
 import { Recipe } from './recipe/Recipe';
-import { PasswordRecoverySuccess } from './restore-password/SuccessFullPaswordRecovery';
+import {  SuccessFullPasswordRecovery } from './restore-password/SuccessFullPasswordRecovery';
 import { UserStudentConflict } from './restore-password/UserStudentConflict';
 import {Carrousel} from './carrousel-instructions/Carrousel'
 import { CarrouselMultimedia } from './carrousel-instructions/CarrouselMultimedia';
@@ -165,7 +165,6 @@ export default function App() {
     <NavigationContainer>
 
       <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-        
         <Stack.Screen name="Home" component={LandingPage} />
         <Stack.Screen name="Login" component={LogIn} />
         <Stack.Screen name="Register" component={Register} />
@@ -186,6 +185,7 @@ export default function App() {
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
+        <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
         {/* habría que ir agregando las screens aca */}
       </Stack.Navigator>
     </NavigationContainer>

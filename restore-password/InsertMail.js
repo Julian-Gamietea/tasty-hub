@@ -1,5 +1,5 @@
-import { Text, View,StyleSheet,Image,ScrollView } from 'react-native'
-import React, { Component } from 'react'
+import { Text, View,StyleSheet,Image,ScrollView, Dimensions } from 'react-native'
+import React  from 'react'
 import { InputTasty } from '../shared-components/InputTasty'
 import { ButtonCustom } from '../shared-components/ButtonCustom'
 import axios from 'axios';
@@ -7,6 +7,7 @@ import validateEmail from '../validations/validateEmail';
 import { isRegistryComplete } from '../validations/isRegistryComplete';
 
 export const InsertMail = ({navigation}) =>{
+  const [isValid, setIsValid] = React.useState(true)
   const [status, setStatus] = React.useState("");
   const [inputMail, setInputMail] = React.useState({mail: ''})
   const mail = inputMail.mail
@@ -16,25 +17,28 @@ export const InsertMail = ({navigation}) =>{
         [mail] : text
     });
 }
-const sentCode = async () => {
-  
+const sentCode =  () => {
+  setIsValid(true)
+  setStatus("")
     if(validateEmail(mail)){
-      if(isUserStudent(mail) && isRegistryComplete(mail,{navigation})){
+    isRegistryComplete(mail,{navigation})
+      if(!isUserStudent(mail)){
         axios.get('https://tasty-hub.herokuapp.com/api/auth/token?email='+mail)
         .then(()=>{
             navigation.navigate('InsertCode',{mail: mail})
         })
         .catch( (e)=>{
           if (e.response.status == 422) {
-            setStatus("Ya se a generado un token para el mail ingresado")
             navigation.navigate('InsertCode',{mail: mail})
           }
           if(e.response.status == 404){
+            setIsValid(false)
             setStatus("El mail ingresado no se encuentra registrado")
           }
           })
     }}
     else{
+      setIsValid(false)
       setStatus("El mail ingresado no es valido")
     }
 
@@ -50,7 +54,11 @@ const sentCode = async () => {
           console.log("No es estudiante")
           return false
         }
+
         
+      }).catch( (e)=>{
+        console.log("el mail no existe")
+        return false
       })
 }
 
@@ -69,6 +77,7 @@ const sentCode = async () => {
                 <Text style = {styles.primaryText}> Ingrese su email </Text>
                 <InputTasty onChange={(text) => handleChange(text, 'mail')}
                             value={inputMail.mail}
+                            isValid={isValid}
                             placeholder = 'E.g: cooking@mail.com'/>
                              
                 <Text style={styles.errorMessage}>{status}</Text>
@@ -92,15 +101,17 @@ const styles = StyleSheet.create(
   {
       image:{
           marginTop:"15%",
-          width:"60%"
+          alignContent:"center",
+          alignItems:"center",
+          width:Dimensions.get("screen").width-190,
+          height:Dimensions.get("screen").height-715
       },
       errorMessage:{
         alignSelf:"center",
         alignContent:"center",
-        fontWeight:"900",
+        fontWeight:"bold",
         fontSize:16,
         marginTop:"2%",
-        fontStyle:'bold',
         color:"#FF9494"
       },
   

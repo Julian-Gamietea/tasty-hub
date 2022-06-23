@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text,Image } from "react-native"
+import { KeyboardAvoidingView ,ScrollView ,View, StyleSheet, Text,Image, Dimensions } from "react-native"
 import React from 'react'
 import { ButtonCustom } from '../shared-components/ButtonCustom';
 import axios from 'axios';
@@ -18,35 +18,39 @@ export const InsertCode = ({navigation,route}) =>{
         })
       }
     console.log(status)
-    return ( 
-        <View style={styles.container}>
-                <View style = {styles.imageContainer}>
-                    <Image source={require('../assets/restore-password/encrypted-code.png')} style = {styles.image}/>
-                </View>
-            <View style={styles.formContainer} >
-                <View style={styles.formContainerItem}>
-                    <Text style ={styles.primaryText}> Ingrese los 6 digitos</Text>
-                    <CodeInput 
-                            activeColor='rgba(243, 162, 0, 1)'
-                            inactiveColor='rgba(243, 162, 0, 1)'
-                            keyboardType="numeric"
-                            codeLength={6}    
-                            className='border-circle'
-                            size={40}
-                            autoFocus={true}
-                            onFulfill={(code)=>setCode(code)}
-                            editable={true}
-                            clearButtonMode='never'
-                            codeInputStyle={{ fontWeight: '800',borderWidth: 1.5 }}
-                            containerStyle={{ marginTop: 30 }}/>
-                            
-                    <Text style={styles.errorMessage}>{status}</Text>
-                </View>
-                    <View style={styles.button}>
-                        <ButtonCustom callback={() => validateCode()} text = 'Continuar'/>
+    return (
+        <ScrollView style={{backgroundColor: '#fff'}}>
+            <View style={styles.container}>
+                    <View style = {styles.imageContainer}>
+                        <Image source={require('../assets/restore-password/encrypted-code.png')} style = {styles.image}/>
+                        <Text style ={styles.primaryText}> Ingrese los 6 digitos</Text>
+
                     </View>
+                <View style={styles.formContainer} >
+                    <View style={styles.formContainerItem}>
+                        <CodeInput 
+                                activeColor='rgba(243, 162, 0, 1)'
+                                inactiveColor='rgba(243, 162, 0, 1)'
+                                keyboardType="numeric"
+                                codeLength={6}    
+                                className='border-circle'
+                                size={40}
+                                autoFocus={true}
+                                onFulfill={(code)=>setCode(code)}
+                                editable={true}
+                                clearButtonMode='never'
+                                codeInputStyle={{ fontWeight: '800',borderWidth: 1.5 }}
+                                containerStyle={{ marginTop: 30 }}/>
+                                
+                        <Text style={styles.errorMessage}>{status}</Text>
+                    </View>
+                        <View style={styles.button}>
+                            <ButtonCustom callback={() => validateCode()} text = 'Continuar'/>
+                        </View>
+                </View>
             </View>
-        </View>)
+        </ScrollView>
+        )
       }
 
 const styles = StyleSheet.create(
@@ -60,17 +64,18 @@ const styles = StyleSheet.create(
             alignContent:"center",
             flexDirection:"column",
             backgroundColor: '#fff',
-            alignItems: 'stretch'
+            alignItems: 'stretch',
+            minHeight: Dimensions.get('window').height+15
         }
         ,
         primaryText:{
           marginTop:"30%",
           marginBottom:"4%",
-           fontWeight: "600",
-            color: "#000000",
-            fontSize: 28,
-            letterSpacing: 0,
-           textAlign: "center"
+          fontWeight: "600",
+          color: "#000000",
+          fontSize: 28,
+          letterSpacing: 0,
+          textAlign: "center"
   
         },
         secondaryText:{
@@ -105,8 +110,7 @@ const styles = StyleSheet.create(
             justifyContent: 'flex-start',
         },
         formContainerItem:{
-          zIndex:2,
-          flex:.5,
+          flex:.6,
           flexDirection: 'column',
           justifyContent: 'flex-start',
       }
@@ -115,6 +119,7 @@ const styles = StyleSheet.create(
             marginHorizontal: "10%",
             flex: 1,
             justifyContent: 'flex-end'
+           
         },
         errorMessage:{
             alignSelf:"center",
@@ -122,8 +127,9 @@ const styles = StyleSheet.create(
             fontWeight:"900",
             fontSize:16,
             marginTop:"15%",
-            fontStyle:'bold',
-            color:"#FF9494"
+            fontStyle:'italic',
+            color:"#FF9494",
+            width:Dimensions.get("screen").width-100
           },
     }
 )
