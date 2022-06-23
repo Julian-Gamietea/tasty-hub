@@ -18,7 +18,9 @@ export const EmailNotConfirmed = ({route, navigation}) => {
             <Text style = {styles.step}>PASO 2/4</Text>
             <Text style = {styles.text}>Aún no confirmó su correo electrónico.{'\n'}{'\n'}Por favor, confírmelo para poder avanzar con el proceso de registro.</Text>
             <Image source = {warning} style = {styles.image}/>
-            <ButtonCustom callback={()=> navigation.navigate('EmailSent', {mail: mail})} text = "Regresar"/>
+            <View style={{width: 215}}>
+                <ButtonCustom callback={()=> navigation.navigate('EmailSent', {mail: mail})} text = "Regresar"/>  
+            </View>
         </View>
     );
 }
