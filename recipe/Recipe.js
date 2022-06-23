@@ -40,7 +40,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
 
                 const id = response.data.id
 
-                if(typeOf(recalculated) == "undefined"){
+                if(typeof(recalculated) == "undefined"){
                     var config2 = {
                         method: 'get',
                         url: `https://tasty-hub.herokuapp.com/api/ingredientQuantity?recipeId=${id}`,
@@ -52,7 +52,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
                         setIngredientes(response.data)
                     })
                     .catch((error) => {
-                        console.log(error)
+                        console.log("ERROR 1 " + error)
                     })
                 }else{
                     setIngredientes(recalculated)
@@ -76,11 +76,11 @@ export const Recipe = ({route, navigation, recalculated}) => {
                     
                     })
                     .catch(function (error) {
-                    console.log(error);
+                    console.log("ERROR 2" + error);
                     }); 
             })
             .catch(function (error) {
-                console.log(error);
+                console.log("ERROR 3 " + error);
             }); 
             
             //ASKING IF THE RECIPE IS ALREADY ADDED TO FAVORITES
@@ -95,7 +95,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
                     }
                 });
             })
-            .catch((error) => console.log(error))
+            .catch((error) => console.log( "ERROR 4 " + error))
 
             //ASKING IF THE USER HAVE A RATING FOR THE CURRENT RECIPE
 
@@ -105,7 +105,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
                 setComments(response.data.comments)
             
             })
-            .catch((error)=>console.log(error))
+            .catch((error)=>console.log(" ERROR 5 " + error))
             
 
             // GETTING THE REST OF THE RECIPE IMAGES
@@ -119,7 +119,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
             })
             .catch((error)=>
             
-             console.log(error)
+             console.log("ERROR 6" + error)
              )
 
 
@@ -197,7 +197,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
             setStarCount(0)       
         })
         .catch(function (error) {
-            console.log(error);
+            console.log("ERROR 7" + error);
         });
 
         
@@ -216,7 +216,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
                 showNotification()
             })
             .catch((error)=>{
-                console.log(error)
+                console.log("ERROR 8" + error)
             })
         }else{
             axios.delete(`https://tasty-hub.herokuapp.com/api/favorite/delete?recipeId=${id}&userId=${userId}`)
@@ -225,7 +225,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
                 showNotification()
             })
             .catch((error)=>{
-                console.log(error)
+                console.log("ERROR 9" + error)
             })
         }
     
@@ -352,7 +352,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
                     <Text style={styles.descriptionTitle}>  Instrucciones </Text>
                 </View>
                 <View style={styles.instructionGreyContainer}>
-                    {/* <Carrousel id={id}/> */}
+                    <Carrousel id={id}/>
                 </View>
             </View>
 
