@@ -39,12 +39,12 @@ export const CarrouselMultimedia = ({ id }) => {
   const RenderMultimediaItem = ({ item,index }) => {
       if(item.typeContent.includes("image")){        
         return (
-          <MultimediaImage item={item} index ={index}/>
+          <MultimediaImage item={item} key ={index}/>
         )
       }
       else{
         return(
-        <MultimediaVideo item={item}/>
+        <MultimediaVideo key={index} item={item}/>
         )
       }
     };
@@ -66,7 +66,10 @@ export const CarrouselMultimedia = ({ id }) => {
       {multimedia.map((elem,index) => {
         if(index < multimedia.length){
           return(
-            <RenderMultimediaItem item={elem}/>
+            <RenderMultimediaItem
+              key={index}
+              item={elem}
+              />
           )}
         return null
 }
