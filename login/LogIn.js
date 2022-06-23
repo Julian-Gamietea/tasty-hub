@@ -7,6 +7,7 @@ import { InputTasty } from '../shared-components/InputTasty';
 import { ButtonCustom } from '../shared-components/ButtonCustom';
 import { Link } from '@react-navigation/native';
 import { loginReducer, initialState } from './loginReducer';
+import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 
 
@@ -28,7 +29,7 @@ export const LogIn = ({ navigation }) => {
         }
     }
 
-    const login = async () => {
+    const login = () => {
         if (areInputsValid()) {
             axios.get(`https://tasty-hub.herokuapp.com/api/user/username/${alias}`)
                 .then((res) => {
@@ -36,8 +37,12 @@ export const LogIn = ({ navigation }) => {
                         .then((res) => {
                             axios.get(`https://tasty-hub.herokuapp.com/api/auth/login?alias=${alias}&password=${password}`)
                                 .then((res) => {
-                                    loginDispatch({ type: "reset" })
-                                    navigation.navigate('Dashboard', res.data);
+                                    loginDispatch({ type: "reset" });
+                                    SecureStore.setItemAsync("user", JSON.stringify(res.data))
+                                    .then(() => {
+                                        navigation.navigate('Dashboard');
+                                    })
+                                    .catch(e => {console.log(e)});
                                 })
                                 .catch(e => {
                                     loginDispatch({ type: "aliasError", error: "Usuario Incorrecto" });
@@ -106,7 +111,7 @@ export const LogIn = ({ navigation }) => {
                 <Link to={{ screen: 'RestorePassword' }} style={styles.link} >¿Olvidaste tu contraseña?</Link>
 
                 <View style={styles.formContainerItem2}>
-                    <ButtonCustom callback={() => login()} text='Iniciar Sesión' />
+                    <ButtonCustom callback={login} text='Iniciar Sesión' />
                 </View>
             </View>
         </ScrollView>

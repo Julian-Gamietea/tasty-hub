@@ -1,27 +1,28 @@
 import React from 'react';
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions, RefreshControl, SafeAreaView, FlatList, KeyboardAvoidingView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { RecipeDashboardCard } from '../shared-components/RecipeDashboardCard';
 import { Feather } from '@expo/vector-icons';
-import { DashboardInput } from './DashboardInput';
+import { DashboardInput } from '../dashboard/DashboardInput';
 
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 
 
 
-export const Dashboard = ({ route, navigation }) => {
+export const SearchResults = ({ route, navigation }) => {
+
+    const { query } = route.params;
+    const { type } = route.params;
 
     const [user, setUser] = React.useState(null);
     const [recipeList, setRecipeList] = React.useState([]);
     const [dataLoaded, setDataLoaded] = React.useState(false);
-    const [selectedValue, setSelectedValue] = React.useState('plato');
-    const [inputValue, setInputValue] = React.useState("");
+    const [selectedValue, setSelectedValue] = React.useState(type);
+    const [inputValue, setInputValue] = React.useState(query);
     const [isFetching, setIsFetching] = React.useState(false);
-    
-
     React.useEffect(() => {
         const fetchUserData = async () => {
             const userData = await SecureStore.getItemAsync("user");
@@ -37,18 +38,18 @@ export const Dashboard = ({ route, navigation }) => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get("https://tasty-hub.herokuapp.com/api/recipes");
-            setRecipeList(res.data.slice(0, 5));
+            let res;
+            if (selectedValue === 'plato') {
+                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/like?name=${inputValue}`);
+            } else {
+                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/username/like?username=${inputValue}`)
+            }
+            setRecipeList(res.data.slice(0, res.data.length));
             setDataLoaded(true);
             setIsFetching(false);
         } catch (error) {
             console.log(error);
         }
-    }
-
-    const checkFavourite = async (id) => {
-        const resf = await axios.get(`https://tasty-hub.herokuapp.com/api/favorite/isfavourite?recipeId=${id}&userId=${user.id}`)
-        return resf.data;
     }
 
     React.useEffect(() => {
@@ -67,10 +68,9 @@ export const Dashboard = ({ route, navigation }) => {
 
     return (
 
-        <KeyboardAvoidingView style={{...styles.mainContainer, paddingTop: StatusBar.currentHeight+5}} >
-            <StatusBar backgroundColor={"#fff"}/>
-            
-            <Text style={styles.welcomeMessage}>¡Bienvenido de nuevo, <Text style={styles.username}>{user.name.split(" ")[0]}</Text>!</Text>
+        <KeyboardAvoidingView style={{ ...styles.mainContainer, paddingTop: StatusBar.currentHeight + 15 }} >
+            <StatusBar backgroundColor={"#fff"} />
+
             <View style={styles.ddcontainer}>
                 <Text>Buscar por </Text>
                 <View style={styles.pickerContainer}>
@@ -88,10 +88,7 @@ export const Dashboard = ({ route, navigation }) => {
                 <DashboardInput
                     onChange={(value) => setInputValue(value)}
                     value={inputValue}
-                    onClick={() => {
-                        setInputValue("");
-                        navigation.navigate("SearchResults", {query: inputValue, type: selectedValue})
-                    }}
+                    onClick={() => fetchData()}
                     placeholder={selectedValue === 'plato' ? "Buscar por plato..." : "Buscar por usuario..."}
                 />
             </View>
@@ -103,14 +100,14 @@ export const Dashboard = ({ route, navigation }) => {
                     <Feather name="filter" size={32} color="#553900" />
                 </TouchableOpacity>
             </View>
-            
+
             <StatusBar style='dark' />
-            <Text style={styles.text}>Recomendados</Text>
-            <FlatList
+            <Text style={styles.text}>Resultados de búsqueda</Text>
+            {recipeList.length > 0 && <FlatList
                 onRefresh={onRefresh}
                 refreshing={isFetching}
                 data={recipeList}
-                style={{...styles.recipesContainer}}
+                style={{ ...styles.recipesContainer }}
                 nestedScrollEnabled={true}
                 key={item => item.id}
                 renderItem={(recipe) => {
@@ -129,13 +126,26 @@ export const Dashboard = ({ route, navigation }) => {
                     />);
                 }}
             />
+            }
+            {recipeList.length === 0 &&
+                <FlatList
+                    data={[{}]}
+                    renderItem={() => (
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 40, marginTop: 40}}>
+                            <Text style={{ textAlign: 'center', fontFamily: "InterRegular", fontSize: 20 }}>Lo sentimos, no tenemos lo que estas buscando...</Text>
+                            <MaterialCommunityIcons name="cookie-alert-outline" size={150} color="#e8e8e8" />
+                        </View>
+                    )}
+                >
+                    
+                </FlatList>}
         </KeyboardAvoidingView>
 
     );
 }
 
 const styles = StyleSheet.create({
-    
+
     mainContainer: {
         flex: 1,
         justifyContent: 'space-around',
@@ -145,13 +155,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     text: {
-        fontSize: 30,
+        fontSize: 28,
         marginBottom: 30,
         marginLeft: 30,
         fontFamily: "InterSemiBold"
     },
     filtersContainer: {
-        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-around',
         maxHeight: 50,
@@ -193,7 +202,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginLeft: 30,
-        marginRight: '48%'
+        marginRight: '48%',
     },
     dropdown: {
         backgroundColor: "#F7EAB5",

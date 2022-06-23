@@ -2,6 +2,7 @@ import { View, Text ,Image, StyleSheet } from "react-native";
 import ok from '../assets/register/ok.png'
 import {useFonts} from 'expo-font'
 import { ButtonCustom } from "../shared-components/ButtonCustom";
+import { NavigationHelpersContext } from "@react-navigation/native";
 
 export const RegisterSuccess = ({navigation}) => {
 
@@ -19,7 +20,7 @@ export const RegisterSuccess = ({navigation}) => {
             <Text style = {styles.text}>  El registro fue {'\n'} realizado con éxito.</Text>
             <Text style = {styles.text2}>  ¡Bienvenido a Tasty {'\n'} Hub!</Text>
             <View style = {styles.button}>
-                <ButtonCustom text = 'Iniciar Sesion'/>
+                <ButtonCustom callback={()=>navigation.navigate("Login")} text = 'Iniciar Sesion'/>
             </View>
         </View>
     );

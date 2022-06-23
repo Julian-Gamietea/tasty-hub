@@ -5,8 +5,12 @@ import { ButtonCustom } from "../shared-components/ButtonCustom";
 import camera from "../assets/register/camera.png"
 import circle from "../assets/register/cameracircle.png"
 import * as ImagePicker from 'expo-image-picker'
+import axios from "axios";
+import * as FileSystem from 'expo-file-system'
+import FormData from 'form-data'
 
-export const EnterAvatar = ({navigation}) => {
+
+export const EnterAvatar = ({route, navigation}) => {
 
     React.useEffect( ()=> {
         (async () => {
@@ -25,7 +29,9 @@ export const EnterAvatar = ({navigation}) => {
     if(!loaded){
         return null;
     }
-    
+
+    const {id} = route.params;
+
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -38,6 +44,7 @@ export const EnterAvatar = ({navigation}) => {
 
         if(!result.cancelled){
             setImage(result.uri);
+            console.log(result)
             setHasImage(true);
         }  
     };
@@ -46,8 +53,40 @@ export const EnterAvatar = ({navigation}) => {
         return <Text> No access to Internal Storage </Text>
     }
     
-    
-    
+    const enterAvatar = async () => {
+        // console.log(image)
+        if(image !== null){
+            const dataFinal = new FormData();
+            const getType = image.split(".");
+            const getFileName = image.split("/");
+            dataFinal.append('image', {
+                uri: image,
+                type: `image/${getType[getType.length - 1]}`,
+                name: getFileName[getFileName.length - 1]
+            });
+
+            console.log(dataFinal);
+            var config = {
+                method: 'post',
+                url: `https://tasty-hub.herokuapp.com/api/user/photo?userId=${id}`,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                data: dataFinal
+            };
+
+            axios(config)
+                .then(() => {
+                    navigation.navigate('RegisterSuccess')
+                })
+                .catch((err) => console.log("Error " + err))
+        }else{
+                navigation.navigate('RegisterSuccess')
+           
+        }
+    }
+
+
     return (
         <ScrollView style ={styles.container}>
             
@@ -85,7 +124,7 @@ export const EnterAvatar = ({navigation}) => {
                     </View>
                     <Text style = {styles.text5} > Si no desea cargar un avatar, se le asignará {'\n'} uno predeterminado </Text>
                     <View style = {styles.formContainerItem2}>
-                        <ButtonCustom text = 'Continuar'/>
+                        <ButtonCustom callback={()=> enterAvatar()} text = 'Continuar'/>
                     </View>
                 </View>  
                 
