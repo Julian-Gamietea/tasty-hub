@@ -6,7 +6,6 @@ import CarrouselMultimedia from "./CarrouselMultimedia";
 
 export const Carrousel = ({id}) => {
   const [instructions, setInstructions] = useState({});
-
   const Item = ({ instruction }) => {
     return (
 
