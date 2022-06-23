@@ -12,7 +12,7 @@ import { CarrouselImages } from "../shared-components/CarrouselImages";
 import Carrousel from "../carrousel-instructions/Carrousel";
 
 
-export const Recipe = ({route,navigation}) => {
+export const Recipe = ({route, navigation, recalculated}) => {
 
     
     const {userId} = route.params;
@@ -39,38 +39,45 @@ export const Recipe = ({route,navigation}) => {
                 array.push(response.data.mainPhoto)
 
                 const id = response.data.id
-                var config2 = {
-                    method: 'get',
-                    url: `https://tasty-hub.herokuapp.com/api/ingredientQuantity?recipeId=${id}`,
-                    headers: { }
-                };
-    
-                axios(config2)
-                .then((response) => {
-                    setIngredientes(response.data)
-                    var config3 = {
+
+                if(typeOf(recalculated) == "undefined"){
+                    var config2 = {
                         method: 'get',
-                        url: `https://tasty-hub.herokuapp.com/api/rating/average/${id}`,
+                        url: `https://tasty-hub.herokuapp.com/api/ingredientQuantity?recipeId=${id}`,
                         headers: { }
-                        };
-                        
-                        axios(config3)
-                        .then(function (response) {
+                    };
+        
+                    axios(config2)
+                    .then((response) => {
+                        setIngredientes(response.data)
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+                }else{
+                    setIngredientes(recalculated)
+                }
+                
 
-                            // SETTING THE RECIPE RATING
+                var config3 = {
+                    method: 'get',
+                    url: `https://tasty-hub.herokuapp.com/api/rating/average/${id}`,
+                    headers: { }
+                    };
+                    
+                    axios(config3)
+                    .then(function (response) {
 
-                            if(!isNaN(response.data)){
-                                setStarCount2(response.data)
-                            }
-                        
-                        })
-                        .catch(function (error) {
-                        console.log(error);
-                        });
-                })
-                .catch((error) => {
-                    console.log(error)
-                }) 
+                        // SETTING THE RECIPE RATING
+
+                        if(!isNaN(response.data)){
+                            setStarCount2(response.data)
+                        }
+                    
+                    })
+                    .catch(function (error) {
+                    console.log(error);
+                    }); 
             })
             .catch(function (error) {
                 console.log(error);
@@ -120,7 +127,7 @@ export const Recipe = ({route,navigation}) => {
 
         }
         fetchData();
-    },[starCount]);
+    },[]);
     const [imgActive, setImgActive] = React.useState(0)
     const [recipeImages, setRecipeImages] = React.useState([])
     const [datos, setDatos] = React.useState([])
