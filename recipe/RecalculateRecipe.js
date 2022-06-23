@@ -26,9 +26,9 @@ export const RecalculateRecipe = ({ navigation, route }) => {
 
 	function Display({ value }) {
 		if (value.toString() === 'portions') {
-			return <Portions />;
+			return <Portions recipeId = {recipeId} userId={userId} navigation={navigation}/>;
 		} else if (value.toString() === 'people') {
-			return <People idRecipe = {recipeId} />;
+			return <People recipeId = {recipeId} userId={userId} navigation={navigation}/>;
 		} else if (value.toString() === 'ingredient') {
 			return <IngredientScreen recipeId = {recipeId} />;
 		}

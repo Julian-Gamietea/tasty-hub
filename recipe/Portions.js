@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
+import axios, { Axios } from 'axios';
+import React, { useEffect, useState } from 'react';
 import {TouchableOpacity, View, Text, Image, StyleSheet, TextInput } from 'react-native';
 import chart from '../assets/recalculate-recipe/chart.png';
 
-export const Portions = () => {
+export const Portions = ({userId,recipeId,navigation}) => {
     const [ portionsQty, setPortionsQty ] = useState();
+	const [recipe ,setRecipe]= useState([]);
 
+	const recalculateRecipeByPortions =  async () => {
+		var conversionFactor = portionsQty/recipe.portions
+		await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
+	   .then((ingredientQuantityList)=>{
+		   navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList.data})
+	   })
+	   .catch( (e)=>{
+			console.log(e)
+	   })
+	 }
+
+	 const fetchRecipe = async (recipeId) => {
+		const resp = await fetch(`https://tasty-hub.herokuapp.com/api/recipes/${recipeId}`);
+		const data = await resp.json();
+		setRecipe(data);
+	  };
 	
-	return (
+	  useEffect(() => {
+		fetchRecipe(recipeId);
+	  }, []);
+	  
+	  return (
 		<View style={styles.container}>
 			<Image style={styles.image} source={chart} />
 			<Text style={styles.instructionsText}>Ingrese la cantidad de porciones deseadas.</Text>
@@ -14,7 +36,7 @@ export const Portions = () => {
 				<TextInput style={styles.input} keyboardType="numeric" maxLength={2} onChangeText={(cantidad) => setPortionsQty(cantidad)} />
 				<Text style={styles.inputText}>porciones</Text>
 			</View>
-			<TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.button}>
+			<TouchableOpacity onPress={()=> recalculateRecipeByPortions()} style={styles.button}>
 					<Text style={styles.buttonText}>Recalcular</Text>
 			</TouchableOpacity>
 		</View>
