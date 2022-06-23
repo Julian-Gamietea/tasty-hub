@@ -5,6 +5,7 @@ import {
   Image,
   Text,
   View,
+  Dimensions,
 } from "react-native";
 import * as React from "react";
 
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     marginTop: 30
   },
   image: {
-    width: 393,
+    width: Dimensions.get("window").width,
     height: 400,
   },
   dotContainer: {
