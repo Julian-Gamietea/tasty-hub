@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, KeyboardAvoidingView } from 'react-native';
+import { TouchableOpacity,View, Text, Image, StyleSheet, TextInput, KeyboardAvoidingView } from 'react-native';
 import group from '../assets/recalculate-recipe/group.png';
 
-export const People = () => {
-	const [ peopleQty, setPeopleQty ] = useState('');
+export const People = ({idRecipe}) => {
+	const [peopleQty, setPeopleQty] = React.useState()
 
 	return (
 		<View style={styles.container}>
@@ -18,8 +18,11 @@ export const People = () => {
 						onChangeText={(qty) => setPeopleQty(qty)}
 					/>
 					<Text style={styles.inputText}>personas</Text>
-				</View>
+				</View>	
 			</KeyboardAvoidingView>
+			<TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.button}>
+				<Text style={styles.buttonText}>Recalcular</Text>
+			</TouchableOpacity>
 		</View>
 	);
 };
@@ -61,5 +64,18 @@ const styles = StyleSheet.create({
 		fontFamily: 'InterLight',
 		marginTop: 15,
 		marginLeft: 10
-	}
+	},
+	button: {
+		elevation: 8,
+		backgroundColor: '#5D420C',
+		borderRadius: 50,
+		padding: 15,
+		marginTop: "10%"
+	},
+	buttonText: {
+		fontFamily: 'InterMedium',
+		fontSize: 30,
+		justifyContent: 'center',
+		color: 'white'
+	},
 });

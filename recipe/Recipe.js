@@ -11,12 +11,14 @@ import { NotificationModal } from "../shared-components/NotificationModal";
 import { CarrouselImages } from "../shared-components/CarrouselImages";
 import Carrousel from "../carrousel-instructions/Carrousel";
 
+console.disableYellowBox = true;
 
-export const Recipe = ({route, navigation, recalculated}) => {
+export const Recipe = ({route, navigation}) => {
 
     
     const {userId} = route.params;
     const {id} = route.params;
+    const {recalculated} = route.params;
 
     React.useEffect(() => {
         const array = []
@@ -105,7 +107,9 @@ export const Recipe = ({route, navigation, recalculated}) => {
                 setComments(response.data.comments)
             
             })
-            .catch((error)=>console.log(" ERROR 5 " + error))
+            .catch(()=>{
+                // Dont send any error because its ok if the user hasnt got a recipe rating in this recipe
+            })
             
 
             // GETTING THE REST OF THE RECIPE IMAGES
@@ -341,7 +345,7 @@ export const Recipe = ({route, navigation, recalculated}) => {
             
             <View style={styles.recalculateContainer}>
                 <Text style={styles.recalculateText}>¿Necesitas {'\n'} otras {'\n'} proporciones {'\n'} de esta receta? </Text>
-                <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("RecalculateRecipe", {userId: userId})}>
+                <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("RecalculateRecipe", {userId: userId, recipeId: id})}>
                 <Text style={styles.buttonTextRecalculate}>Recalcular {'\n'} receta</Text>
                 </TouchableOpacity>
             </View>

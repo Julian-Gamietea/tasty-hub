@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView ,View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { CustomNav } from '../shared-components/CustomNav';
 import { Picker } from '@react-native-picker/picker';
@@ -7,7 +7,8 @@ import { Portions } from './Portions';
 import { People } from './People';
 import { IngredientScreen } from './IngredientScreen';
 
-export const RecalculateRecipe = ({ navigation, userId }) => {
+export const RecalculateRecipe = ({ navigation, route }) => {
+
 	const [ selectedType, setSelectedType ] = React.useState(['portions']);
 	const [ loaded ] = useFonts({
 		InterMedium: require('../assets/fonts/Inter-Medium.ttf'),
@@ -19,29 +20,42 @@ export const RecalculateRecipe = ({ navigation, userId }) => {
 		return null;
 	}
 
+	const {userId} = route.params;
+	const {recipeId} = route.params;
+
+
+	function Display({ value }) {
+		if (value.toString() === 'portions') {
+			return <Portions />;
+		} else if (value.toString() === 'people') {
+			return <People idRecipe = {recipeId} />;
+		} else if (value.toString() === 'ingredient') {
+			return <IngredientScreen recipeId = {recipeId} />;
+		}
+	}
+
 	return (
-		<View style={styles.container}>
-			<View style={styles.menu}>
-				<CustomNav callback={() => navigation.navigate('Recipe', {id: userId})} text="Recalcular receta" />
-			</View>
-			<View style={styles.inputContainer}>
-				<Text style={styles.text}>Recalcular por</Text>
-				<View style={styles.pickerContainer}>
-					<Picker
-						style={styles.picker}
-						selectedValue={selectedType}
-						onValueChange={(itemValue, itemIndex) => setSelectedType(itemValue)}>
-						<Picker.Item label="Porciones" value="portions" />
-						<Picker.Item label="Personas" value="people" />
-						<Picker.Item label="Ingrediente" value="ingredient" />
-					</Picker>
+		<ScrollView style={{backgroundColor:'#fff'}}>
+			<View style={styles.container}>
+				<View style={styles.menu}>
+					<CustomNav callback={() => navigation.navigate('Recipe', {userId: userId, id: recipeId})} text="Recalcular receta" />
 				</View>
+				<View style={styles.inputContainer}>
+					<Text style={styles.text}>Recalcular por</Text>
+					<View style={styles.pickerContainer}>
+						<Picker
+							style={styles.picker}
+							selectedValue={selectedType}
+							onValueChange={(itemValue, itemIndex) => setSelectedType(itemValue)}>
+							<Picker.Item label="Porciones" value="portions" />
+							<Picker.Item label="Personas" value="people" />
+							<Picker.Item label="Ingrediente" value="ingredient" />
+						</Picker>
+					</View>
+				</View>
+				<Display style={styles.display} value={selectedType}/>
 			</View>
-			<Display style={styles.display} value={selectedType}/>
-			<TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.button}>
-				<Text style={styles.buttonText}>Recalcular</Text>
-			</TouchableOpacity>
-		</View>
+		</ScrollView>
 	);
 };
 
@@ -49,7 +63,8 @@ const styles = StyleSheet.create({
 	container: {
 		backgroundColor: '#fff',
 		flex: 1,
-		alignItems: 'center'
+		alignItems: 'center',
+		minHeight: Dimensions.get('window').height+60
 	},
 	image: {
 		marginTop: 50,
@@ -67,20 +82,7 @@ const styles = StyleSheet.create({
 		fontSize: 22,
 		color: '#553900'
 	},
-	button: {
-		elevation: 8,
-		backgroundColor: '#5D420C',
-		borderRadius: 50,
-		padding: 15,
-		position: 'absolute',
-		bottom: "5%"
-	},
-	buttonText: {
-		fontFamily: 'InterMedium',
-		fontSize: 30,
-		justifyContent: 'center',
-		color: 'white'
-	},
+	
 	menuBar: {
 		marginTop: 40,
 		flexDirection: 'row',
@@ -147,16 +149,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center'
 	},
 	display: {
+		
 		alignItems: 'center'
 	}
 });
 
-function Display({ value }) {
-	if (value.toString() === 'portions') {
-		return <Portions />;
-	} else if (value.toString() === 'people') {
-		return <People />;
-	} else if (value.toString() === 'ingredient') {
-		return <IngredientScreen />;
-	}
-}
