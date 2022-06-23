@@ -1,9 +1,33 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity,View, Text, Image, StyleSheet, TextInput, KeyboardAvoidingView } from 'react-native';
 import group from '../assets/recalculate-recipe/group.png';
 
-export const People = ({idRecipe}) => {
+export const People = ({userId,recipeId,navigation}) => {
 	const [peopleQty, setPeopleQty] = React.useState()
+
+	const [recipe ,setRecipe]= useState([]);
+
+	const recalculateRecipeByPortions =  () => {
+		var conversionFactor = recipe.peopleAmount/peopleQty
+		axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
+	   .then((ingredientQuantityList)=>{
+		   	navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList})
+	   })
+	   .catch((e)=>{
+			console.log(e)
+	   })
+	 }
+
+	 const fetchRecipe = async (recipeId) => {
+		const resp = await fetch(`https://tasty-hub.herokuapp.com/api/recipes/${recipeId}`);
+		const data = await resp.json();
+		setRecipe(data);
+	  };
+	
+	  useEffect(() => {
+		fetchRecipe(recipeId);
+	  }, []);
 
 	return (
 		<View style={styles.container}>
@@ -20,7 +44,7 @@ export const People = ({idRecipe}) => {
 					<Text style={styles.inputText}>personas</Text>
 				</View>	
 			</KeyboardAvoidingView>
-			<TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.button}>
+			<TouchableOpacity onPress={recalculateRecipeByPortions()} style={styles.button}>
 				<Text style={styles.buttonText}>Recalcular</Text>
 			</TouchableOpacity>
 		</View>
