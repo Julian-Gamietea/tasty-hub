@@ -34,6 +34,7 @@ import { Favourites } from './favourites/Favourites';
 import { EditProfile } from './profiles/EditProfile';
 import { Profile } from './profiles/Profile';
 import { UserRecipes } from './recipe/UserRecipes';
+import { ProfileUpdated } from './profiles/ProfileUpdated';
 
 
 
@@ -70,6 +71,7 @@ function ProfileTabStack() {
       <Stack.Screen name="Recipe" component={Recipe} />
       <Stack.Screen name="UserProfile" component={UserProfile}/>
       <Stack.Screen name="EditProfile" component={EditProfile}/>
+      <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
     </Stack.Navigator>
   )
 }

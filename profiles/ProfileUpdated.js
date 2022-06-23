@@ -18,7 +18,7 @@ export const ProfileUpdated = ({navigation}) => {
             <Image style = {styles.image} source = {ok} />
             <Text style = {styles.text}>¡Datos actualizados!</Text>
             <View style = {styles.button}>
-                <ButtonCustom callback={()=>navigation.navigate("Login")} text = 'Regresar al Perfil'/>
+                <ButtonCustom callback={()=>navigation.navigate("EditProfile")} text = 'Regresar al Perfil'/>
             </View>
         </View>
     );
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     },
     button:{
         flex: 1,
-        marginTop: 250,
+        marginTop: 200,
         width: 300
     }
 })

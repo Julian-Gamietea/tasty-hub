@@ -6,8 +6,45 @@ import { MaterialIcons, Feather } from "@expo/vector-icons";
 import { useFonts } from 'expo-font';
 import { CustomNav } from "../shared-components/CustomNav";
 import { StatusBar } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 
 export const Profile = ({ navigation }) => {
+
+    const [user, setUser] = React.useState(null);
+    const [userRating, setUserRating] = React.useState(1);
+    const [userRecipeCount, setUserRecipeCount] = React.useState(0);
+    const focused = useIsFocused();
+    
+    React.useEffect(() => {
+        const fetchUserData = async () => {
+            const userData = await SecureStore.getItemAsync("user");
+            setUser(JSON.parse(userData));
+        }
+        fetchUserData();
+    }, [focused]);
+
+    React.useEffect(() => {
+        const fetchUserRating = async () => {
+            try {
+                const res = await axios.get(`https://tasty-hub.herokuapp.com/api/rating/user/${user.id}`)
+                setUserRating(res.data);
+            } catch (e) {
+                console.log("not yet rated")
+            }
+        }
+
+        const fetcheUserRecipeCount = async () => {
+            try {
+                const res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/count/${user.id}`);
+                setUserRecipeCount(res.data);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchUserRating();
+        fetcheUserRecipeCount();
+    }, [user])
+
 
     const [loaded] = useFonts({
         InterBlack: require('../assets/fonts/Inter-Black.ttf'),
@@ -16,7 +53,7 @@ export const Profile = ({ navigation }) => {
         InterMedium: require('../assets/fonts/Inter-Medium.ttf')
     });
 
-    if (!loaded) {
+    if (!loaded || !user) {
         return null;
     }
 
@@ -25,17 +62,17 @@ export const Profile = ({ navigation }) => {
             <CustomNav text={"Mi Perfil"} callback={() => navigation.goBack()} />
             <View style={styles.profileInfo}>
                 <View style={styles.userData}>
-                    <Text style={styles.name}>Franco Siciliano</Text>
-                    <Text style={styles.username}>@usuario</Text>
+                    <Text style={styles.name}>{user.name}</Text>
+                    <Text style={styles.username}>@{user.userName}</Text>
                     <View>
-                        <Text style={styles.text}>Ha creado 15 rectas</Text>
+                        <Text style={styles.text}>Ha creado {userRecipeCount} rectas</Text>
                         <View style={styles.rating}>
-                            <Text style={styles.text}>Calificacion: </Text>
-                            <Feather name="star" color="#553900" size={24} />
-                            <Feather name="star" color="#553900" size={24} />
-                            <Feather name="star" color="#553900" size={24} />
-                            <Feather name="star" color="#553900" size={24} />
-                            <Feather name="star" color="#553900" size={24} />
+                            <Text style={styles.text}>Calificacion: {isNaN(userRating) && "Sin calificaciones"}</Text>
+                            {userRating > 0 && <Feather name="star" color="#553900" size={24} />}
+                            {userRating > 1 && <Feather name="star" color="#553900" size={24} />}
+                            {userRating > 2 && <Feather name="star" color="#553900" size={24} />}
+                            {userRating > 3 && <Feather name="star" color="#553900" size={24} />}
+                            {userRating > 4 && <Feather name="star" color="#553900" size={24} />}
                         </View>
                     </View>
                     <TouchableOpacity style={styles.editProfileButton} onPress={() => navigation.navigate("EditProfile")}>
@@ -43,7 +80,7 @@ export const Profile = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.profilePic}>
-                    <Image source={{uri: "https://i.pinimg.com/originals/d9/56/9b/d9569bbed4393e2ceb1af7ba64fdf86a.jpg"}} style={{ width: 130, height: 130, borderRadius: 5000 }}/>
+                    <Image source={{uri: user.avatar}} style={{ width: 130, height: 130, borderRadius: 5000 }}/>
                 </View>
             </View>
             <View style={styles.buttons}>
