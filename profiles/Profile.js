@@ -65,7 +65,7 @@ export const Profile = ({ navigation }) => {
                     <Text style={styles.name}>{user.name}</Text>
                     <Text style={styles.username}>@{user.userName}</Text>
                     <View>
-                        <Text style={styles.text}>Ha creado {userRecipeCount} rectas</Text>
+                        <Text style={styles.text}>Ha creado {userRecipeCount} recetas</Text>
                         <View style={styles.rating}>
                             <Text style={styles.text}>Calificacion: {isNaN(userRating) && "Sin calificaciones"}</Text>
                             {userRating > 0 && <Feather name="star" color="#553900" size={24} />}
