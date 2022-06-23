@@ -124,8 +124,7 @@ export const Dashboard = ({ route, navigation }) => {
                         image={elem.mainPhoto}
                         shortDescription={elem.description}
                         timeToMake={elem.duration}
-                        userId={user.id}
-                        isFav={isFetching}
+                        userId={user.id} 
                     />);
                 }}
             />

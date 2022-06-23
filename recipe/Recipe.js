@@ -7,7 +7,6 @@ import StarRating from 'react-native-star-rating';
 import * as React from 'react';
 import { InputTasty } from "../shared-components/InputTasty";
 import axios from "axios";
-import { add, not } from "react-native-reanimated";
 import { NotificationModal } from "../shared-components/NotificationModal";
 import { CarrouselImages } from "../shared-components/CarrouselImages";
 import * as FileSystem from 'expo-file-system'
@@ -343,7 +342,7 @@ export const Recipe = ({route,navigation}) => {
                     <Text style={styles.descriptionTitle}>  Instrucciones </Text>
                 </View>
                 <View style={styles.instructionGreyContainer}>
-                    <Carrousel id={id}/>
+                    {/* <Carrousel id={id}/> */}
                 </View>
             </View>
 

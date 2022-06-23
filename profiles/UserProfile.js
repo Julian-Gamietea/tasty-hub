@@ -7,7 +7,7 @@ import { StarRating } from 'react-native-star-rating';
 import { useFonts } from 'expo-font'
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
-import react from "react";
+import * as SecureStore from 'expo-secure-store';
 
 export const UserProfile = ({route, navigation}) => {
 
@@ -16,13 +16,21 @@ export const UserProfile = ({route, navigation}) => {
     const [user, setUser] = React.useState(null);
     const [recipes, setRecipes] = React.useState(null);
     const [userRating, setUserRating] = React.useState(0);
-
+    const [loggedUser, setLoggedUser] = React.useState({});
     const [loaded] = useFonts({
         InterBlack: require('../assets/fonts/Inter-Black.ttf'),
         InterLight: require('../assets/fonts/Inter-Light.ttf'),
         InterRegular: require('../assets/fonts/Inter-Regular.ttf'),
         InterMedium: require('../assets/fonts/Inter-Medium.ttf')
     });
+
+    React.useEffect(() => {
+        const fetchLoggedUserData = async () => {
+            const userData = await SecureStore.getItemAsync("user");
+            setLoggedUser(JSON.parse(userData));
+        }
+        fetchLoggedUserData();
+    }, []);
 
     React.useEffect(() => {
         const fetchUserData = async () => {
@@ -55,7 +63,7 @@ export const UserProfile = ({route, navigation}) => {
     }
     return (
         <View style={styles.mainContainer}>
-            <CustomNav text={"Perfil"} callback={() => navigation.navigate("Dashboard")} />
+            <CustomNav text={"Perfil"} callback={() => navigation.goBack()} />
             <View style={styles.profileInfo}>
                 <View style={styles.textContainer}>
                     <Text style={styles.name}>{user.name}</Text>
@@ -74,7 +82,7 @@ export const UserProfile = ({route, navigation}) => {
                     <Image source={{ uri: user.avatar }} style={{ width: 100, height: 100, borderRadius: 5000 }} />
                 </View>
             </View>
-                <FlatList
+                {loggedUser && <FlatList
                 // onRefresh={onRefresh}
                 // refreshing={isFetching}
                 data={recipes}
@@ -92,11 +100,11 @@ export const UserProfile = ({route, navigation}) => {
                         image={elem.mainPhoto}
                         shortDescription={elem.description}
                         timeToMake={elem.duration}
-                        userId={13}
+                        userId={loggedUser.id}
                         isFav={false}
                     />);
                 }}
-            />
+            />}
         </View>
     )
 }

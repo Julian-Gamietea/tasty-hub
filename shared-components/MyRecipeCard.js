@@ -8,19 +8,17 @@ import React from 'react';
 import { NotificationModal } from "./NotificationModal";
 import { useIsFocused } from "@react-navigation/native";
 
-export const RecipeDashboardCard = ({ onPress, image, title, shortDescription, timeToMake, author, id, userId }) => {
+export const MyRecipeCard = ({ onPress, image, title, timeToMake, id }) => {
 
-    const [isBookmarked, setIsBookmarked] = React.useState(false);
+
     const [rating, setRating] = React.useState(0);
-    const [isLoading, setIsLoading] = React.useState(true);
-    const [modalVisible, setModalVisible] = React.useState(false);
     const focus = useIsFocused();
 
     const [loaded] = useFonts({
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf'),
         InterRegular: require('../assets/fonts/Inter-Regular.ttf')
     });
-      
+
     React.useEffect(() => {
         const getRating = async () => {
             try {
@@ -40,78 +38,38 @@ export const RecipeDashboardCard = ({ onPress, image, title, shortDescription, t
         return null;
     }
 
-    const showModal = () => {
-        setModalVisible(true);
-        setTimeout(() => {
-            setModalVisible(false);
-        }, 1500);
-    }
-
-    const handlePress = async () => {
-        try {
-            if (!isBookmarked) {
-                const res = await axios.post(`https://tasty-hub.herokuapp.com/api/favorite?recipeId=${id}&userId=${userId}`)
-                setIsBookmarked(true);
-                showModal();
-            } else {
-                const res = await axios.delete(`https://tasty-hub.herokuapp.com/api/favorite/delete?recipeId=${id}&userId=${userId}`)
-                setIsBookmarked(false);
-                showModal();
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-
-
 
     let arrayRating = [];
-    for (let index = 0; index < rating; index++) {
+    for (let index = 0; index < 5; index++) {
         arrayRating.push(1);
     }
 
     return (
 
         <TouchableOpacity style={styles.container} onPress={onPress}>
-            <NotificationModal 
-            visible={modalVisible} 
-            onRequestClose={() => {
-                setModalVisible(!modalVisible);
-            }}
-            onPress={() => setModalVisible(!modalVisible)}
-            message={isBookmarked ? "Receta agregada a Favoritos!" : "Receta eliminada de Favoritos!"}
-            />
             <Image source={{ uri: image }} style={styles.image} />
             <View style={styles.dataContainer}>
                 <View style={styles.textContainer}>
+                    <View style={styles.ratingContainer}>
+                        {
+                            arrayRating.map((_, index) => {
+                                return (
+                                    <Feather key={index} name="star" size={20} color="#553900" />
+                                );
+                            })
+                        }
+                    </View>
                     <Text style={styles.title}>{title}</Text>
-                    {shortDescription.length <= 55 && <Text style={styles.description}>{shortDescription}</Text>}
-                    {shortDescription.length > 55 && <Text style={styles.description}>{shortDescription.slice(0, 55) + "..."}</Text>}
-                </View>
-                <View style={styles.authorContainer}>
-                    <MaterialIcons name="person" size={18} color="#553900" />
-                    <Text style={styles.author}>{author}</Text>
                 </View>
             </View>
             <View style={styles.timeAndRatingContainer}>
                 <View style={styles.timeAndBookmarkContainer}>
-                    <Feather name="clock" size={13} color="#553900" />
+                    <Feather name="clock" size={15} color="#553900" />
                     <Text style={styles.time}>{timeToMake} min</Text>
-                    <TouchableOpacity onPress={handlePress}>
-                        {isBookmarked && <Ionicons name="bookmark" size={24} color="#553900" />}
-                        {!isBookmarked && <Ionicons name="bookmark-outline" size={24} color="#553900" />}
-                    </TouchableOpacity>
                 </View>
-                <View style={styles.ratingContainer}>
-                    {
-                        arrayRating.map((_, index) => {
-                            return (
-                                <Feather key={index} name="star" size={20} color="#553900" />
-                            );
-                        })
-                    }
-                </View>
+                <TouchableOpacity style={{marginBottom: 15, marginLeft: 20}} onPress={() => console.log("Edit Button Pressed")}>
+                    <MaterialIcons name="edit" color="#5D420C" size={35} />
+                </TouchableOpacity>
             </View>
         </TouchableOpacity>
     );
@@ -137,7 +95,7 @@ const styles = StyleSheet.create(
             resizeMode: "cover"
         },
         title: {
-            fontSize: 14,
+            fontSize: 20,
             fontFamily: "InterSemiBold",
             color: '#553900',
             marginLeft: 5,
@@ -189,12 +147,12 @@ const styles = StyleSheet.create(
             marginLeft: 2,
             marginRight: 8,
             fontFamily: "InterRegular",
-            fontSize: 12
+            fontSize: 14
         },
         ratingContainer: {
             flexDirection: 'row',
-            marginBottom: 8,
-            marginRight: 5
+            marginTop: 5,
+            marginLeft: 3
         },
         timeAndRatingContainer: {
             justifyContent: 'space-between'

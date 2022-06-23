@@ -30,13 +30,17 @@ import {Carrousel} from './carrousel-instructions/Carrousel'
 import { CarrouselMultimedia } from './carrousel-instructions/CarrouselMultimedia';
 import { CarrouselImages } from './shared-components/CarrouselImages';
 import { UserProfile } from './profiles/UserProfile';
+import { Favourites } from './favourites/Favourites';
+import { EditProfile } from './profiles/EditProfile';
+import { Profile } from './profiles/Profile';
+import { UserRecipes } from './recipe/UserRecipes';
 
 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function TabStack() {
+function DashboardTabStack() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Dashboard">
       <Stack.Screen name="Recipe" component={Recipe} />
@@ -45,6 +49,29 @@ function TabStack() {
       <Stack.Screen name="UserProfile" component={UserProfile}/>
     </Stack.Navigator>
     );
+}
+
+function FavouritesTabStack() {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Favourites">
+      <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="SearchResults" component={SearchResults}/>
+      <Stack.Screen name="Favourites" component={Favourites} />
+      <Stack.Screen name="UserProfile" component={UserProfile}/>
+    </Stack.Navigator>
+  )
+}
+
+function ProfileTabStack() {
+  return(
+    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="ProfileInfo">
+      <Stack.Screen name="ProfileInfo" component={Profile}/>
+      <Stack.Screen name="UserRecipes" component={UserRecipes}/>
+      <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="EditProfile" component={EditProfile}/>
+    </Stack.Navigator>
+  )
 }
 
 function Tabs() {
@@ -72,7 +99,7 @@ function Tabs() {
     >
       <Tab.Screen
         name="Dashboard"
-        component={TabStack}
+        component={DashboardTabStack}
         options={{
           tabBarLabel: 'Inicio',
           tabBarIcon: ({ color }) => (
@@ -109,7 +136,7 @@ function Tabs() {
       />
       <Tab.Screen
         name="Favourites"
-        component={Dashboard}
+        component={FavouritesTabStack}
         options={{
           tabBarLabel: 'Favoritos',
           tabBarIcon: ({ color }) => (
@@ -121,7 +148,7 @@ function Tabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={Dashboard}
+        component={ProfileTabStack}
         options={{
           tabBarLabel: 'Perfil',
           tabBarIcon: ({ color }) => (
