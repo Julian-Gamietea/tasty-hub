@@ -35,6 +35,7 @@ import { EditProfile } from './profiles/EditProfile';
 import { Profile } from './profiles/Profile';
 import { UserRecipes } from './recipe/UserRecipes';
 import { ProfileUpdated } from './profiles/ProfileUpdated';
+import { RecalculateRecipe } from './recipe/RecalculateRecipe';
 
 
 
@@ -184,6 +185,7 @@ export default function App() {
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
         
         <Stack.Screen name="Recipe" component={Recipe}/>
+        <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />

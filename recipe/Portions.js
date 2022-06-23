@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TextInput } from 'react-native';
 import chart from '../assets/recalculate-recipe/chart.png';
 
 export const Portions = () => {
+    const [ portionsQty, setPortionsQty ] = useState('');
+
 	return (
 		<View style={styles.container}>
 			<Image style={styles.image} source={chart} />
 			<Text style={styles.instructionsText}>Ingrese la cantidad de porciones deseadas.</Text>
 			<View style={styles.qtyContainer}>
-				<TextInput style={styles.input} keyboardType="numeric" maxLength={2} />
+				<TextInput style={styles.input} keyboardType="numeric" maxLength={2} onChangeText={(qty) => setPortionsQty(qty)} />
 				<Text style={styles.inputText}>porciones</Text>
 			</View>
 		</View>

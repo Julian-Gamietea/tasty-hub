@@ -7,7 +7,7 @@ import { Portions } from './Portions';
 import { People } from './People';
 import { IngredientScreen } from './IngredientScreen';
 
-export const RecalculateRecipe = ({ navigation }) => {
+export const RecalculateRecipe = ({ navigation, userId }) => {
 	const [ selectedType, setSelectedType ] = React.useState(['portions']);
 	const [ loaded ] = useFonts({
 		InterMedium: require('../assets/fonts/Inter-Medium.ttf'),
@@ -22,7 +22,7 @@ export const RecalculateRecipe = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.menu}>
-				<CustomNav callback={() => navigation.navigate('Home')} text="Recalcular receta" />
+				<CustomNav callback={() => navigation.navigate('Recipe', {id: userId})} text="Recalcular receta" />
 			</View>
 			<View style={styles.inputContainer}>
 				<Text style={styles.text}>Recalcular por</Text>

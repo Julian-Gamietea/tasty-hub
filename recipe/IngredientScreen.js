@@ -5,6 +5,9 @@ import { Picker } from '@react-native-picker/picker';
 
 export const IngredientScreen = () => {
     const [ selectedType, setSelectedType ] = React.useState(['gr']);
+	const [ ingredientName, setIngredientName ] = React.useState();
+	const [ ingredientQty, setIngredientQty ] = React.useState();
+
 	return (
 		<View style={styles.container}>
 			<Image style={styles.image} source={fork} />
