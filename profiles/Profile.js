@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     profileInfo: {
+        marginTop: 10,
         justifyContent: 'space-between',
         backgroundColor: "#F3E7BA",
         flexDirection: 'row',
