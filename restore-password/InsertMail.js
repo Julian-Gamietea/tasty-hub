@@ -7,6 +7,7 @@ import validateEmail from '../validations/validateEmail';
 import { isRegistryComplete } from '../validations/isRegistryComplete';
 
 export const InsertMail = ({navigation}) =>{
+  const [isValid, setIsValid] = React.useState(true)
   const [status, setStatus] = React.useState("");
   const [inputMail, setInputMail] = React.useState({mail: ''})
   const mail = inputMail.mail
@@ -17,6 +18,8 @@ export const InsertMail = ({navigation}) =>{
     });
 }
 const sentCode =  () => {
+  setIsValid(true)
+  setStatus("")
     if(validateEmail(mail)){
     isRegistryComplete(mail,{navigation})
       if(!isUserStudent(mail)){
@@ -29,11 +32,13 @@ const sentCode =  () => {
             navigation.navigate('InsertCode',{mail: mail})
           }
           if(e.response.status == 404){
+            setIsValid(false)
             setStatus("El mail ingresado no se encuentra registrado")
           }
           })
     }}
     else{
+      setIsValid(false)
       setStatus("El mail ingresado no es valido")
     }
 
@@ -72,6 +77,7 @@ const sentCode =  () => {
                 <Text style = {styles.primaryText}> Ingrese su email </Text>
                 <InputTasty onChange={(text) => handleChange(text, 'mail')}
                             value={inputMail.mail}
+                            isValid={isValid}
                             placeholder = 'E.g: cooking@mail.com'/>
                              
                 <Text style={styles.errorMessage}>{status}</Text>
@@ -106,7 +112,6 @@ const styles = StyleSheet.create(
         fontWeight:"bold",
         fontSize:16,
         marginTop:"2%",
-        fontStyle:'bold',
         color:"#FF9494"
       },
   

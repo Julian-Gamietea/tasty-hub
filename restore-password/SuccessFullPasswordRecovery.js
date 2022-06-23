@@ -3,7 +3,7 @@ import ok from '../assets/register/ok.png'
 import {useFonts} from 'expo-font'
 import { ButtonCustom } from "../shared-components/ButtonCustom";
 
-export const PasswordRecoverySuccess = ({navigation}) => {
+export const SuccessFullPasswordRecovery = ({navigation}) => {
 
     const [loaded] = useFonts({
         InterSemiBold: require ('../assets/fonts/Inter-SemiBold.ttf'),
