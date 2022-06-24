@@ -127,8 +127,8 @@ const styles = StyleSheet.create(
             fontWeight:"900",
             fontSize:16,
             marginTop:"15%",
-            fontStyle:'italic',
-            color:"#FF9494",
+            // fontStyle:'italic',
+            color:"#FF6D6D", 
             width:Dimensions.get("screen").width-100
           },
     }
