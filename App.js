@@ -36,8 +36,9 @@ import { Profile } from './profiles/Profile';
 import { UserRecipes } from './recipe/UserRecipes';
 import { ProfileUpdated } from './profiles/ProfileUpdated';
 import { RecalculateRecipe } from './recipe/RecalculateRecipe';
-
-
+import { WelcomeScreen } from './recipe-creation/WelcomeScreen';
+import { CreateRecipeName } from './recipe-creation/CreateRecipeName';
+import { RecipeForm } from './recipe-creation/RecipeForm';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -190,6 +191,11 @@ export default function App() {
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
+
+        <Stack.Screen name="WelcomeScreen" component={WelcomeScreen}/>
+        <Stack.Screen name="CreateRecipeName" component={CreateRecipeName}/>
+        <Stack.Screen name="RecipeForm" component={RecipeForm}/>
+
         {/* habría que ir agregando las screens aca */}
       </Stack.Navigator>
     </NavigationContainer>
