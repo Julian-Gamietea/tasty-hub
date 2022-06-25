@@ -2,6 +2,7 @@ import { View, Text ,Image, StyleSheet } from "react-native";
 import warning from '../assets/register/incomplete-warning.png';
 import {useFonts} from 'expo-font'
 import { ButtonCustom } from "../shared-components/ButtonCustom";
+import { MaterialIcons } from '@expo/vector-icons';
 
 export const UserStudentConflict = ({navigation}) => {
 
@@ -16,11 +17,11 @@ export const UserStudentConflict = ({navigation}) => {
     return(
         <View style = {styles.container}>
             <Text style={styles.title}>¡Atencion!</Text>
-            <Image style = {styles.image} source = {warning} />
+            <MaterialIcons name="report-problem" size={180} color="#F3A200" />
 
             <View style={styles.textContainer}>
-                <Text style = {styles.text}>  Solo los invitados pueden{'\n'} cambiar su contraseña</Text>
-                <Text style = {styles.text}>  Usted esta registrado {'\n'}como alumno</Text>
+                <Text style = {styles.text}>Solo los invitados pueden{'\n'} cambiar su contraseña</Text>
+                <Text style = {styles.text}>Usted esta registrado {'\n'}como alumno</Text>
             </View>
             <View style = {styles.button}>
                 <ButtonCustom callback={()=>navigation.navigate("Login")} text = 'Aceptar'/>
@@ -34,7 +35,8 @@ const styles = StyleSheet.create({
         fontSize:40,
         justifyContent:"flex-start",
         alignContent:"center",
-        marginTop:"15%"
+        marginTop:"15%",
+        marginBottom: 15
     },
     container:{
         backgroundColor: '#fff',
