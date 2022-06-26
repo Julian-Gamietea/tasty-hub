@@ -36,6 +36,7 @@ import { Profile } from './profiles/Profile';
 import { UserRecipes } from './recipe/UserRecipes';
 import { ProfileUpdated } from './profiles/ProfileUpdated';
 import { RecalculateRecipe } from './recipe/RecalculateRecipe';
+import { InstructionCreation } from './recipe-creation/InstructionCreation';
 
 
 
@@ -167,7 +168,7 @@ export default function App() {
   return (
     <NavigationContainer>
 
-      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Test" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={LandingPage} />
         <Stack.Screen name="Login" component={LogIn} />
         <Stack.Screen name="Register" component={Register} />
@@ -187,7 +188,7 @@ export default function App() {
         <Stack.Screen name="Recipe" component={Recipe}/>
         <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
-
+        <Stack.Screen name="Test" component={InstructionCreation}/>
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
         {/* habría que ir agregando las screens aca */}
