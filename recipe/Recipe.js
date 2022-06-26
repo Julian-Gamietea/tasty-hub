@@ -14,8 +14,9 @@ import Carrousel from "../carrousel-instructions/Carrousel";
 console.disableYellowBox = true;
 
 export const Recipe = ({route, navigation}) => {
-
-    
+    const {factor} = route.params
+    const {porciones} = route.params;
+    const {personas} = route.params;
     const {userId} = route.params;
     const {id} = route.params;
     const {recalculated} = route.params;
@@ -287,11 +288,11 @@ export const Recipe = ({route, navigation}) => {
                 <View style={styles.infoItem1}>
                     <View style={{flexDirection:'row', marginBottom: 5}}>
                         <MaterialIcons name="group" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {datos.peopleAmount} personas </Text>
+                        <Text style={styles.infoText}> {factor ? datos.peopleAmount*factor : datos.peopleAmount } personas </Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                         <Feather name="pie-chart" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {datos.portions} porciones </Text>
+                        <Text style={styles.infoText}> {factor ? datos.portions*factor : datos.portions} porciones </Text>
                     </View>  
                 </View>
                 <View style={styles.infoItem2}>
