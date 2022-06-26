@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         backgroundColor: '#E8E8E8',
         borderRadius: 20,
-        height: 475,
+        // height: 550,
     },
 
     calificationText:{
