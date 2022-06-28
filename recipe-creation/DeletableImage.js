@@ -1,11 +1,17 @@
-import { ImageBackground, Image, TouchableOpacity } from "react-native"
+import { ImageBackground, Image, TouchableOpacity, View, Text } from "react-native"
 import { Feather } from '@expo/vector-icons';
 
-export const DeletableImage = () => {
+export const DeletableImage = ({ uri, onPress, type }) => {
     return (
-        <ImageBackground source={{uri: "https://images.unsplash.com/photo-1466637574441-749b8f19452f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"}}
-        style={{width: 100, height: 100, marginRight: 8, borderRadius: 10, overflow: 'hidden', alignItems: 'flex-end'}}>
-            <TouchableOpacity style={{backgroundColor: "#eb3434", borderRadius: 100, padding: 2}}>
+        <ImageBackground source={{uri: uri}}
+        style={{width: 100, height: 100,marginRight: 8, borderRadius: 10, overflow: 'hidden', alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'flex-end'}}>
+            <View style={{marginRight: 10, borderRadius: 5, backgroundColor: "#e8e8e8", paddingHorizontal: 5, marginTop: 3}}>
+                <Text>{type}</Text>
+            </View>
+            <TouchableOpacity 
+            style={{backgroundColor: "#eb3434", borderRadius: 100, padding: 2}}
+            onPress={onPress}
+            >
                 <Feather name="x" size={20} color="white" />
             </TouchableOpacity>
         </ImageBackground>
