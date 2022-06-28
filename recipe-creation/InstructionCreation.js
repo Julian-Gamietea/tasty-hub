@@ -216,7 +216,7 @@ export const InstructionCreation = ({ navigation }) => {
                     data: fd
                 };
 
-                axios(config);
+                await axios(config);
                 
             } catch (e) {
                 console.log(e);
