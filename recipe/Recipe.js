@@ -21,7 +21,7 @@ export const Recipe = ({route, navigation}) => {
     const {id} = route.params;
     const {recalculated} = route.params;
     const {filename} = route.params
-    // const filename = 'Receta_3'
+    
     React.useEffect(() => {
 
         if(!filename){
@@ -154,7 +154,7 @@ export const Recipe = ({route, navigation}) => {
                         setRecipeImages(JSON.parse(jsonValue).images)
                         setStarCount2(JSON.parse(jsonValue).rating)
                         setSaved(true)
-                        // console.log(JSON.parse(jsonValue).datos)
+                       
                     }
                 } catch(e) {
                     console.log(e)
