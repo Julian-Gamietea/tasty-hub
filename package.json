@@ -43,7 +43,8 @@
     "react-native-video": "^2.3.1",
     "react-native-video-player": "^0.12.0",
     "react-native-web": "0.17.7",
-    "webpack-dev-server": "~3.11.0"
+    "webpack-dev-server": "~3.11.0",
+    "@react-native-async-storage/async-storage": "~1.17.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
