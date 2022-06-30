@@ -6,11 +6,12 @@ import { useFonts } from 'expo-font';
 import { MaterialIcons } from '@expo/vector-icons';
 import { InputTasty } from '../shared-components/InputTasty';
 import { ButtonCustom } from '../shared-components/ButtonCustom';
-import { DeletableImage } from './DeletableImage';
+import { DeletableImage } from '../shared-components/DeletableImage';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import axios from 'axios';
-
+// import { DeletableImage } from '../shared-components/DeletableImage';
+import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
 
 export const InstructionCreation = ({ navigation }) => {
 
@@ -306,7 +307,13 @@ export const InstructionCreation = ({ navigation }) => {
                             />
                         </View>
                     </View>
-                    <View>
+                    <AddMultimediaForm 
+                    title={"Multimedia"} 
+                    onPress={handleMultimedia}
+                    data={selectedStep.multimedia}
+                    onRemove={removeMultimedia}
+                    />
+                    {/* <View>
                         <Text style={styles.InputText}>Multimedia</Text>
                         <TouchableOpacity style={styles.addMultimedia} onPress={handleMultimedia}>
                             <MaterialIcons name="add-a-photo" size={24} color="white" />
@@ -318,7 +325,7 @@ export const InstructionCreation = ({ navigation }) => {
                                     <DeletableImage uri={elem.type.split("/")[0] === "image" ? elem.uri : elem.thumbnailUri} onPress={() => removeMultimedia(index)} type={elem.type.split("/")[0] === "image" ? "Imagen":"Video"} />
                                 ))}
                             </ScrollView>}
-                    </View>
+                    </View> */}
                 </View>
             </ScrollView>
             <View style={{ marginHorizontal: 80, marginBottom: 80, marginTop: 10 }}>
