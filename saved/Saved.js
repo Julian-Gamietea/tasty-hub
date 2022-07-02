@@ -1,8 +1,35 @@
-import {View, StyleSheet, StatusBar, Dimensions} from 'react-native'
+import {Text ,View, StyleSheet, StatusBar, Dimensions, TouchableOpacity, ScrollView} from 'react-native'
 import { CustomNav } from "../shared-components/CustomNav";
 import { MaterialIcons } from '@expo/vector-icons';
+import * as React from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import { CarrouselImages } from '../shared-components/CarrouselImages';
+import { SavedRecipeCard } from '../shared-components/SavedRecipeCard';
 
 export const Saved = () => {
+    const [recipes, setRecipes] = React.useState([]);
+
+    const getStoragedData = async () => {
+        let keys = []
+        let recipesAux = []
+        try {
+            keys = await AsyncStorage.getAllKeys()
+            for await (const key of keys) {
+                const jsonValue = await AsyncStorage.getItem(key)
+                recipesAux.push(JSON.parse(jsonValue))
+            }
+            setRecipes(recipesAux)
+            console.log(recipes)
+        } catch(e) {
+            console.log(e)
+        }
+    }
+    React.useEffect(()=>{
+        getStoragedData() 
+    },[])
+
+   
 
     const onGoBack = ({navigation}) => {
         navigation.goBack();
@@ -10,15 +37,31 @@ export const Saved = () => {
 
     return (
         <View style={styles.container}>
-            <CustomNav text={"Guardados"} callback={onGoBack} />
+            <CustomNav style={{flex:1}} text={"Guardados"} callback={onGoBack} />
             <View style={styles.listContainer}>
-                <View style={styles.cardContainer}>
+                <ScrollView pagingEnabled>
+                    {
+                        recipes.map((element,index) => {
+                            return(
+                                <View style={{height: 616, width: '100%'}}>
+                                    <SavedRecipeCard 
+                                        key={index}
+                                        rating={element.rating} 
+                                        directory={element.directory}
+                                        image={element.images[0]}
+                                        duration={element.datos.duration}
+                                        ownerUserName={element.datos.ownerUserName}
+                                        title={element.datos.name}
+                                        userPhoto={element.avatarUser}
+                                    />
+                                </View>
+                            );
+                        })
+                    }
 
-                </View>
-                <View style={styles.buttonDown}>
-                    <MaterialIcons size={100} name="keyboard-arrow-down" color="#553900"/>
-                </View>
+                </ScrollView>
             </View>
+            <View style={styles.emptySpace}/>
         </View>
     );
 
@@ -26,27 +69,18 @@ export const Saved = () => {
 
 const styles = StyleSheet.create({
     container:{
-        flex: 1,
+        flex:1,
         paddingTop: StatusBar.currentHeight + 5,
-        backgroundColor: "#fff"
+        backgroundColor: 'white',
     },
     listContainer:{
-        flex: 1,
-        backgroundColor: '#fff',
-        width: Dimensions.get('window').width-15,
-        alignSelf:'center',
-        borderRadius: 15,
-        marginBottom: '2%'
-    },  
-    buttonDown:{
-        flex:1,
-        alignItems:'center',
-        backgroundColor:'red'
+        paddingTop: 10,
+        flex: 10,
+        width: '95%',
+        alignSelf: 'center'
     },
-    cardContainer:{
-        flex: 9,
-        backgroundColor: 'green',
-        width: Dimensions.get('window').width-15,
-        borderRadius:15
-    }
+    emptySpace:{
+        flex:1 
+    },
+    
 })

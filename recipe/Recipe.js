@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable, Dimensions } from "react-native";
 import {useFonts} from 'expo-font'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons'; 
@@ -23,6 +23,20 @@ export const Recipe = ({route, navigation}) => {
     const {filename} = route.params
     
     React.useEffect(() => {
+        
+        const isSaved = async (id) => {
+            let keys = []
+            try {
+                keys = await AsyncStorage.getAllKeys()
+                keys.forEach(element => {
+                    if(element===`Receta_${id}`){
+                        setSaved(true)
+                    }
+                });
+            } catch(e) {
+                console.log(e)
+            }
+        }
 
         if(!filename){
             const array = []
@@ -37,17 +51,19 @@ export const Recipe = ({route, navigation}) => {
     
                 axios(config)
                 .then(function (response) {
-    
+     
                     // SETTING THE RECIPE INFORMATION 
-    
                     setDatos(response.data)
-                
                     array.push(response.data.mainPhoto)
-    
                     const id = response.data.id
-    
+                    isSaved(id)
                     
-    
+                    // GETTING THE USER PHOTO
+
+                    axios.get(`https://tasty-hub.herokuapp.com/api/user/${response.data.ownerId}`)
+                    .then((response) => setUserProfilePhoto(response.data.avatar))
+                    .catch((error) => console.log(error))
+
                     if(typeof(recalculated) == "undefined"){
                         var config2 = {
                             method: 'get',
@@ -166,6 +182,8 @@ export const Recipe = ({route, navigation}) => {
         }
         
     },[]);
+
+    const [userProfilePhoto, setUserProfilePhoto] = React.useState("")
     const [multimedia, setMultimedia] = React.useState([])
     const [instructions, setInstructions] = React.useState([])
     const [imgActive, setImgActive] = React.useState(0)
@@ -200,14 +218,8 @@ export const Recipe = ({route, navigation}) => {
         setModalVisible(true)
     }
 
-    const onChangeImg = (nativeEvent) => {
-        if(nativeEvent){
-            const slide = Math.ceil(nativeEvent.contentOffset.x / nativeEvent.layoutMeasurement.width);
-            if(slide != imgActive){
-                setImgActive(slide);
-            }
-        }
-    }
+
+    
 
     const closeModalSend = () => {
         
@@ -348,7 +360,8 @@ export const Recipe = ({route, navigation}) => {
                     instructions: instructions,
                     directory: directory,
                     images: images,
-                    multimedia: multimedia
+                    multimedia: multimedia,
+                    avatarUser: userProfilePhoto
                 }
                 
                 AsyncStorage.setItem(filename, JSON.stringify(object))
@@ -437,9 +450,9 @@ export const Recipe = ({route, navigation}) => {
                     <Text style={styles.buttonText}> Guardar </Text>
                 </TouchableOpacity>
             </View>
-            
+
             <CarrouselImages recipeImages = {recipeImages}/>
-            
+
             <View style={styles.descriptionContainer}>
                 <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8}}>
                     <MaterialIcons name="info" size={24} color="#5D420C" />
