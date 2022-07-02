@@ -1,14 +1,16 @@
-import {Text ,View, StyleSheet, StatusBar, Dimensions, TouchableOpacity, ScrollView} from 'react-native'
+import {Text,View, StyleSheet, StatusBar, RefreshControl, Dimensions, ScrollView} from 'react-native'
 import { CustomNav } from "../shared-components/CustomNav";
-import { MaterialIcons } from '@expo/vector-icons';
 import * as React from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
-import { CarrouselImages } from '../shared-components/CarrouselImages';
 import { SavedRecipeCard } from '../shared-components/SavedRecipeCard';
+import { useIsFocused } from "@react-navigation/native";
+import { MaterialIcons } from '@expo/vector-icons';
 
-export const Saved = () => {
+export const Saved = ({navigation}) => {
+
     const [recipes, setRecipes] = React.useState([]);
+    const focus = useIsFocused();
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
 
     const getStoragedData = async () => {
         let keys = []
@@ -20,32 +22,41 @@ export const Saved = () => {
                 recipesAux.push(JSON.parse(jsonValue))
             }
             setRecipes(recipesAux)
-            console.log(recipes)
+            setIsRefreshing(false)
         } catch(e) {
             console.log(e)
         }
     }
     React.useEffect(()=>{
         getStoragedData() 
-    },[])
+    },[focus])
 
    
+    const onRefresh = () => {
+        setIsRefreshing(true);
+        getStoragedData();
+    }
 
-    const onGoBack = ({navigation}) => {
+    const onGoBack = () => {
         navigation.goBack();
     }
 
     return (
         <View style={styles.container}>
             <CustomNav style={{flex:1}} text={"Guardados"} callback={onGoBack} />
-            <View style={styles.listContainer}>
-                <ScrollView pagingEnabled>
+            <View  style={styles.listContainer}>
+                <ScrollView 
+                    refreshControl={<RefreshControl refreshing = {isRefreshing} onRefresh = {onRefresh}/>}
+                    pagingEnabled
+                >
                     {
                         recipes.map((element,index) => {
                             return(
-                                <View style={{height: 616, width: '100%'}}>
+                                <View style={{height: 614, width: '100%'}}>
                                     <SavedRecipeCard 
                                         key={index}
+                                        navigation={navigation}
+                                        id={element.datos.id}
                                         rating={element.rating} 
                                         directory={element.directory}
                                         image={element.images[0]}
@@ -61,7 +72,12 @@ export const Saved = () => {
 
                 </ScrollView>
             </View>
-            <View style={styles.emptySpace}/>
+            {recipes.length === 0 && 
+            <View style={styles.emptyMessage}>
+                <Text style={styles.text}>Aún no tenés recetas guardadas...</Text>
+                <MaterialIcons name="save-alt" size={80} color="#e8e8e8" />
+            </View>}
+            
         </View>
     );
 
@@ -79,8 +95,20 @@ const styles = StyleSheet.create({
         width: '95%',
         alignSelf: 'center'
     },
-    emptySpace:{
-        flex:1 
+    emptyMessage: {
+        height: Dimensions.get("screen").height*0.4,
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        marginBottom: '40%'
     },
-    
+    text: {
+        color: "#000",
+        fontFamily: "InterSemiBold",
+        fontSize: 30,
+        textAlign: 'center',
+        
+    },
+    text2: {
+        
+    }
 })

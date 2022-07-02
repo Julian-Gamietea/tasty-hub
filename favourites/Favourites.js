@@ -90,7 +90,7 @@ export const Favourites = ({navigation}) => {
             />}
             {recipes.length === 0 && 
             <View style={styles.emptyMessage}>
-                <Text style={styles.text}>Aún no tenes recetas marcadas como favoritas...</Text>
+                <Text style={styles.text}>Aún no tenés recetas marcadas como favoritas...</Text>
                 <Ionicons name="ios-bookmarks-outline" size={80} color="#e8e8e8" />
             </View>}
         </View>

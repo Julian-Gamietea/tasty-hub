@@ -12,6 +12,7 @@ import { CarrouselImages } from "../shared-components/CarrouselImages";
 import Carrousel from "../carrousel-instructions/Carrousel";
 import * as FileSystem from 'expo-file-system'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from "@react-navigation/native";
 
 console.disableYellowBox = true;
 
@@ -158,6 +159,7 @@ export const Recipe = ({route, navigation}) => {
             }
             fetchData();
         }else{
+            
             const fetchStoragedData = async () => {
                 try {
                     const jsonValue = await AsyncStorage.getItem(filename)
@@ -181,8 +183,10 @@ export const Recipe = ({route, navigation}) => {
             
         }
         
-    },[]);
+    },[focus, recalculated]);
 
+
+    const focus = useIsFocused();
     const [userProfilePhoto, setUserProfilePhoto] = React.useState("")
     const [multimedia, setMultimedia] = React.useState([])
     const [instructions, setInstructions] = React.useState([])
@@ -353,10 +357,12 @@ export const Recipe = ({route, navigation}) => {
                     index ++;
                 }
                 
+                
+
                 const object  = {
                     datos: datos,
                     rating: starCount2,
-                    ingredientes: ingredientes,
+                    ingredientes: recalculated,
                     instructions: instructions,
                     directory: directory,
                     images: images,
@@ -439,7 +445,7 @@ export const Recipe = ({route, navigation}) => {
                     }
                         <Text style={styles.buttonText}> Añadir a {'\n'} favoritos </Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
+                {recalculated && <TouchableOpacity 
                     onPress={()=> save()}  
                     style={styles.profileButton}
                 >
@@ -448,7 +454,8 @@ export const Recipe = ({route, navigation}) => {
                         : <Ionicons name="download-outline" size={24} color="white" />
                     }
                     <Text style={styles.buttonText}> Guardar </Text>
-                </TouchableOpacity>
+                </TouchableOpacity>}
+                
             </View>
 
             <CarrouselImages recipeImages = {recipeImages}/>
@@ -468,7 +475,8 @@ export const Recipe = ({route, navigation}) => {
                 </View>
                 <View style={{flexDirection:'column'}}>
                     {ingredientes.map((element, index) => {
-                        return( <Text key={index} style={styles.ingredientItemText}> - {element.quantity} {element.unitName} de {element.ingredientName} </Text>);  
+                        return( 
+                        <Text key={index} style={styles.ingredientItemText}> - {element.quantity} {element.unitName} de {element.ingredientName} </Text>);  
                     })
                     }
                     

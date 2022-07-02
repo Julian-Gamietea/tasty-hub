@@ -26,8 +26,6 @@ import { SearchResults } from '../tasty-hub/search-results/SearchResults'
 import { Recipe } from './recipe/Recipe';
 import {  SuccessFullPasswordRecovery } from './restore-password/SuccessFullPasswordRecovery';
 import { UserStudentConflict } from './restore-password/UserStudentConflict';
-import {Carrousel} from './carrousel-instructions/Carrousel'
-import { CarrouselMultimedia } from './carrousel-instructions/CarrouselMultimedia';
 import { CarrouselImages } from './shared-components/CarrouselImages';
 import { UserProfile } from './profiles/UserProfile';
 import { Favourites } from './favourites/Favourites';
@@ -41,6 +39,7 @@ import { Saved } from './saved/Saved';
 import { SavedRecipeCard } from './shared-components/SavedRecipeCard';
 
 
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -48,6 +47,7 @@ function DashboardTabStack() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Dashboard">
       <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
       <Stack.Screen name="SearchResults" component={SearchResults}/>
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="UserProfile" component={UserProfile}/>
@@ -62,6 +62,7 @@ function FavouritesTabStack() {
       <Stack.Screen name="SearchResults" component={SearchResults}/>
       <Stack.Screen name="Favourites" component={Favourites} />
       <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
     </Stack.Navigator>
   )
 }
@@ -75,6 +76,22 @@ function ProfileTabStack() {
       <Stack.Screen name="UserProfile" component={UserProfile}/>
       <Stack.Screen name="EditProfile" component={EditProfile}/>
       <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
+      <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+    </Stack.Navigator>
+  )
+}
+
+function SavedTabStack() {
+  return(
+    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Saved">
+      <Stack.Screen name="ProfileInfo" component={Profile}/>
+      <Stack.Screen name="UserRecipes" component={UserRecipes}/>
+      <Stack.Screen name="Saved" component={Saved}/>
+      <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="EditProfile" component={EditProfile}/>
+      <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
+      <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
     </Stack.Navigator>
   )
 }
@@ -115,7 +132,7 @@ function Tabs() {
       />
       <Tab.Screen
         name="Saved"
-        component={Dashboard}
+        component={SavedTabStack}
         options={{
           tabBarLabel: 'Guardados',
           tabBarIcon: ({ color }) => (
@@ -169,7 +186,7 @@ export default function App() {
   return (
     <NavigationContainer>
 
-      <Stack.Navigator initialRouteName="Saved" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={LandingPage} />
         <Stack.Screen name="Login" component={LogIn} />
         <Stack.Screen name="Register" component={Register} />
@@ -186,9 +203,6 @@ export default function App() {
         <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry} />
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
         <Stack.Screen name="SavedRecipeCard" component={SavedRecipeCard}/>
-        <Stack.Screen name="Saved" component={Saved}/>
-        <Stack.Screen name="Recipe" component={Recipe}/>
-        <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
         <Stack.Screen name="Test" component={InstructionCreation}/>
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />

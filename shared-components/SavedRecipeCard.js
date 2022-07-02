@@ -2,8 +2,10 @@ import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native'
 import {useFonts} from 'expo-font'
 import { Feather } from '@expo/vector-icons'; 
 import StarRating from 'react-native-star-rating';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system'
 
-export const  SavedRecipeCard = ({rating, directory, image, duration, ownerUserName, title, userPhoto}) => {
+export const  SavedRecipeCard = ({ navigation,rating, id, directory, image, duration, ownerUserName, title, userPhoto}) => {
     const [loaded] = useFonts({
         InterBold: require ('../assets/fonts/Inter-Bold.ttf'),
         InterRegular: require ('../assets/fonts/Inter-Regular.ttf'),
@@ -12,6 +14,20 @@ export const  SavedRecipeCard = ({rating, directory, image, duration, ownerUserN
     });
     if(!loaded){
         return null;
+    }
+
+    const handlePressVer = () => {
+        navigation.navigate("Recipe", {filename: `Receta_${id}`})
+    }
+
+    const handlePressEliminar = () => {
+        AsyncStorage.removeItem(`Receta_${id}`)
+        .then((response) => console.log("Eliminado"))
+        .catch((error) => console.log(error))
+
+        FileSystem.deleteAsync(directory)
+        .then(()=> console.log("directorio eliminado"))
+        .catch((error)=>console.log(error))  
     }
 
     return(
@@ -40,15 +56,16 @@ export const  SavedRecipeCard = ({rating, directory, image, duration, ownerUserN
                     iconSet={'Feather'}
                     rating={rating}
                     fullStarColor={'#553900'}
+                    emptyStarColor={'#FAEEC7'}
                     starSize={26}
                     halfStarEnabled={true}
                 />
             </View>
             <View style={styles.buttonLine}>
-                <TouchableOpacity style={styles.buttonVer}>
+                <TouchableOpacity style={styles.buttonVer} onPress={()=>handlePressVer()}>
                     <Text style={styles.buttonVerFont}>Ver</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonEliminar}>
+                <TouchableOpacity style={styles.buttonEliminar} onPress={()=>handlePressEliminar()}>
                     <Text style={styles.buttonEliminarFont}>Eliminar</Text>
                 </TouchableOpacity>
             </View>
@@ -127,7 +144,7 @@ const styles = StyleSheet.create({
     },
     buttonLine:{
         flex: 2,
-        paddingTop: 10,
+        paddingTop: 20,
         marginLeft: '10%',
         marginRight: '10%',
         flexDirection: 'row',
