@@ -1,18 +1,29 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 import { ButtonCustom } from '../shared-components/ButtonCustom';
 import { CustomNav } from '../shared-components/CustomNav';
 import { TextInput } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
+import { InputTasty } from '../shared-components/InputTasty';
 
 export const RecipeForm = ({ navigation, route }) => {
-	const [ minutes, setMinutes ] = React.useState();
-	const [ people, setPeople ] = React.useState();
-	const [ portions, setPortions ] = React.useState();
+	const [minutes, setMinutes] = React.useState();
+	const [people, setPeople] = React.useState();
+	const [portions, setPortions] = React.useState();
 
-	const { recipeTitle } = route.params;
-	const [ loaded ] = useFonts({
+	let recipeTitle = "";
+
+
+	if (route.params.recipeTitle) {
+		recipeTitle = route.params.recipeTitle;
+	} else {
+		recipeTitle = route.params.data;
+	}
+
+	const cellular = route.params.cellular;
+
+	const [loaded] = useFonts({
 		InterMedium: require('../assets/fonts/Inter-Medium.ttf'),
 		InterBold: require('../assets/fonts/Inter-Bold.ttf'),
 		InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf')
@@ -25,89 +36,91 @@ export const RecipeForm = ({ navigation, route }) => {
 		<ScrollView style={styles.container}>
 			<View style={styles.menu}>
 				<CustomNav
-					style={styles.navbar}
 					callback={() => navigation.navigate('CreateRecipeName')}
 					text="Nueva receta"
 				/>
 			</View>
-			<View style={styles.margin}>
-				<Text style={styles.recipeTitle}>{recipeTitle}</Text>
-				<Text style={styles.description}>Descripción</Text>
-				<TextInput
-					style={styles.input}
-					placeholder={'Alguna descripción de su plato...'}
-					multiline={true}
-					maxLength={200}
-					numberOfLines={4}
-				/>
-			</View>
-			<View style={styles.composedInputs}>
-				<View style={styles.inputRow}>
-					<MaterialIcons name="schedule" size={40} style={styles.inputImage} />
-					<TextInput
-						style={styles.inputComposed}
-						keyboardType={'numeric'}
-						maxLength={3}
-						onChangeText={(minutes) => setMinutes(minutes)}
-						value={minutes}
-					/>
-					<Text style={styles.inputText}>minutos</Text>
-				</View>
-				<View style={styles.inputRow}>
-					<MaterialIcons name="groups" size={40} style={styles.inputImage} />
-					<TextInput
-						style={styles.inputComposed}
-						keyboardType={'numeric'}
-						maxLength={3}
-						onChangeText={(plp) => setPeople(plp)}
-						value={people}
-					/>
-					<Text style={styles.inputText}>personas</Text>
-				</View>
-				<View style={styles.inputRow}>
-					<MaterialIcons name="pie-chart" size={40} style={styles.inputImage} />
-					<TextInput
-						style={styles.inputComposed}
-						keyboardType={'numeric'}
-						maxLength={3}
-						onChangeText={(ptions) => setPortions(ptions)}
-						value={portions}
-					/>
-					<Text style={styles.inputText}>porciones</Text>
-				</View>
-			</View>
+			<View style={{alignItems: 'center'}}>
 
-			<View style={styles.margin}>
-				<Text style={styles.description}>Tipo de plato</Text>
-				<TouchableOpacity onPress={() => console.log('Agregar tipo de plato')}>
-					<View style={styles.addButton}>
-						<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
-						<Text style={styles.textButton}>Añadir</Text>
+				<View>
+					<Text style={styles.recipeTitle}>{recipeTitle}</Text>
+					<Text style={styles.description}>Descripción</Text>
+					<InputTasty
+						style={styles.input}
+						placeholder={'Alguna descripción de su plato...'}
+						multiline
+						maxLength={200}
+						// numberOfLines={4}
+					/>
+				</View>
+				<View style={styles.composedInputs}>
+					<View style={styles.inputRow}>
+						<MaterialIcons name="schedule" size={40} style={styles.inputImage} />
+						<InputTasty
+							style={styles.inputComposed}
+							keyboardType={'numeric'}
+							maxLength={3}
+							onChange={(minutes) => setMinutes(minutes)}
+							value={minutes}
+						/>
+						<Text style={styles.inputText}>minutos</Text>
 					</View>
-				</TouchableOpacity>
-			</View>
-			<View style={styles.margin}>
-				<Text style={styles.description}>Ingredientes</Text>
-				<TouchableOpacity onPress={() => console.log('Agregar ingrediente')}>
-					<View style={styles.addButton}>
-						<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
-						<Text style={styles.textButton}>Añadir</Text>
+					<View style={styles.inputRow}>
+						<MaterialIcons name="groups" size={40} style={styles.inputImage} />
+						<InputTasty
+							style={styles.inputComposed}
+							keyboardType={'numeric'}
+							maxLength={3}
+							onChange={(plp) => setPeople(plp)}
+							value={people}
+						/>
+						<Text style={styles.inputText}>personas</Text>
 					</View>
-				</TouchableOpacity>
-			</View>
-			<View style={styles.margin}>
-				<Text style={styles.description}>Fotos</Text>
-				<TouchableOpacity onPress={() => console.log('Agregar fotos')}>
-					<View style={styles.addButton}>
-						<MaterialIcons name="add-a-photo" size={24} style={styles.iconCamera} />
-						<Text style={styles.textButton}>Añadir</Text>
+					<View style={styles.inputRow}>
+						<MaterialIcons name="pie-chart" size={40} style={styles.inputImage} />
+						<InputTasty
+							style={styles.inputComposed}
+							keyboardType={'numeric'}
+							maxLength={3}
+							onChange={(ptions) => setPortions(ptions)}
+							value={portions}
+						/>
+						<Text style={styles.inputText}>porciones</Text>
 					</View>
-				</TouchableOpacity>
-			</View>
+				</View>
 
-			<View style={{ flex: 1 }}>
-				<View style={{ borderWidth: 1, position: 'absolute', bottom: 0, alignSelf: 'flex-end' }}>
-					<MaterialIcons name="keyboard-arrow-right" size={24} style={styles.iconButton} />
+				<View style={styles.margin}>
+					<Text style={styles.description}>Tipo de plato</Text>
+					<TouchableOpacity onPress={() => console.log('Agregar tipo de plato')}>
+						<View style={styles.addButton}>
+							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
+							<Text style={styles.textButton}>Añadir</Text>
+						</View>
+					</TouchableOpacity>
+				</View>
+				<View style={styles.margin}>
+					<Text style={styles.description}>Ingredientes</Text>
+					<TouchableOpacity onPress={() => console.log('Agregar ingrediente')}>
+						<View style={styles.addButton}>
+							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
+							<Text style={styles.textButton}>Añadir</Text>
+						</View>
+					</TouchableOpacity>
+				</View>
+				<View style={styles.margin}>
+					<Text style={styles.description}>Fotos</Text>
+					<TouchableOpacity onPress={() => console.log('Agregar fotos')}>
+						<View style={styles.addButton}>
+							<MaterialIcons name="add-a-photo" size={24} style={styles.iconCamera} />
+							<Text style={styles.textButton}>Añadir</Text>
+						</View>
+					</TouchableOpacity>
+				</View>
+
+				<View style={{ flex: 1 }}>
+					<View style={{ borderWidth: 1, position: 'absolute', bottom: 0, alignSelf: 'flex-end' }}>
+						<MaterialIcons name="keyboard-arrow-right" size={24} style={styles.iconButton} />
+					</View>
 				</View>
 			</View>
 		</ScrollView>
@@ -117,13 +130,10 @@ export const RecipeForm = ({ navigation, route }) => {
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: '#fff',
-		contentContainerStyle: 'center',
-		paddingTop: 60
+		paddingTop: StatusBar.currentHeight + 5
 	},
 	margin: {
-		marginLeft: 60,
-		marginRight: 60,
-		marginBottom: 10
+		width: '65%',
 	},
 	recipeTitle: {
 		fontFamily: 'InterBold',
@@ -135,28 +145,29 @@ const styles = StyleSheet.create({
 	description: {
 		fontFamily: 'InterSemiBold',
 		fontSize: 29,
-		color: '#312102'
+		color: '#312102',
+		textAlign: 'left'
 	},
 	inputComposed: {
 		borderColor: '#312102',
-		borderWidth: 1,
 		borderRadius: 40,
-		paddingHorizontal: 40
+		paddingHorizontal: 20,
 	},
 	inputRow: {
 		flexDirection: 'row',
 		marginBottom: 10,
-		alignContent: 'center',
+		alignItems: 'center',
 		marginLeft: 60
 	},
 	inputImage: {
 		color: '#312102',
-		marginTop: 0
+		marginBottom: 20,
+		marginRight: 5
 	},
 	inputText: {
 		fontFamily: 'InterMedium',
 		fontSize: 18,
-		marginTop: 10,
+		marginBottom: 20,
 		marginLeft: 10
 	},
 	text: {
@@ -182,11 +193,15 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderRadius: 30,
 		paddingHorizontal: 20,
-		paddingVertical: 10
+		paddingVertical: 10,
+		height: 100,
+		maxHeight: 100,
+		textAlignVertical: 'top'
 	},
 	composedInputs: {
 		flexDirection: 'column',
-		marginTop: 30
+		marginTop: 30,
+		alignSelf: 'flex-start'
 	},
 	addButton: {
 		backgroundColor: '#F3A200',

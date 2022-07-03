@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useFonts } from 'expo-font'
 
-export const ButtonCustom = ({ text, callback }) => {
+export const ButtonCustom = ({ text, callback, style }) => {
     const [loaded] = useFonts({
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf')
     });
@@ -11,7 +11,7 @@ export const ButtonCustom = ({ text, callback }) => {
     }
 
     return (
-        <TouchableOpacity onPress={callback} style={styles.container}>
+        <TouchableOpacity onPress={callback} style={[styles.container, style]}>
             <Text style={styles.button}>{text}</Text>
         </TouchableOpacity>
     );

@@ -1,15 +1,22 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, TouchableOpacity, StatusBar, Dimensions } from 'react-native';
 import React from 'react';
 import burger from '../assets/recipes/burger.png';
 import nextArrow from '../assets/recipes/NextArrow.png'
 import { useFonts } from 'expo-font';
 import { CustomNav } from '../shared-components/CustomNav';
 import { TextInput } from 'react-native-gesture-handler';
+import { MaterialIcons } from '@expo/vector-icons';
+import { InputTasty } from '../shared-components/InputTasty';
+import { useNetInfo } from '@react-native-community/netinfo';
 
-export const CreateRecipeName = ({ navigation }) => {
 
-    const [recipeName, setRecipeName] = React.useState()
-	const [ loaded ] = useFonts({
+export const CreateRecipeName = ({ navigation, route }) => {
+
+	const cellular = route.params ? route.params.cellular : null;
+	const netInfo = useNetInfo();
+	const [isValid, setIsValid] = React.useState(true);
+	const [recipeName, setRecipeName] = React.useState('')
+	const [loaded] = useFonts({
 		InterMedium: require('../assets/fonts/Inter-Medium.ttf'),
 		InterBold: require('../assets/fonts/Inter-Bold.ttf')
 	});
@@ -17,28 +24,52 @@ export const CreateRecipeName = ({ navigation }) => {
 		return null;
 	}
 
+	const handlePress =	() => {
+		if (!cellular && netInfo.type !== 'wifi') {
+			navigation.navigate('NoWifi', {nextScreen: 'RecipeForm', data: recipeName});
+		} else {
+			if (recipeName) {
+				navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: cellular});
+			} else {
+				setIsValid(false);
+			}
+		}
+	}
+
 	return (
-		<View style={styles.container}>
+		<ScrollView style={styles.container}>
 			<View style={styles.menu}>
 				<CustomNav callback={() => navigation.navigate('WelcomeScreen')} text="" />
 			</View>
-			<Text style={styles.title}>Crear receta</Text>
-			<Image style={styles.image} source={burger} />
-			<Text style={styles.dishName}>Nombre del plato</Text>
-			<TextInput value={recipeName} style={styles.input} onChangeText={(name) => setRecipeName(name)} />
-			<TouchableOpacity onPress={() => navigation.navigate('RecipeForm', {recipeTitle: recipeName})}>
-				<Image source={nextArrow} style={styles.nextArrow}></Image>
-			</TouchableOpacity>
-		</View>
+			<View style={[styles.container, {alignItems: 'center', paddingTop: 0, marginBottom: 50}]}>
+				<Text style={styles.title}>Crear receta</Text>
+				<View style={{ backgroundColor: "#F3A200", borderRadius: 500, padding: 30, marginTop: 15 }}>
+					<MaterialIcons name="lunch-dining" size={150} color="#fff" />
+				</View>
+				<Text style={styles.dishName}>Nombre del plato</Text>
+				<InputTasty 
+				value={recipeName} 
+				errorMessage={'No puede dejar este campo vacío'} 
+				isValid={isValid} 
+				style={styles.input} 
+				onChange={(name) => {
+					setIsValid(true);
+					setRecipeName(name);
+					}} />
+				<TouchableOpacity onPress={handlePress}>
+					<View style={{ backgroundColor: "#583209", borderRadius: 500, padding: 10, marginTop: 30 }}>
+						<MaterialIcons name="chevron-right" size={70} color="#fff" />
+					</View>
+				</TouchableOpacity>
+			</View>
+		</ScrollView>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: '#fff',
-		flex: 1,
-		alignItems: 'center',
-        paddingTop: 60
+		paddingTop: StatusBar.currentHeight + 5,
 	},
 	image: {
 		marginTop: 50,
@@ -65,15 +96,14 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start'
 	},
 	input: {
-		borderColor: '#DC9518',
 		borderWidth: 1,
 		borderRadius: 30,
 		paddingHorizontal: 140,
 		paddingVertical: 10
 	},
-    nextArrow: {
-        width: 120,
-        height: 120,
-        marginTop: 40
-    }
+	nextArrow: {
+		width: 120,
+		height: 120,
+		marginTop: 40
+	}
 });

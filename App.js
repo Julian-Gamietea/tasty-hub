@@ -24,9 +24,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { SearchResults } from '../tasty-hub/search-results/SearchResults'
 import { Recipe } from './recipe/Recipe';
-import {  SuccessFullPasswordRecovery } from './restore-password/SuccessFullPasswordRecovery';
+import { SuccessFullPasswordRecovery } from './restore-password/SuccessFullPasswordRecovery';
 import { UserStudentConflict } from './restore-password/UserStudentConflict';
-import {Carrousel} from './carrousel-instructions/Carrousel'
+import { Carrousel } from './carrousel-instructions/Carrousel'
 import { CarrouselMultimedia } from './carrousel-instructions/CarrouselMultimedia';
 import { CarrouselImages } from './shared-components/CarrouselImages';
 import { UserProfile } from './profiles/UserProfile';
@@ -39,41 +39,53 @@ import { RecalculateRecipe } from './recipe/RecalculateRecipe';
 import { WelcomeScreen } from './recipe-creation/WelcomeScreen';
 import { CreateRecipeName } from './recipe-creation/CreateRecipeName';
 import { RecipeForm } from './recipe-creation/RecipeForm';
+import { NoWifi } from './recipe-creation/NoWifi';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function DashboardTabStack() {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Dashboard">
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Dashboard">
       <Stack.Screen name="Recipe" component={Recipe} />
-      <Stack.Screen name="SearchResults" component={SearchResults}/>
+      <Stack.Screen name="SearchResults" component={SearchResults} />
       <Stack.Screen name="Dashboard" component={Dashboard} />
-      <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="UserProfile" component={UserProfile} />
     </Stack.Navigator>
-    );
+  );
 }
 
 function FavouritesTabStack() {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Favourites">
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Favourites">
       <Stack.Screen name="Recipe" component={Recipe} />
-      <Stack.Screen name="SearchResults" component={SearchResults}/>
+      <Stack.Screen name="SearchResults" component={SearchResults} />
       <Stack.Screen name="Favourites" component={Favourites} />
-      <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="UserProfile" component={UserProfile} />
     </Stack.Navigator>
   )
 }
 
 function ProfileTabStack() {
-  return(
-    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="ProfileInfo">
-      <Stack.Screen name="ProfileInfo" component={Profile}/>
-      <Stack.Screen name="UserRecipes" component={UserRecipes}/>
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="ProfileInfo">
+      <Stack.Screen name="ProfileInfo" component={Profile} />
+      <Stack.Screen name="UserRecipes" component={UserRecipes} />
       <Stack.Screen name="Recipe" component={Recipe} />
-      <Stack.Screen name="UserProfile" component={UserProfile}/>
-      <Stack.Screen name="EditProfile" component={EditProfile}/>
-      <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
+      <Stack.Screen name="UserProfile" component={UserProfile} />
+      <Stack.Screen name="EditProfile" component={EditProfile} />
+      <Stack.Screen name="ProfileUpdate" component={ProfileUpdated} />
+    </Stack.Navigator>
+  )
+}
+
+function RecipeTabStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="WelcomeScreen">
+      <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+      <Stack.Screen name="CreateRecipeName" component={CreateRecipeName} />
+      <Stack.Screen name="RecipeForm" component={RecipeForm} />
+      <Stack.Screen name="NoWifi" component={NoWifi}/>
     </Stack.Navigator>
   )
 }
@@ -126,7 +138,7 @@ function Tabs() {
       />
       <Tab.Screen
         name="Recipe"
-        component={Dashboard}
+        component={RecipeTabStack}
         options={{
           tabBarLabel: '',
           tabBarIcon: ({ color }) => (
@@ -184,17 +196,17 @@ export default function App() {
         <Stack.Screen name="ExistingMail" component={ExistingMail} />
         <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry} />
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
-        
-        <Stack.Screen name="Recipe" component={Recipe}/>
-        <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+
+        <Stack.Screen name="Recipe" component={Recipe} />
+        <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe} />
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
 
-        <Stack.Screen name="WelcomeScreen" component={WelcomeScreen}/>
-        <Stack.Screen name="CreateRecipeName" component={CreateRecipeName}/>
-        <Stack.Screen name="RecipeForm" component={RecipeForm}/>
+        <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+        <Stack.Screen name="CreateRecipeName" component={CreateRecipeName} />
+        <Stack.Screen name="RecipeForm" component={RecipeForm} />
 
         {/* habría que ir agregando las screens aca */}
       </Stack.Navigator>

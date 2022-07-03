@@ -3,14 +3,31 @@ import recipes from '../assets/recipes/recipes.png';
 import { useFonts } from 'expo-font';
 import { ButtonCustom } from '../shared-components/ButtonCustom';
 import { CustomNav } from '../shared-components/CustomNav';
+import { useNetInfo } from '@react-native-community/netinfo';
 
-export const WelcomeScreen = ({ navigation }) => {
+export const WelcomeScreen = ({ navigation, route }) => {
+
+	const netInfo = useNetInfo();
+	
 	const [ loaded ] = useFonts({
 		InterMedium: require('../assets/fonts/Inter-Medium.ttf'),
 		InterBold: require('../assets/fonts/Inter-Bold.ttf')
 	});
 	if (!loaded) {
 		return null;
+	}
+
+	const checkWifiConnection = () => {
+		console.log(netInfo);
+		return netInfo.type === 'wifi';
+	}
+
+	const handlePress = () => {
+		if (checkWifiConnection()) {
+			navigation.navigate('CreateRecipeName', {cellular: false});
+		} else {
+			navigation.navigate('NoWifi', {nextScreen: 'CreateRecipeName'});
+		}
 	}
 
 	return (
@@ -25,7 +42,7 @@ export const WelcomeScreen = ({ navigation }) => {
 				la más consultada de Tasty Hub.
 			</Text>
 			<View style={styles.button}>
-				<ButtonCustom callback={() => navigation.navigate('CreateRecipeName')} text="¡Comenzar!" />
+				<ButtonCustom callback={handlePress} text="¡Comenzar!" />
 			</View>
 		</View>
 	);
