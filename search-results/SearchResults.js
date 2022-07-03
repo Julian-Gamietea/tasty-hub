@@ -152,6 +152,18 @@ export const SearchResults = ({ route, navigation }) => {
                 }}
             />
             }
+             {recipesFilter.length === 0  &&
+                <FlatList
+                    data={[{}]}
+                    renderItem={() => (
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 40, marginTop: 40}}>
+                            <Text style={{ textAlign: 'center', fontFamily: "InterRegular", fontSize: 20 }}>Lo sentimos, no tenemos lo que estas buscando...</Text>
+                            <MaterialCommunityIcons name="cookie-alert-outline" size={150} color="#e8e8e8" />
+                        </View>
+                    )}
+                >
+                    
+                </FlatList>}
             {recipeList.length === 0 && !recipesFilter &&
                 <FlatList
                     data={[{}]}
