@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions, RefreshControl, SafeAreaView, FlatList, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
@@ -13,7 +13,8 @@ import axios from 'axios';
 
 
 export const SearchResults = ({ route, navigation }) => {
-
+    const recipesFilter = route.params.recipeList
+    console.log(recipesFilter)
     const { query } = route.params;
     const { type } = route.params;
 
@@ -37,23 +38,25 @@ export const SearchResults = ({ route, navigation }) => {
     }
 
     const fetchData = async () => {
-        try {
-            let res;
-            if (selectedValue === 'plato') {
-                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/like?name=${inputValue}`);
-            } else {
-                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/username/like?username=${inputValue}`)
+            try {
+                let res;
+                if (selectedValue === 'plato') {
+                    res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/like?name=${inputValue}`);
+                } else {
+                    res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/username/like?username=${inputValue}`)
+                }
+                setRecipeList(res.data.slice(0, res.data.length));
+                setDataLoaded(true);
+                setIsFetching(false);
+            } catch (error) {
+                console.log(error);
             }
-            setRecipeList(res.data.slice(0, res.data.length));
-            setDataLoaded(true);
-            setIsFetching(false);
-        } catch (error) {
-            console.log(error);
-        }
+    
     }
 
     React.useEffect(() => {
         fetchData();
+    
     }, [user])
 
 
@@ -61,16 +64,14 @@ export const SearchResults = ({ route, navigation }) => {
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf'),
         InterRegular: require('../assets/fonts/Inter-Regular.ttf')
     });
-
     if (!loaded || !dataLoaded) {
         return null;
     }
-
+    
     return (
 
         <KeyboardAvoidingView style={{ ...styles.mainContainer, paddingTop: StatusBar.currentHeight + 15 }} >
             <StatusBar backgroundColor={"#fff"} />
-
             <View style={styles.ddcontainer}>
                 <Text>Buscar por </Text>
                 <View style={styles.pickerContainer}>
@@ -127,7 +128,31 @@ export const SearchResults = ({ route, navigation }) => {
                 }}
             />
             }
-            {recipeList.length === 0 &&
+            {recipesFilter && <FlatList
+                onRefresh={onRefresh}
+                refreshing={isFetching}
+                data={recipesFilter}
+                style={{ ...styles.recipesContainer }}
+                nestedScrollEnabled={true}
+                key={item => item.id}
+                renderItem={(recipe) => {
+                    const elem = recipe.item;
+                    return (<RecipeDashboardCard
+                        key={elem.id}
+                        onPress={() => navigation.navigate('Recipe', { id: elem.id, userId: user.id })}
+                        id={elem.id}
+                        title={elem.name}
+                        author={elem.ownerUserName}
+                        image={elem.mainPhoto}
+                        shortDescription={elem.description}
+                        timeToMake={elem.duration}
+                        userId={user.id}
+                        isFav={isFetching}
+                    />);
+                }}
+            />
+            }
+            {recipeList.length === 0 && !recipesFilter &&
                 <FlatList
                     data={[{}]}
                     renderItem={() => (

@@ -3,7 +3,6 @@ import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity } from "react-
 import { View } from "react-native";
 import CarrouselMultimedia from "./CarrouselMultimedia";
 import { MaterialIcons } from '@expo/vector-icons';
-import { set } from "react-native-reanimated";
 
 export const Carrousel = ({id}) => {
   const [instructions, setInstructions] = useState({});
