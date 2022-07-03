@@ -6,22 +6,71 @@ import { CustomNav } from '../shared-components/CustomNav';
 import { TextInput } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
 import { InputTasty } from '../shared-components/InputTasty';
+import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
+import * as ImagePicker from 'expo-image-picker';
+import { recipeReducer, initialState } from './RecipeReducer';
+import * as SecureStore from 'expo-secure-store';
+import { set } from 'react-native-reanimated';
 
 export const RecipeForm = ({ navigation, route }) => {
-	const [minutes, setMinutes] = React.useState();
-	const [people, setPeople] = React.useState();
-	const [portions, setPortions] = React.useState();
+
+	const [recipeState, recipeDispatch] = React.useReducer(recipeReducer, initialState);
+	const { id, description, duration, images, name, ownerId, peopleAmount, portions, typeId, typeDescription } = recipeState;
 
 	let recipeTitle = "";
-
-
 	if (route.params.recipeTitle) {
 		recipeTitle = route.params.recipeTitle;
 	} else {
 		recipeTitle = route.params.data;
 	}
+	
+	React.useEffect(() => {
+		recipeDispatch({ type: 'fieldUpdate', field: 'name', value: recipeTitle });
+		const fetchUserData = async () => {
+			const userData = await SecureStore.getItemAsync("user");
+			recipeDispatch({ type: 'fieldUpdate', field: 'ownerId', value: JSON.parse(userData).id})
+		}
+		fetchUserData();
+		if (route.params.state) {
+			recipeDispatch({type: 'set', state: route.params.state});
+		}
+	}, [route.params])
 
 	const cellular = route.params.cellular;
+
+	const AddPhoto = async () => {
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+
+
+		if (!result.cancelled) {
+			const getFileName = result.uri.split("/");
+			const getExtension = result.uri.split(".");
+			recipeDispatch({
+				type: 'AddImage', image: {
+					uri: result.uri,
+					type: 'image/' + getExtension[getExtension.length - 1],
+					name: getFileName[getFileName.length - 1]
+				}
+			})
+
+		}
+	}
+
+	const removePhoto = (index) => {
+		const aux = images.slice(0, images.length)
+		aux.splice(index, 1);
+        recipeDispatch({type: 'fieldUpdate', field: 'images', value: aux});
+	}
+
+	const handleRemoveType = () => {
+		recipeDispatch({type: 'fieldUpdate', field: 'typeId', value: null});
+		recipeDispatch({type: 'fieldUpdate', field: 'typeDescription', value: ""});
+	}
 
 	const [loaded] = useFonts({
 		InterMedium: require('../assets/fonts/Inter-Medium.ttf'),
@@ -33,104 +82,115 @@ export const RecipeForm = ({ navigation, route }) => {
 	}
 
 	return (
-		<ScrollView style={styles.container}>
-			<View style={styles.menu}>
+		<View style={{backgroundColor: '#fff', flex: 1, justifyContent: 'center', paddingTop: StatusBar.currentHeight + 5, }}>
+
+			<View style={{ backgroundColor: '#fff' }}>
 				<CustomNav
-					callback={() => navigation.navigate('CreateRecipeName')}
+					callback={() => {
+						recipeDispatch({type: 'reset'});
+						navigation.goBack();
+					}}
 					text="Nueva receta"
 				/>
 			</View>
-			<View style={{alignItems: 'center'}}>
 
-				<View>
-					<Text style={styles.recipeTitle}>{recipeTitle}</Text>
-					<Text style={styles.description}>Descripción</Text>
-					<InputTasty
-						style={styles.input}
-						placeholder={'Alguna descripción de su plato...'}
-						multiline
-						maxLength={200}
-						// numberOfLines={4}
-					/>
-				</View>
-				<View style={styles.composedInputs}>
-					<View style={styles.inputRow}>
-						<MaterialIcons name="schedule" size={40} style={styles.inputImage} />
-						<InputTasty
-							style={styles.inputComposed}
-							keyboardType={'numeric'}
-							maxLength={3}
-							onChange={(minutes) => setMinutes(minutes)}
-							value={minutes}
-						/>
-						<Text style={styles.inputText}>minutos</Text>
-					</View>
-					<View style={styles.inputRow}>
-						<MaterialIcons name="groups" size={40} style={styles.inputImage} />
-						<InputTasty
-							style={styles.inputComposed}
-							keyboardType={'numeric'}
-							maxLength={3}
-							onChange={(plp) => setPeople(plp)}
-							value={people}
-						/>
-						<Text style={styles.inputText}>personas</Text>
-					</View>
-					<View style={styles.inputRow}>
-						<MaterialIcons name="pie-chart" size={40} style={styles.inputImage} />
-						<InputTasty
-							style={styles.inputComposed}
-							keyboardType={'numeric'}
-							maxLength={3}
-							onChange={(ptions) => setPortions(ptions)}
-							value={portions}
-						/>
-						<Text style={styles.inputText}>porciones</Text>
-					</View>
-				</View>
+			<ScrollView style={styles.container}>
+				<View style={{ alignItems: 'center' }}>
 
-				<View style={styles.margin}>
-					<Text style={styles.description}>Tipo de plato</Text>
-					<TouchableOpacity onPress={() => console.log('Agregar tipo de plato')}>
-						<View style={styles.addButton}>
+					<View>
+						<Text style={styles.recipeTitle}>{name}</Text>
+						<Text style={styles.description}>Descripción</Text>
+						<InputTasty
+							style={styles.input}
+							placeholder={'Alguna descripción de su plato...'}
+							multiline
+							maxLength={200}
+							value={description}
+							onChange={(desc) => recipeDispatch({ type: 'fieldUpdate', field: 'description', value: desc })}
+						/>
+					</View>
+					<View style={styles.composedInputs}>
+						<View style={styles.inputRow}>
+							<MaterialIcons name="schedule" size={40} style={styles.inputImage} />
+							<InputTasty
+								style={styles.inputComposed}
+								keyboardType={'numeric'}
+								maxLength={3}
+								onChange={(minutes) => recipeDispatch({ type: 'fieldUpdate', field: 'duration', value: minutes })}
+								value={duration}
+							/>
+							<Text style={styles.inputText}>minutos</Text>
+						</View>
+						<View style={styles.inputRow}>
+							<MaterialIcons name="groups" size={40} style={styles.inputImage} />
+							<InputTasty
+								style={styles.inputComposed}
+								keyboardType={'numeric'}
+								maxLength={3}
+								onChange={(plp) => recipeDispatch({ type: 'fieldUpdate', field: 'peopleAmount', value: plp })}
+								value={peopleAmount}
+							/>
+							<Text style={styles.inputText}>personas</Text>
+						</View>
+						<View style={styles.inputRow}>
+							<MaterialIcons name="pie-chart" size={40} style={styles.inputImage} />
+							<InputTasty
+								style={styles.inputComposed}
+								keyboardType={'numeric'}
+								maxLength={3}
+								onChange={(ptions) => recipeDispatch({ type: 'fieldUpdate', field: 'portions', value: ptions })}
+								value={portions}
+							/>
+							<Text style={styles.inputText}>porciones</Text>
+						</View>
+					</View>
+
+					<View style={styles.margin}>
+						<Text style={styles.description}>Tipo de plato</Text>
+						<TouchableOpacity onPress={() => navigation.navigate('DefineType', {state: recipeState})} style={styles.addButton}>
+							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton}/>
+							<Text style={styles.textButton}>Añadir</Text>
+						</TouchableOpacity>
+						{typeId && 
+						<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '60%', marginTop: 10}}>
+							<Text style={{fontSize: 18}}> - {typeDescription}</Text>
+							<TouchableOpacity 
+							style={{backgroundColor: "#E31C1C", borderRadius: 5, padding: 2, width: 24}}
+							onPress={handleRemoveType}
+							>
+								<MaterialIcons name="delete" size={20} color="white" />
+							</TouchableOpacity>
+						</View>
+						}
+					</View>
+					<View style={styles.margin}>
+						<Text style={styles.description}>Ingredientes</Text>
+						<TouchableOpacity onPress={() => console.log('Agregar ingrediente')} style={styles.addButton}>
 							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
 							<Text style={styles.textButton}>Añadir</Text>
-						</View>
-					</TouchableOpacity>
-				</View>
-				<View style={styles.margin}>
-					<Text style={styles.description}>Ingredientes</Text>
-					<TouchableOpacity onPress={() => console.log('Agregar ingrediente')}>
-						<View style={styles.addButton}>
-							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
-							<Text style={styles.textButton}>Añadir</Text>
-						</View>
-					</TouchableOpacity>
-				</View>
-				<View style={styles.margin}>
-					<Text style={styles.description}>Fotos</Text>
-					<TouchableOpacity onPress={() => console.log('Agregar fotos')}>
-						<View style={styles.addButton}>
-							<MaterialIcons name="add-a-photo" size={24} style={styles.iconCamera} />
-							<Text style={styles.textButton}>Añadir</Text>
-						</View>
-					</TouchableOpacity>
-				</View>
-
-				<View style={{ flex: 1 }}>
-					<View style={{ borderWidth: 1, position: 'absolute', bottom: 0, alignSelf: 'flex-end' }}>
-						<MaterialIcons name="keyboard-arrow-right" size={24} style={styles.iconButton} />
+						</TouchableOpacity>
+					</View>
+					<View style={[styles.margin, {marginBottom: 10}]}>
+						<AddMultimediaForm
+							title={"Fotos"}
+							titleStyle={styles.description}
+							onPress={AddPhoto}
+							data={images}
+							onRemove={removePhoto} />
 					</View>
 				</View>
-			</View>
-		</ScrollView>
+			</ScrollView>
+			<TouchableOpacity 
+			style={{position: 'absolute', right: 10, bottom: 10 ,alignSelf: 'flex-end', backgroundColor: "#583209", borderRadius: 500, padding: 5, marginTop: 30 }}>
+						<MaterialIcons name="chevron-right" size={60} color="#fff" />
+			</TouchableOpacity>
+		</View>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: '#fff',
-		paddingTop: StatusBar.currentHeight + 5
 	},
 	margin: {
 		width: '65%',
@@ -151,6 +211,7 @@ const styles = StyleSheet.create({
 	inputComposed: {
 		borderColor: '#312102',
 		borderRadius: 40,
+		textAlign: 'center',
 		paddingHorizontal: 20,
 	},
 	inputRow: {
@@ -204,20 +265,21 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-start'
 	},
 	addButton: {
-		backgroundColor: '#F3A200',
+		backgroundColor: "#F3A200",
 		flexDirection: 'row',
-		borderRadius: 50,
-		justifyContent: 'center',
-		marginRight: 120
+		justifyContent: 'space-around',
+		width: 110,
+		borderRadius: 25,
+		paddingVertical: 5,
+		paddingHorizontal: 10
 	},
 	textButton: {
-		fontFamily: 'InterMedium',
-		fontSize: 22,
-		color: 'white'
+		color: "#fff",
+		fontFamily: "InterSemiBold",
+		fontSize: 18,
 	},
 	iconButton: {
 		color: 'white',
-		marginTop: 5
 	},
 	iconCamera: {
 		color: 'white',

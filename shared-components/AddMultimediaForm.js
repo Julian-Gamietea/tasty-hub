@@ -2,10 +2,10 @@ import { DeletableImage } from "./DeletableImage";
 import { Text, View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
 
-export const AddMultimediaForm = ({ title, data, onPress, onRemove}) => {
+export const AddMultimediaForm = ({ title, data, onPress, onRemove, titleStyle}) => {
     return (
         <View>
-            <Text style={styles.InputText}>{title}</Text>
+            <Text style={[styles.InputText, titleStyle]}>{title}</Text>
             <TouchableOpacity style={styles.addMultimedia} onPress={onPress}>
                 <MaterialIcons name="add-a-photo" size={24} color="white" />
                 <Text style={styles.addMultimediaText}>Añadir</Text>

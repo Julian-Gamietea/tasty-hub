@@ -43,6 +43,7 @@ import { NoWifi } from './recipe-creation/NoWifi';
 import { InstructionCreation } from './recipe-creation/InstructionCreation';
 import { Saved } from './saved/Saved';
 import { SavedRecipeCard } from './shared-components/SavedRecipeCard';
+import { DefineType } from './recipe-creation/DefineType';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +94,7 @@ function RecipeTabStack() {
       <Stack.Screen name="CreateRecipeName" component={CreateRecipeName} />
       <Stack.Screen name="RecipeForm" component={RecipeForm} />
       <Stack.Screen name="NoWifi" component={NoWifi}/>
+      <Stack.Screen name="DefineType" component={DefineType}/>
     </Stack.Navigator>
     )
 }
