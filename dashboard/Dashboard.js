@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions, RefreshControl, SafeAreaView, FlatList, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Modal, FlatList, KeyboardAvoidingView, Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 import { useFonts } from 'expo-font';
@@ -9,7 +9,8 @@ import { DashboardInput } from './DashboardInput';
 
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
-
+import NetInfo from '@react-native-community/netinfo';
+import { MaterialIcons } from '@expo/vector-icons';
 
 
 export const Dashboard = ({ route, navigation }) => {
@@ -20,7 +21,24 @@ export const Dashboard = ({ route, navigation }) => {
     const [selectedValue, setSelectedValue] = React.useState('plato');
     const [inputValue, setInputValue] = React.useState("");
     const [isFetching, setIsFetching] = React.useState(false);
-    
+    const [modalVisible, setModalVisible] = React.useState(true);
+
+    React.useEffect(() => {
+        //AGREGAR ACA CHEQUEAR SI AÚN QUEDAN RECETAS POR SUBIR Y MOSTRAR MODAL EN CASO DE QUE ASI
+        //SEA
+        const unsuscribe = NetInfo.addEventListener(state => {
+            console.log("Connection type", state.type);
+            console.log("Is Connected?", state.isConnected);
+
+            if (state.type === "wifi") {
+                setModalVisible(false);
+            } else {
+                setModalVisible(true);
+            }
+        })
+
+        return () => unsuscribe();
+    }, [])
 
     React.useEffect(() => {
         const fetchUserData = async () => {
@@ -67,9 +85,39 @@ export const Dashboard = ({ route, navigation }) => {
 
     return (
 
-        <KeyboardAvoidingView style={{...styles.mainContainer, paddingTop: StatusBar.currentHeight+5}} >
-            <StatusBar backgroundColor={"#fff"}/>
-            
+        <KeyboardAvoidingView style={{ ...styles.mainContainer, paddingTop: StatusBar.currentHeight + 5 }} >
+            <StatusBar backgroundColor={"#fff"} />
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <MaterialIcons name="info" size={60} color="#F3A200" />
+                        <Text style={styles.modalText}>Ya tiene una receta llamada #NOMBRE</Text>
+                        <Text style={styles.modalText}>¿Desea sobrescribirla o descartarla?</Text>
+                        <View style={{flexDirection: 'row'}}>
+                            <TouchableOpacity
+                                style={[styles.button, styles.buttonClose, {marginRight: 5}]}
+                                onPress={() => setModalVisible(!modalVisible)}
+                            >
+                                <Text style={styles.textStyle}>Sobrescribir</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => setModalVisible(!modalVisible)}
+                            >
+                                <Text style={styles.textStyle}>Descartar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
             <Text style={styles.welcomeMessage}>¡Bienvenido de nuevo, <Text style={styles.username}>{user.name.split(" ")[0]}</Text>!</Text>
             <View style={styles.ddcontainer}>
                 <Text>Buscar por </Text>
@@ -90,7 +138,7 @@ export const Dashboard = ({ route, navigation }) => {
                     value={inputValue}
                     onClick={() => {
                         setInputValue("");
-                        navigation.navigate("SearchResults", {query: inputValue, type: selectedValue})
+                        navigation.navigate("SearchResults", { query: inputValue, type: selectedValue })
                     }}
                     placeholder={selectedValue === 'plato' ? "Buscar por plato..." : "Buscar por usuario..."}
                 />
@@ -103,14 +151,14 @@ export const Dashboard = ({ route, navigation }) => {
                     <Feather name="filter" size={32} color="#553900" />
                 </TouchableOpacity>
             </View>
-            
+
             <StatusBar style='dark' />
             <Text style={styles.text}>Recomendados</Text>
             <FlatList
                 onRefresh={onRefresh}
                 refreshing={isFetching}
                 data={recipeList}
-                style={{...styles.recipesContainer}}
+                style={{ ...styles.recipesContainer }}
                 nestedScrollEnabled={true}
                 key={item => item.id}
                 renderItem={(recipe) => {
@@ -124,7 +172,7 @@ export const Dashboard = ({ route, navigation }) => {
                         image={elem.mainPhoto}
                         shortDescription={elem.description}
                         timeToMake={elem.duration}
-                        userId={user.id} 
+                        userId={user.id}
                     />);
                 }}
             />
@@ -134,7 +182,7 @@ export const Dashboard = ({ route, navigation }) => {
 }
 
 const styles = StyleSheet.create({
-    
+
     mainContainer: {
         flex: 1,
         justifyContent: 'space-around',
@@ -221,5 +269,53 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: '#F7EAB5',
         marginLeft: 5
-    }
+    },
+    
+        centeredView: {
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: 22
+        },
+        modalView: {
+          margin: 20,
+          backgroundColor: "white",
+          borderRadius: 20,
+          padding: 35,
+          alignItems: "center",
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+          elevation: 5,
+          height: 300,
+          width: 270
+        },
+        button: {
+          borderRadius: 8,
+          padding: 10,
+          elevation: 2
+        },
+        buttonOpen: {
+          backgroundColor: "#F194FF",
+        },
+        buttonClose: {
+          backgroundColor: "#F3A200",
+        },
+        textStyle: {
+          color: "white",
+          fontWeight: "bold",
+          textAlign: "center",
+          fontFamily: "InterSemiBold",
+          fontSize: 20
+        },
+        modalText: {
+          marginBottom: 15,
+          textAlign: "center",
+          fontFamily: "InterSemiBold"
+        }
+      
 })
