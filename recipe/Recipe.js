@@ -13,6 +13,7 @@ import Carrousel from "../carrousel-instructions/Carrousel";
 import * as FileSystem from 'expo-file-system'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from "@react-navigation/native";
+import { AntDesign } from '@expo/vector-icons'; 
 
 console.disableYellowBox = true;
 
@@ -24,16 +25,36 @@ export const Recipe = ({route, navigation}) => {
     const {filename} = route.params
     
     React.useEffect(() => {
-        
+        const getStoragedIngredients = async (filename) => {
+            try{
+                const jsonValue = await AsyncStorage.getItem(`Receta_${id}`)
+                return JSON.parse(jsonValue).ingredientes;
+            } catch(e) {
+                console.log(e)
+            }
+        }
+
         const isSaved = async (id) => {
             let keys = []
+            let stop = false;
             try {
                 keys = await AsyncStorage.getAllKeys()
-                keys.forEach(element => {
-                    if(element===`Receta_${id}`){
-                        setSaved(true)
+                for (const key of keys){
+                    if(key ===`Receta_${id}`){
+                        setOverwrite(true)
+                        const ingStoraged = await getStoragedIngredients(`Receta_${id}`)
+                        for (let index = 0; index < ingStoraged.length; index++) {
+                            if(ingStoraged[index].quantity !== recalculated[index].quantity){
+                                setSaved(false)
+                                stop = true;
+                                break;
+                            }
+                        }
+                        if(stop === false){
+                            setSaved(true)
+                        }
                     }
-                });
+                }
             } catch(e) {
                 console.log(e)
             }
@@ -187,6 +208,7 @@ export const Recipe = ({route, navigation}) => {
 
 
     const focus = useIsFocused();
+    const [overwrite, setOverwrite] = React.useState(false)
     const [userProfilePhoto, setUserProfilePhoto] = React.useState("")
     const [multimedia, setMultimedia] = React.useState([])
     const [instructions, setInstructions] = React.useState([])
@@ -328,63 +350,89 @@ export const Recipe = ({route, navigation}) => {
             }else{
                 setSaved(true)
                 showNotification('Recordat')
-                FileSystem.makeDirectoryAsync(directory)
-                .then((response)=>console.log("Directorio Creado"))
-                .catch((error)=>console.log(error))
-
-                FileSystem.makeDirectoryAsync(directory+'/photos/')
-                .then((response)=>console.log("Directorio de fotos creado"))
-                .catch((error)=>console.log(error))
-
+                
+                if(!overwrite){
+                    FileSystem.makeDirectoryAsync(directory)
+                    .then((response)=>console.log("Directorio Creado"))
+                    .catch((error)=>console.log(error))
+    
+                    FileSystem.makeDirectoryAsync(directory+'/photos/')
+                    .then((response)=>console.log("Directorio de fotos creado"))
+                    .catch((error)=>console.log(error))
+                }
+               
                 
                 const cargarData = async () => {
-                    const multimedia = []
-                    const images = []
+                    let multimedia = []
+                    let images = []
 
-                    for (let i = 0; i < recipeImages.length; i++) {
+                    if(!overwrite){
+                        for (let i = 0; i < recipeImages.length; i++) {
                         const extension = recipeImages[i].split('.')
                         await FileSystem.downloadAsync(recipeImages[i], directory+'/photos/photo_'+i+'.'+extension[extension.length-1])
                         images.push(directory+'/photos/photo_'+i+'.'+extension[extension.length-1])    
-                    }
-
-
-                    let index = 0;
-                    for (const inst of instructions){
-                        const subMultimedia = [];
-                        const instructionDir = directory+'/instruction'+index+'/';
-                        try{
-                            await FileSystem.makeDirectoryAsync(instructionDir)
-                        }catch(e){
-                            console.log(e)
                         }
 
-                        try{
-                            const res = await axios.get(`https://tasty-hub.herokuapp.com/api/multimedia/instruction/${inst.id}`)
-                            const data = res.data
-                            
-                            for (const multi of data){
-                                try{
-                                    await FileSystem.downloadAsync(multi.urlContent, instructionDir+'multimedia_'+index+'.'+multi.extension)
-                                    subMultimedia.push(instructionDir+'multimedia_'+index+'.'+multi.extension)
-                                    console.log(instructionDir+'multimedia_'+index+'.'+multi.extension)
-                                }catch(e){
-                                    console.log(e)
-                                }
+                        let index = 0;
+                        for (const inst of instructions){
+                            const subMultimedia = [];
+                            const instructionDir = directory+'/instruction'+index+'/';
+                            try{
+                                await FileSystem.makeDirectoryAsync(instructionDir)
+                            }catch(e){
+                                console.log(e)
                             }
-                            
-                            multimedia.push(subMultimedia)
-                            
-                        }catch(e){
+
+                            try{
+                                const res = await axios.get(`https://tasty-hub.herokuapp.com/api/multimedia/instruction/${inst.id}`)
+                                const data = res.data
+                                
+                                for (const multi of data){
+                                    try{
+                                        await FileSystem.downloadAsync(multi.urlContent, instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                        subMultimedia.push(instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                        //console.log(instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                    }catch(e){
+                                        console.log(e)
+                                    }
+                                }
+                                
+                                multimedia.push(subMultimedia)
+                                
+                            }catch(e){
+                                console.log(e)
+                            }
+
+                            index ++;
+                        }
+                    }else{
+                        try {
+                            const jsonValue = await AsyncStorage.getItem(filename)
+                            multimedia = JSON.parse(jsonValue).multimedia
+                            images = JSON.parse(jsonValue).images
+                        } catch(e) {
                             console.log(e)
                         }
-
-                        index ++;
                     }
-                    
-                    
+
+                    const newData = {
+                        description: datos.description,
+                        duration: datos.duration,
+                        enabled: datos.enabled,
+                        id: datos.id,
+                        mainPhoto: datos.mainPhoto,
+                        name: datos.name,
+                        ownerId: datos.ownerId,
+                        ownerUserName: datos.ownerUserName,
+                        peopleAmount: datos.peopleAmount*factor,
+                        portions: datos.portions*factor,
+                        timestamp: datos.timestamp,
+                        typeId: datos.typeId,
+                        typeName: datos.typeName,
+                    }
 
                     const object  = {
-                        datos: datos,
+                        datos: newData,
                         rating: starCount2,
                         ingredientes: recalculated,
                         instructions: instructions,
@@ -393,6 +441,7 @@ export const Recipe = ({route, navigation}) => {
                         multimedia: multimedia,
                         avatarUser: userProfilePhoto
                     }
+
                     
                     AsyncStorage.setItem(filename, JSON.stringify(object))
                     .then(()=>console.log("Agregado"))
@@ -458,8 +507,14 @@ export const Recipe = ({route, navigation}) => {
                     </View>  
                 </View>
                 <View style={styles.infoItem2}>
-                    <Feather name="clock" size={24} color="#5D420C" />
-                    <Text style={styles.infoText}> {datos.duration} min </Text>
+                    <View style={{flexDirection: 'row', marginBottom: 5}}>
+                        <Feather name="clock" size={24} color="#5D420C" />
+                        <Text style={styles.infoText}> {datos.duration} min </Text>
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                        <AntDesign name="tags" size={24} color="#5D420C"  />
+                        <Text style={styles.infoText}>{datos.typeName}</Text>
+                    </View>
                 </View>
             </View>
             
@@ -593,11 +648,12 @@ export const Recipe = ({route, navigation}) => {
                     </View>
                 </View>
             </Modal>
+
             {recalculated && saved && <NotificationModal
                 visible={notificationRecordat}
-                onRequestClose={()=>setNotificationRecordat(!notificationGuardadas)}
-                onPress={()=>setNotificationRecordat(!notificationGuardadas)}
-                message={"¡RECUERDE! Para guardar otra versión de esta receta deberá eliminar la actual"}
+                onRequestClose={()=>setNotificationRecordat(!notificationRecordat)}
+                onPress={()=>setNotificationRecordat(!notificationRecordat)}
+                message={"¡RECUERDE! Cualquier modificacion que desee guardar sobreescribirá la ya guardada"}
             />}
             <NotificationModal
                 visible={notificationGuardadas}
@@ -666,8 +722,6 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
 
-
-
     info:{
         flex: 1,
         marginTop: 20,
@@ -684,9 +738,8 @@ const styles = StyleSheet.create({
         flexDirection: 'column'
     },
     infoItem2:{
-        flexDirection: 'row'
+        flexDirection: 'column'
     },
-
 
     buttons:{
         flex: 1,
