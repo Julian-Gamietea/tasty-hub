@@ -25,8 +25,8 @@ export const CreateRecipeName = ({ navigation }) => {
 			<Text style={styles.title}>Crear receta</Text>
 			<Image style={styles.image} source={burger} />
 			<Text style={styles.dishName}>Nombre del plato</Text>
-			<TextInput style={styles.input} onChangeText={(name) => setRecipeName(name)} />
-			<TouchableOpacity onPress={() => navigation.navigate('RecipeForm')}>
+			<TextInput value={recipeName} style={styles.input} onChangeText={(name) => setRecipeName(name)} />
+			<TouchableOpacity onPress={() => navigation.navigate('RecipeForm', {recipeTitle: recipeName})}>
 				<Image source={nextArrow} style={styles.nextArrow}></Image>
 			</TouchableOpacity>
 		</View>
