@@ -201,6 +201,8 @@ export const Recipe = ({route, navigation}) => {
     const [addedFavorites, setAddedFavorites] = React.useState(false)
     const [notificationText, setNotificationText] = React.useState("")
     const [notification, setNotification] = React.useState(false)
+    const [notificationGuardadas, setNotificationGuardadas] = React.useState(false)
+    const [notificationRecordat, setNotificationRecordat] = React.useState(false)
     const [saved, setSaved] = React.useState(false) 
     const [uri, setUri] = React.useState("")
     const [loaded] = useFonts({
@@ -267,7 +269,7 @@ export const Recipe = ({route, navigation}) => {
             axios.post(`https://tasty-hub.herokuapp.com/api/favorite?recipeId=${id}&userId=${userId}`)
             .then(()=>{
                 setAddedFavorites(true)    
-                showNotification()
+                showNotification('Favoritas')
             })
             .catch((error)=>{
                 console.log("ERROR 8" + error)
@@ -276,7 +278,7 @@ export const Recipe = ({route, navigation}) => {
             axios.delete(`https://tasty-hub.herokuapp.com/api/favorite/delete?recipeId=${id}&userId=${userId}`)
             .then(()=>{
                 setAddedFavorites(false)
-                showNotification()
+                showNotification('Favoritas')
             })
             .catch((error)=>{
                 console.log("ERROR 9" + error)
@@ -285,98 +287,122 @@ export const Recipe = ({route, navigation}) => {
     
     }
 
-    const showNotification = () => {
-        setNotification(true);
-        setTimeout(() => {
-            setNotification(false);
-        }, 1500);
+    const showNotification = (type) => {
+        if(type === 'Favoritas'){
+            setNotification(true);
+            setTimeout(() => {
+                setNotification(false);
+            }, 1500);
+        }else if(type==='Guardadas'){
+            setNotificationGuardadas(true);
+            setTimeout(() => {
+                setNotificationGuardadas(false);
+            }, 1500);
+        }else{
+            setNotificationRecordat(true)
+            setTimeout(() => {
+                setNotificationRecordat(false);
+            }, 4000);
+        }
+       
     }
 
+    
+
     const save = async () => {
-        
+
         const filename = `Receta_${datos.id}`
         const directory = FileSystem.documentDirectory+filename;
-        
-        // FileSystem.readDirectoryAsync(directory)
-        // .then((response)=>console.log(response))
-        // .catch((error)=>console.log(error))
 
         if (!saved){
-            setSaved(true)
-            
-            FileSystem.makeDirectoryAsync(directory)
-            .then((response)=>console.log("Directorio Creado"))
-            .catch((error)=>console.log(error))
 
-            FileSystem.makeDirectoryAsync(directory+'/photos/')
-            .then((response)=>console.log("Directorio de fotos creado"))
-            .catch((error)=>console.log(error))
-
-              
-            const cargarData = async () => {
-                const multimedia = []
-                const images = []
-
-                for (let i = 0; i < recipeImages.length; i++) {
-                    const extension = recipeImages[i].split('.')
-                    await FileSystem.downloadAsync(recipeImages[i], directory+'/photos/photo_'+i+'.'+extension[extension.length-1])
-                    images.push(directory+'/photos/photo_'+i+'.'+extension[extension.length-1])    
-                }
-
-
-                let index = 0;
-                for (const inst of instructions){
-                    const subMultimedia = [];
-                    const instructionDir = directory+'/instruction'+index+'/';
-                    try{
-                        await FileSystem.makeDirectoryAsync(instructionDir)
-                    }catch(e){
-                        console.log(e)
-                    }
-
-                    try{
-                        const res = await axios.get(`https://tasty-hub.herokuapp.com/api/multimedia/instruction/${inst.id}`)
-                        const data = res.data
-                        
-                        for (const multi of data){
-                            try{
-                                await FileSystem.downloadAsync(multi.urlContent, instructionDir+'multimedia_'+index+'.'+multi.extension)
-                                subMultimedia.push(instructionDir+'multimedia_'+index+'.'+multi.extension)
-                                console.log(instructionDir+'multimedia_'+index+'.'+multi.extension)
-                            }catch(e){
-                                console.log(e)
-                            }
-                        }
-                        
-                        multimedia.push(subMultimedia)
-                        
-                    }catch(e){
-                        console.log(e)
-                    }
-
-                    index ++;
-                }
-                
-                
-
-                const object  = {
-                    datos: datos,
-                    rating: starCount2,
-                    ingredientes: recalculated,
-                    instructions: instructions,
-                    directory: directory,
-                    images: images,
-                    multimedia: multimedia,
-                    avatarUser: userProfilePhoto
-                }
-                
-                AsyncStorage.setItem(filename, JSON.stringify(object))
-                .then(()=>console.log("Agregado"))
-                .catch((error) => console.log(error))
-                
+            let keys = []
+            try {
+                keys = await AsyncStorage.getAllKeys()
+            } catch(e) {
+                console.log(e)
             }
 
-            cargarData()
+            if(keys.length >= 5){
+                showNotification('Guardadas')
+            }else{
+                setSaved(true)
+                showNotification('Recordat')
+                FileSystem.makeDirectoryAsync(directory)
+                .then((response)=>console.log("Directorio Creado"))
+                .catch((error)=>console.log(error))
+
+                FileSystem.makeDirectoryAsync(directory+'/photos/')
+                .then((response)=>console.log("Directorio de fotos creado"))
+                .catch((error)=>console.log(error))
+
+                
+                const cargarData = async () => {
+                    const multimedia = []
+                    const images = []
+
+                    for (let i = 0; i < recipeImages.length; i++) {
+                        const extension = recipeImages[i].split('.')
+                        await FileSystem.downloadAsync(recipeImages[i], directory+'/photos/photo_'+i+'.'+extension[extension.length-1])
+                        images.push(directory+'/photos/photo_'+i+'.'+extension[extension.length-1])    
+                    }
+
+
+                    let index = 0;
+                    for (const inst of instructions){
+                        const subMultimedia = [];
+                        const instructionDir = directory+'/instruction'+index+'/';
+                        try{
+                            await FileSystem.makeDirectoryAsync(instructionDir)
+                        }catch(e){
+                            console.log(e)
+                        }
+
+                        try{
+                            const res = await axios.get(`https://tasty-hub.herokuapp.com/api/multimedia/instruction/${inst.id}`)
+                            const data = res.data
+                            
+                            for (const multi of data){
+                                try{
+                                    await FileSystem.downloadAsync(multi.urlContent, instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                    subMultimedia.push(instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                    console.log(instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                }catch(e){
+                                    console.log(e)
+                                }
+                            }
+                            
+                            multimedia.push(subMultimedia)
+                            
+                        }catch(e){
+                            console.log(e)
+                        }
+
+                        index ++;
+                    }
+                    
+                    
+
+                    const object  = {
+                        datos: datos,
+                        rating: starCount2,
+                        ingredientes: recalculated,
+                        instructions: instructions,
+                        directory: directory,
+                        images: images,
+                        multimedia: multimedia,
+                        avatarUser: userProfilePhoto
+                    }
+                    
+                    AsyncStorage.setItem(filename, JSON.stringify(object))
+                    .then(()=>console.log("Agregado"))
+                    .catch((error) => console.log(error))
+                    
+                }
+
+                cargarData()
+            }
+            
         }else{
             setSaved(false)
             
@@ -567,8 +593,18 @@ export const Recipe = ({route, navigation}) => {
                     </View>
                 </View>
             </Modal>
-            
-
+            {recalculated && saved && <NotificationModal
+                visible={notificationRecordat}
+                onRequestClose={()=>setNotificationRecordat(!notificationGuardadas)}
+                onPress={()=>setNotificationRecordat(!notificationGuardadas)}
+                message={"¡RECUERDE! Para guardar otra versión de esta receta deberá eliminar la actual"}
+            />}
+            <NotificationModal
+                visible={notificationGuardadas}
+                onRequestClose={()=>setNotificationGuardadas(!notificationGuardadas)}
+                onPress={()=>setNotificationGuardadas(!notificationGuardadas)}
+                message={"Ha alcanzado el máximo de 5 recetas guardadas"}
+            />
             <NotificationModal
                 visible={notification}
                 onRequestClose={()=>setNotification(!notification)}
