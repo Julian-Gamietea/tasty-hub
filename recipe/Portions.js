@@ -11,7 +11,7 @@ export const Portions = ({userId,recipeId,navigation}) => {
 		var conversionFactor = portionsQty/recipe.portions
 		await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
 	   .then((ingredientQuantityList)=>{
-		   navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList.data})
+		   navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList.data, factor: conversionFactor})
 	   })
 	   .catch( (e)=>{
 			console.log(e)

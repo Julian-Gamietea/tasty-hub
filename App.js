@@ -40,6 +40,9 @@ import { WelcomeScreen } from './recipe-creation/WelcomeScreen';
 import { CreateRecipeName } from './recipe-creation/CreateRecipeName';
 import { RecipeForm } from './recipe-creation/RecipeForm';
 import { NoWifi } from './recipe-creation/NoWifi';
+import { InstructionCreation } from './recipe-creation/InstructionCreation';
+import { Saved } from './saved/Saved';
+import { SavedRecipeCard } from './shared-components/SavedRecipeCard';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,7 +51,8 @@ function DashboardTabStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Dashboard">
       <Stack.Screen name="Recipe" component={Recipe} />
-      <Stack.Screen name="SearchResults" component={SearchResults} />
+      <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+      <Stack.Screen name="SearchResults" component={SearchResults}/>
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="UserProfile" component={UserProfile} />
     </Stack.Navigator>
@@ -61,7 +65,8 @@ function FavouritesTabStack() {
       <Stack.Screen name="Recipe" component={Recipe} />
       <Stack.Screen name="SearchResults" component={SearchResults} />
       <Stack.Screen name="Favourites" component={Favourites} />
-      <Stack.Screen name="UserProfile" component={UserProfile} />
+      <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
     </Stack.Navigator>
   )
 }
@@ -72,12 +77,14 @@ function ProfileTabStack() {
       <Stack.Screen name="ProfileInfo" component={Profile} />
       <Stack.Screen name="UserRecipes" component={UserRecipes} />
       <Stack.Screen name="Recipe" component={Recipe} />
-      <Stack.Screen name="UserProfile" component={UserProfile} />
-      <Stack.Screen name="EditProfile" component={EditProfile} />
-      <Stack.Screen name="ProfileUpdate" component={ProfileUpdated} />
+      <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="EditProfile" component={EditProfile}/>
+      <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
+      <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
     </Stack.Navigator>
   )
 }
+
 
 function RecipeTabStack() {
   return (
@@ -86,6 +93,22 @@ function RecipeTabStack() {
       <Stack.Screen name="CreateRecipeName" component={CreateRecipeName} />
       <Stack.Screen name="RecipeForm" component={RecipeForm} />
       <Stack.Screen name="NoWifi" component={NoWifi}/>
+    </Stack.Navigator>
+    )
+}
+
+function SavedTabStack() {
+  return(
+    <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Saved">
+      <Stack.Screen name="ProfileInfo" component={Profile}/>
+      <Stack.Screen name="UserRecipes" component={UserRecipes}/>
+      <Stack.Screen name="Saved" component={Saved}/>
+      <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="EditProfile" component={EditProfile}/>
+      <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
+      <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+
     </Stack.Navigator>
   )
 }
@@ -126,7 +149,7 @@ function Tabs() {
       />
       <Tab.Screen
         name="Saved"
-        component={Dashboard}
+        component={SavedTabStack}
         options={{
           tabBarLabel: 'Guardados',
           tabBarIcon: ({ color }) => (
@@ -196,11 +219,9 @@ export default function App() {
         <Stack.Screen name="ExistingMail" component={ExistingMail} />
         <Stack.Screen name="IncompleteRegistry" component={IncompleteRegistry} />
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
-
-        <Stack.Screen name="Recipe" component={Recipe} />
-        <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe} />
+        <Stack.Screen name="SavedRecipeCard" component={SavedRecipeCard}/>
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
-
+        <Stack.Screen name="Test" component={InstructionCreation}/>
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
 

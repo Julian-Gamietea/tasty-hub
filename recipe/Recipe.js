@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable, Dimensions } from "react-native";
 import {useFonts} from 'expo-font'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons'; 
@@ -10,127 +10,186 @@ import axios from "axios";
 import { NotificationModal } from "../shared-components/NotificationModal";
 import { CarrouselImages } from "../shared-components/CarrouselImages";
 import Carrousel from "../carrousel-instructions/Carrousel";
+import * as FileSystem from 'expo-file-system'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from "@react-navigation/native";
 
 console.disableYellowBox = true;
 
 export const Recipe = ({route, navigation}) => {
-
-    
+    const {factor} = route.params
     const {userId} = route.params;
     const {id} = route.params;
     const {recalculated} = route.params;
+    const {filename} = route.params
+    
     React.useEffect(() => {
-        const array = []
-
-        const fetchData = () => {
-            var axios = require('axios');
-            var config = {
-            method: 'get',
-            url: `https://tasty-hub.herokuapp.com/api/recipes/${id}`,
-            headers: { }
-            };
-
-            axios(config)
-            .then(function (response) {
-
-                // SETTING THE RECIPE INFORMATION 
-
-                setDatos(response.data)
-            
-                array.push(response.data.mainPhoto)
-
-                const id = response.data.id
-
-                if(typeof(recalculated) == "undefined"){
-                    var config2 = {
-                        method: 'get',
-                        url: `https://tasty-hub.herokuapp.com/api/ingredientQuantity?recipeId=${id}`,
-                        headers: { }
-                    };
         
-                    axios(config2)
-                    .then((response) => {
-                        setIngredientes(response.data)
-                    })
-                    .catch((error) => {
-                        console.log("ERROR 1 " + error)
-                    })
-                }else{
-                    setIngredientes(recalculated)
-                }
-                
-
-                var config3 = {
-                    method: 'get',
-                    url: `https://tasty-hub.herokuapp.com/api/rating/average/${id}`,
-                    headers: { }
-                    };
-                    
-                    axios(config3)
-                    .then(function (response) {
-
-                        // SETTING THE RECIPE RATING
-
-                        if(!isNaN(response.data)){
-                            setStarCount2(response.data)
-                        }
-                    
-                    })
-                    .catch(function (error) {
-                    console.log("ERROR 2" + error);
-                    }); 
-            })
-            .catch(function (error) {
-                console.log("ERROR 3 " + error);
-            }); 
-            
-            //ASKING IF THE RECIPE IS ALREADY ADDED TO FAVORITES
-
-            axios.get(`https://tasty-hub.herokuapp.com/api/favorite/${userId}`)
-            .then((response)=>{
-                const favorites = response.data;
-                favorites.forEach(element => {
-                    
-                    if(element.recipeId === id){
-                        setAddedFavorites(true)
+        const isSaved = async (id) => {
+            let keys = []
+            try {
+                keys = await AsyncStorage.getAllKeys()
+                keys.forEach(element => {
+                    if(element===`Receta_${id}`){
+                        setSaved(true)
                     }
                 });
-            })
-            .catch((error) => console.log( "ERROR 4 " + error))
-
-            //ASKING IF THE USER HAVE A RATING FOR THE CURRENT RECIPE
-
-            axios.get(`https://tasty-hub.herokuapp.com/api/rating/user?recipeId=${id}&userId=${userId}`)
-            .then((response)=>{
-                setStarCount(response.data.rating)
-                setComments(response.data.comments)
-            
-            })
-            .catch(()=>{
-                // Dont send any error because its ok if the user hasnt got a recipe rating in this recipe
-            })
-            
-
-            // GETTING THE REST OF THE RECIPE IMAGES
-
-            axios.get(`https://tasty-hub.herokuapp.com/api/recipePhotos/recipe/${id}`)
-            .then((response)=>{
-                response.data.forEach(element => {
-                    array.push(element.photoUrl)
-                });
-
-            })
-            .catch((error)=>
-            
-             console.log("ERROR 6" + error)
-             )
-
-
-            setRecipeImages(array)
-
+            } catch(e) {
+                console.log(e)
+            }
         }
-        fetchData();
-    },[]);
+
+        if(!filename){
+            const array = []
+
+            const fetchData = () => {
+                var axios = require('axios');
+                var config = {
+                method: 'get',
+                url: `https://tasty-hub.herokuapp.com/api/recipes/${id}`,
+                headers: { }
+                };
+    
+                axios(config)
+                .then(function (response) {
+     
+                    // SETTING THE RECIPE INFORMATION 
+                    setDatos(response.data)
+                    array.push(response.data.mainPhoto)
+                    const id = response.data.id
+                    isSaved(id)
+                    
+                    // GETTING THE USER PHOTO
+
+                    axios.get(`https://tasty-hub.herokuapp.com/api/user/${response.data.ownerId}`)
+                    .then((response) => setUserProfilePhoto(response.data.avatar))
+                    .catch((error) => console.log(error))
+
+                    if(typeof(recalculated) == "undefined"){
+                        var config2 = {
+                            method: 'get',
+                            url: `https://tasty-hub.herokuapp.com/api/ingredientQuantity?recipeId=${id}`,
+                            headers: { }
+                        };
+            
+                        axios(config2)
+                        .then((response) => {
+                            setIngredientes(response.data)
+    
+                            axios.get(`https://tasty-hub.herokuapp.com/api/instruction/recipe/${id}`)
+                            .then((response) => {setInstructions(response.data)})
+                            .catch((error) => console.log(error))
+                        })
+                        .catch((error) => {
+                            console.log("ERROR 1 " + error)
+                        })
+                    }else{
+                        setIngredientes(recalculated)
+                    }
+                    
+    
+                    var config3 = {
+                        method: 'get',
+                        url: `https://tasty-hub.herokuapp.com/api/rating/average/${id}`,
+                        headers: { }
+                        };
+                        
+                        axios(config3)
+                        .then(function (response) {
+    
+                            // SETTING THE RECIPE RATING
+    
+                            if(!isNaN(response.data)){
+                                setStarCount2(response.data)
+                            }
+                        
+                        })
+                        .catch(function (error) {
+                        console.log("ERROR 2" + error);
+                        }); 
+                })
+                .catch(function (error) {
+                    console.log("ERROR 3 " + error);
+                }); 
+                
+                //ASKING IF THE RECIPE IS ALREADY ADDED TO FAVORITES
+    
+                axios.get(`https://tasty-hub.herokuapp.com/api/favorite/${userId}`)
+                .then((response)=>{
+                    const favorites = response.data;
+                    favorites.forEach(element => {
+                        
+                        if(element.recipeId === id){
+                            setAddedFavorites(true)
+                        }
+                    });
+                })
+                .catch((error) => console.log( "ERROR 4 " + error))
+    
+                //ASKING IF THE USER HAVE A RATING FOR THE CURRENT RECIPE
+    
+                axios.get(`https://tasty-hub.herokuapp.com/api/rating/user?recipeId=${id}&userId=${userId}`)
+                .then((response)=>{
+                    setStarCount(response.data.rating)
+                    setComments(response.data.comments)
+                
+                })
+                .catch(()=>{
+                    // Dont send any error because its ok if the user hasnt got a recipe rating in this recipe
+                })
+                
+    
+                // GETTING THE REST OF THE RECIPE IMAGES
+    
+                axios.get(`https://tasty-hub.herokuapp.com/api/recipePhotos/recipe/${id}`)
+                .then((response)=>{
+                    response.data.forEach(element => {
+                        array.push(element.photoUrl)
+                    });
+    
+                })
+                .catch((error)=>
+                
+                 console.log("ERROR 6" + error)
+                 )
+    
+    
+                setRecipeImages(array)
+    
+            }
+            fetchData();
+        }else{
+            
+            const fetchStoragedData = async () => {
+                try {
+                    const jsonValue = await AsyncStorage.getItem(filename)
+                    if(jsonValue !== null){
+                        console.log(JSON.parse(jsonValue))
+                        setDatos(JSON.parse(jsonValue).datos)
+                        setIngredientes(JSON.parse(jsonValue).ingredientes)
+                        setInstructions(JSON.parse(jsonValue).instructions)
+                        setMultimedia(JSON.parse(jsonValue).multimedia)
+                        setRecipeImages(JSON.parse(jsonValue).images)
+                        setStarCount2(JSON.parse(jsonValue).rating)
+                        setSaved(true)
+                       
+                    }
+                } catch(e) {
+                    console.log(e)
+                }
+            }
+
+            fetchStoragedData()
+            
+        }
+        
+    },[focus, recalculated]);
+
+
+    const focus = useIsFocused();
+    const [userProfilePhoto, setUserProfilePhoto] = React.useState("")
+    const [multimedia, setMultimedia] = React.useState([])
+    const [instructions, setInstructions] = React.useState([])
     const [imgActive, setImgActive] = React.useState(0)
     const [recipeImages, setRecipeImages] = React.useState([])
     const [datos, setDatos] = React.useState([])
@@ -142,6 +201,8 @@ export const Recipe = ({route, navigation}) => {
     const [addedFavorites, setAddedFavorites] = React.useState(false)
     const [notificationText, setNotificationText] = React.useState("")
     const [notification, setNotification] = React.useState(false)
+    const [notificationGuardadas, setNotificationGuardadas] = React.useState(false)
+    const [notificationRecordat, setNotificationRecordat] = React.useState(false)
     const [saved, setSaved] = React.useState(false) 
     const [uri, setUri] = React.useState("")
     const [loaded] = useFonts({
@@ -155,8 +216,6 @@ export const Recipe = ({route, navigation}) => {
     }
 
 
-    const rating = 5;
-
     const onStarRatingPress = (rating) => {
         setStarCount(rating)
     }
@@ -165,14 +224,8 @@ export const Recipe = ({route, navigation}) => {
         setModalVisible(true)
     }
 
-    const onChangeImg = (nativeEvent) => {
-        if(nativeEvent){
-            const slide = Math.ceil(nativeEvent.contentOffset.x / nativeEvent.layoutMeasurement.width);
-            if(slide != imgActive){
-                setImgActive(slide);
-            }
-        }
-    }
+
+    
 
     const closeModalSend = () => {
         
@@ -216,7 +269,7 @@ export const Recipe = ({route, navigation}) => {
             axios.post(`https://tasty-hub.herokuapp.com/api/favorite?recipeId=${id}&userId=${userId}`)
             .then(()=>{
                 setAddedFavorites(true)    
-                showNotification()
+                showNotification('Favoritas')
             })
             .catch((error)=>{
                 console.log("ERROR 8" + error)
@@ -225,7 +278,7 @@ export const Recipe = ({route, navigation}) => {
             axios.delete(`https://tasty-hub.herokuapp.com/api/favorite/delete?recipeId=${id}&userId=${userId}`)
             .then(()=>{
                 setAddedFavorites(false)
-                showNotification()
+                showNotification('Favoritas')
             })
             .catch((error)=>{
                 console.log("ERROR 9" + error)
@@ -234,22 +287,132 @@ export const Recipe = ({route, navigation}) => {
     
     }
 
-    const showNotification = () => {
-        setNotification(true);
-        setTimeout(() => {
-            setNotification(false);
-        }, 1500);
+    const showNotification = (type) => {
+        if(type === 'Favoritas'){
+            setNotification(true);
+            setTimeout(() => {
+                setNotification(false);
+            }, 1500);
+        }else if(type==='Guardadas'){
+            setNotificationGuardadas(true);
+            setTimeout(() => {
+                setNotificationGuardadas(false);
+            }, 1500);
+        }else{
+            setNotificationRecordat(true)
+            setTimeout(() => {
+                setNotificationRecordat(false);
+            }, 4000);
+        }
+       
     }
 
     
-    const save = async () => {
-        const filename = `Receta_${datos.id}`
-        
-        if (!saved){
-            setSaved(true)
 
+    const save = async () => {
+
+        const filename = `Receta_${datos.id}`
+        const directory = FileSystem.documentDirectory+filename;
+
+        if (!saved){
+
+            let keys = []
+            try {
+                keys = await AsyncStorage.getAllKeys()
+            } catch(e) {
+                console.log(e)
+            }
+
+            if(keys.length >= 5){
+                showNotification('Guardadas')
+            }else{
+                setSaved(true)
+                showNotification('Recordat')
+                FileSystem.makeDirectoryAsync(directory)
+                .then((response)=>console.log("Directorio Creado"))
+                .catch((error)=>console.log(error))
+
+                FileSystem.makeDirectoryAsync(directory+'/photos/')
+                .then((response)=>console.log("Directorio de fotos creado"))
+                .catch((error)=>console.log(error))
+
+                
+                const cargarData = async () => {
+                    const multimedia = []
+                    const images = []
+
+                    for (let i = 0; i < recipeImages.length; i++) {
+                        const extension = recipeImages[i].split('.')
+                        await FileSystem.downloadAsync(recipeImages[i], directory+'/photos/photo_'+i+'.'+extension[extension.length-1])
+                        images.push(directory+'/photos/photo_'+i+'.'+extension[extension.length-1])    
+                    }
+
+
+                    let index = 0;
+                    for (const inst of instructions){
+                        const subMultimedia = [];
+                        const instructionDir = directory+'/instruction'+index+'/';
+                        try{
+                            await FileSystem.makeDirectoryAsync(instructionDir)
+                        }catch(e){
+                            console.log(e)
+                        }
+
+                        try{
+                            const res = await axios.get(`https://tasty-hub.herokuapp.com/api/multimedia/instruction/${inst.id}`)
+                            const data = res.data
+                            
+                            for (const multi of data){
+                                try{
+                                    await FileSystem.downloadAsync(multi.urlContent, instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                    subMultimedia.push(instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                    console.log(instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                }catch(e){
+                                    console.log(e)
+                                }
+                            }
+                            
+                            multimedia.push(subMultimedia)
+                            
+                        }catch(e){
+                            console.log(e)
+                        }
+
+                        index ++;
+                    }
+                    
+                    
+
+                    const object  = {
+                        datos: datos,
+                        rating: starCount2,
+                        ingredientes: recalculated,
+                        instructions: instructions,
+                        directory: directory,
+                        images: images,
+                        multimedia: multimedia,
+                        avatarUser: userProfilePhoto
+                    }
+                    
+                    AsyncStorage.setItem(filename, JSON.stringify(object))
+                    .then(()=>console.log("Agregado"))
+                    .catch((error) => console.log(error))
+                    
+                }
+
+                cargarData()
+            }
+            
         }else{
             setSaved(false)
+            
+            AsyncStorage.removeItem(filename)
+            .then((response) => console.log("Eliminado"))
+            .catch((error) => console.log(error))
+
+            FileSystem.deleteAsync(directory)
+            .then(()=> console.log("directorio eliminado"))
+            .catch((error)=>console.log(error))  
         }
     }
     
@@ -287,11 +450,11 @@ export const Recipe = ({route, navigation}) => {
                 <View style={styles.infoItem1}>
                     <View style={{flexDirection:'row', marginBottom: 5}}>
                         <MaterialIcons name="group" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {datos.peopleAmount} personas </Text>
+                        <Text style={styles.infoText}> {factor ? datos.peopleAmount*factor : datos.peopleAmount } personas </Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                         <Feather name="pie-chart" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {datos.portions} porciones </Text>
+                        <Text style={styles.infoText}> {factor ? datos.portions*factor : datos.portions} porciones </Text>
                     </View>  
                 </View>
                 <View style={styles.infoItem2}>
@@ -308,17 +471,21 @@ export const Recipe = ({route, navigation}) => {
                     }
                         <Text style={styles.buttonText}> Añadir a {'\n'} favoritos </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=> save()}  style={styles.profileButton}>
+                {recalculated && <TouchableOpacity 
+                    onPress={()=> save()}  
+                    style={styles.profileButton}
+                >
                     {saved
                         ? <Ionicons name="download" size={24} color="white" /> 
                         : <Ionicons name="download-outline" size={24} color="white" />
                     }
                     <Text style={styles.buttonText}> Guardar </Text>
-                </TouchableOpacity>
+                </TouchableOpacity>}
+                
             </View>
-            
+
             <CarrouselImages recipeImages = {recipeImages}/>
-            
+
             <View style={styles.descriptionContainer}>
                 <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8}}>
                     <MaterialIcons name="info" size={24} color="#5D420C" />
@@ -334,7 +501,8 @@ export const Recipe = ({route, navigation}) => {
                 </View>
                 <View style={{flexDirection:'column'}}>
                     {ingredientes.map((element, index) => {
-                        return( <Text key={index} style={styles.ingredientItemText}> - {element.quantity} {element.unitName} de {element.ingredientName} </Text>);  
+                        return( 
+                        <Text key={index} style={styles.ingredientItemText}> - {element.quantity} {element.unitName} de {element.ingredientName} </Text>);  
                     })
                     }
                     
@@ -425,8 +593,18 @@ export const Recipe = ({route, navigation}) => {
                     </View>
                 </View>
             </Modal>
-            
-
+            {recalculated && saved && <NotificationModal
+                visible={notificationRecordat}
+                onRequestClose={()=>setNotificationRecordat(!notificationGuardadas)}
+                onPress={()=>setNotificationRecordat(!notificationGuardadas)}
+                message={"¡RECUERDE! Para guardar otra versión de esta receta deberá eliminar la actual"}
+            />}
+            <NotificationModal
+                visible={notificationGuardadas}
+                onRequestClose={()=>setNotificationGuardadas(!notificationGuardadas)}
+                onPress={()=>setNotificationGuardadas(!notificationGuardadas)}
+                message={"Ha alcanzado el máximo de 5 recetas guardadas"}
+            />
             <NotificationModal
                 visible={notification}
                 onRequestClose={()=>setNotification(!notification)}
@@ -610,7 +788,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         backgroundColor: '#E8E8E8',
         borderRadius: 20,
-        height: 475,
+        // height: 550,
     },
 
     calificationText:{

@@ -30,7 +30,7 @@ export const RecalculateRecipe = ({ navigation, route }) => {
 		} else if (value.toString() === 'people') {
 			return <People recipeId = {recipeId} userId={userId} navigation={navigation}/>;
 		} else if (value.toString() === 'ingredient') {
-			return <IngredientScreen recipeId = {recipeId} />;
+			return <IngredientScreen recipeId = {recipeId} userId={userId} navigation={navigation}/>;
 		}
 	}
 
