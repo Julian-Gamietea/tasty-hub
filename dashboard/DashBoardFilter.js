@@ -213,6 +213,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
           horizontal
           extraData={reload}
           pagingEnabled
+          showsHorizontalScrollIndicator={false}
           renderItem={renderItem}
         />
       </View>
@@ -221,6 +222,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
         <FlatList
           data={ingredients}
           horizontal
+          showsHorizontalScrollIndicator={false}
           pagingEnabled
           renderItem={(item) => renderItem(item, true)}
         />
@@ -230,6 +232,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
         <FlatList
           data={ingredients}
           horizontal
+          showsHorizontalScrollIndicator={false}
           pagingEnabled
           renderItem={(item) => renderItem(item, false)}
         />
