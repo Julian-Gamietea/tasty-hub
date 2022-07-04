@@ -41,81 +41,72 @@ export const Register = ({navigation}) => {
         const status = checkBlanks();
         const mailOk = validateEmail(datos.email)
         if(status && mailOk){
-            if(checked ==='alumno'){
-                var config = {
-                    method: 'post',
-                    url: 'https://tasty-hub.herokuapp.com/api/user/student/',
-                    headers: { 
-                      'Content-Type': 'application/json'
-                    },
-                    data : datos
-                  };
-                  
-                  axios(config)
-                  .then(function () {
-                    setDatos({
-                        email: "",
-                        userName: ""
-                    })
-                    navigation.navigate('EmailSent', {mail: datos.email})
-                  })
-                  .catch(function async (error) {
-                    const mensaje = error.response.data;
-                    if (mensaje === 'There is already a user with that username'){
-                        setIsValidAlias(false);
-                        setErrorMessageAlias('El alias ingresado ya existe. Pruebe ingresando otro');
-                    }else if(mensaje === 'There is already a user with that email'){
-                        setDatos({
-                            email: "",
-                            userName: ""
+            axios.get(`https://tasty-hub.herokuapp.com/api/user/email/${datos.email}`)
+            .then(()=>{
+                axios.get(`https://tasty-hub.herokuapp.com/api/user/check/registration/completion?email=${datos.email}`)
+                .then(()=>{
+                    navigation.navigate('ExistingMail')
+                })
+                .catch(() => {
+                    navigation.navigate('IncompleteRegistry')
+                })
+            })
+            .catch(()=>{
+                
+                    if(checked ==='alumno'){
+                        var config = {
+                            method: 'post',
+                            url: 'https://tasty-hub.herokuapp.com/api/user/student/',
+                            headers: { 
+                            'Content-Type': 'application/json'
+                            },
+                            data : datos
+                        };
+                        
+                        axios(config)
+                        .then(function () {
+                            setDatos({
+                                email: "",
+                                userName: ""
+                            })
+                            navigation.navigate('EmailSent', {mail: datos.email})
                         })
-                        navigation.navigate('ExistingMail')
+                        .catch((error) => {
+                            const mensaje = error.response.data;
+                            if (mensaje === 'There is already a user with that username'){
+                                setIsValidAlias(false);
+                                setErrorMessageAlias('El alias ingresado ya existe. Pruebe ingresando otro');
+                            }
+                        });  
                     }else{
-                        setDatos({
-                            email: "",
-                            userName: ""
+                        var config = {
+                            method: 'post',
+                            url: 'https://tasty-hub.herokuapp.com/api/user/guest/',
+                            headers: { 
+                            'Content-Type': 'application/json'
+                            },
+                            data : datos
+                        };
+                        
+                        axios(config)
+                        .then(function () {
+                            setDatos({
+                                email: "",
+                                userName: ""
+                            })
+                            navigation.navigate('EmailSent', {mail: datos.email})
                         })
-                        navigation.navigate('IncompleteRegistry')
+                        .catch(function async (error) {
+                            const mensaje = error.response.data;
+                            if (mensaje === 'There is already a user with that username'){
+                                setIsValidAlias(false);
+                                setErrorMessageAlias('El alias ingresado ya existe. Pruebe ingresando otro');
+                            }
+                        });  
                     }
-                  });  
-            }else{
-                var config = {
-                    method: 'post',
-                    url: 'https://tasty-hub.herokuapp.com/api/user/guest/',
-                    headers: { 
-                      'Content-Type': 'application/json'
-                    },
-                    data : datos
-                  };
-                  
-                  axios(config)
-                  .then(function () {
-                    setDatos({
-                        email: "",
-                        userName: ""
-                    })
-                    navigation.navigate('EmailSent', {mail: datos.email})
-                  })
-                  .catch(function async (error) {
-                    const mensaje = error.response.data;
-                    if (mensaje === 'There is already a user with that username'){
-                        setIsValidAlias(false);
-                        setErrorMessageAlias('El alias ingresado ya existe. Pruebe ingresando otro');
-                    }else if(mensaje === 'There is already a user with that email'){
-                        setDatos({
-                            email: "",
-                            userName: ""
-                        })
-                        navigation.navigate('ExistingMail')
-                    }else{
-                        setDatos({
-                            email: "",
-                            userName: ""
-                        })
-                        navigation.navigate('IncompleteRegistry')
-                    }
-                  });  
-            }
+                
+            })
+        
         }
         
         

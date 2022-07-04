@@ -7,7 +7,6 @@ import axios from "axios";
 
 export const InsertNewPassword = ({ navigation, route }) => {
   var userEmail = route.params.userEmail;
-  var userEmail = 'agustin.sturba@hotmail.com'
   const [isValid, setIsValid] = React.useState(true)
   const [state, setState] = React.useState("");
   const [inputPassword, setPassword] = React.useState({ password: '' })
@@ -109,9 +108,9 @@ export const InsertNewPassword = ({ navigation, route }) => {
     setState("")
     if (inputPassword.password === reEnterinputPassword.reEnterPassword) {
       await axios.put('https://tasty-hub.herokuapp.com/api/auth/password/restore?email=' + userEmail + '&password=' + inputPassword.password)
-        .then(() => {
-          navigation.navigate('SuccessFullPasswordRecovery')
-        })
+      .then(() => {
+        navigation.navigate('SuccessFullPasswordRecovery')
+      })
 
     } else {
       setIsValid(false)

@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, Image, ScrollView, Dimensions } from 'react-native'
-import React from 'react'
+import React, { startTransition } from 'react'
 import { InputTasty } from '../shared-components/InputTasty'
 import { ButtonCustom } from '../shared-components/ButtonCustom'
 import axios from 'axios';
@@ -18,50 +18,56 @@ export const InsertMail = ({ navigation }) => {
       [mail]: text
     });
   }
-  const sentCode = () => {
+  const sentCode = async () => {
     setIsValid(true)
     setStatus("")
+  
     if (validateEmail(mail)) {
-      isRegistryComplete(mail, { navigation })
-      if (!isUserStudent(mail)) {
-        axios.get('https://tasty-hub.herokuapp.com/api/auth/token?email=' + mail)
-          .then(() => {
-            navigation.navigate('InsertCode', { mail: mail })
-          })
-          .catch((e) => {
-            if (e.response.status == 422) {
+      const status = await isRegistryComplete(mail)
+      if(status.value){
+        const userStudent = await isUserStudent(mail)
+        if (!userStudent) {
+          axios.get('https://tasty-hub.herokuapp.com/api/auth/token?email=' + mail)
+            .then(() => {
               navigation.navigate('InsertCode', { mail: mail })
-            }
-            if (e.response.status == 404) {
-              setIsValid(false)
-              setStatus("El mail ingresado no se encuentra registrado")
-            }
-          })
+            })
+            .catch((e) => {
+              if (e.response.status == 422) {
+                navigation.navigate('InsertCode', { mail: mail })
+              }else{
+                console.log(e)
+              }
+            })
+        }else{
+          navigation.navigate('UserStudentConflict')
+        }
+      }else{
+        if(status.msj === 'not found'){
+          setIsValid(false)
+          setStatus("El mail ingresado no se encuentra registrado")
+        }else{
+          navigation.navigate('IncompleteRegistry')
+        }
       }
-    }
-    else {
+      
+    }else {
       setIsValid(false)
       setStatus("El mail ingresado no es valido")
     }
 
   }
-  const isUserStudent = (email) => {
-    axios.get(`https://tasty-hub.herokuapp.com/api/user/email/${email}`)
-      .then((response) => {
-        if (response.data.role === "STUDENT") {
-          navigation.navigate("UserStudentConflict")
-          return true;
-        }
-        else {
-          console.log("No es estudiante")
-          return false
-        }
-
-
-      }).catch((e) => {
-        console.log("el mail no existe")
+  const isUserStudent = async (email) => {
+    try{
+      const response = await axios.get(`https://tasty-hub.herokuapp.com/api/user/email/${email}`)
+      if (response.data.role === "STUDENT") {
+        return true;
+      }
+      else {
         return false
-      })
+      }
+    }catch(error){
+      console.log(error)
+    }
   }
 
 
