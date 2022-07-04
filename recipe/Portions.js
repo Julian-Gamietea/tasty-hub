@@ -5,7 +5,7 @@ import chart from '../assets/recalculate-recipe/chart.png';
 import { InputTasty } from '../shared-components/InputTasty';
 
 export const Portions = ({userId,recipeId,navigation}) => {
-    const [portionsQty, setPortionsQty ] = useState();
+    const [portionsQty, setPortionsQty ] = useState(0);
 	const [recipe ,setRecipe] = useState([]);
 	const [isValid, setIsValid] = useState(true)
 	const [errorMsg, setErrorMsg] = useState('')

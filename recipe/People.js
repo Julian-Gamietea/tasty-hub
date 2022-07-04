@@ -5,7 +5,7 @@ import group from '../assets/recalculate-recipe/group.png';
 import { InputTasty } from '../shared-components/InputTasty';
 
 export const People = ({userId,recipeId,navigation}) => {
-	const [peopleQty, setPeopleQty] = React.useState()
+	const [peopleQty, setPeopleQty] = React.useState(0)
 	const [isValid, setIsValid] = useState(true)
 	const [recipe ,setRecipe]= useState([]);
 	const [errorMessage, setErrorMessage] = useState('')
