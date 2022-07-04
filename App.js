@@ -84,9 +84,9 @@ function ProfileTabStack() {
 function SavedTabStack() {
   return(
     <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Saved">
+      <Stack.Screen name="Saved" component={Saved}/>
       <Stack.Screen name="ProfileInfo" component={Profile}/>
       <Stack.Screen name="UserRecipes" component={UserRecipes}/>
-      <Stack.Screen name="Saved" component={Saved}/>
       <Stack.Screen name="Recipe" component={Recipe} />
       <Stack.Screen name="UserProfile" component={UserProfile}/>
       <Stack.Screen name="EditProfile" component={EditProfile}/>
