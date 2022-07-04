@@ -185,7 +185,6 @@ export const Recipe = ({route, navigation}) => {
                 try {
                     const jsonValue = await AsyncStorage.getItem(filename)
                     if(jsonValue !== null){
-                        console.log(JSON.parse(jsonValue))
                         setDatos(JSON.parse(jsonValue).datos)
                         setIngredientes(JSON.parse(jsonValue).ingredientes)
                         setInstructions(JSON.parse(jsonValue).instructions)
@@ -565,12 +564,12 @@ export const Recipe = ({route, navigation}) => {
                
             </View>
             
-            <View style={styles.recalculateContainer}>
+            {!filename && <View style={styles.recalculateContainer}>
                 <Text style={styles.recalculateText}>¿Necesitas {'\n'} otras {'\n'} proporciones {'\n'} de esta receta? </Text>
                 <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("RecalculateRecipe", {userId: userId, recipeId: id})}>
                 <Text style={styles.buttonTextRecalculate}>Recalcular {'\n'} receta</Text>
                 </TouchableOpacity>
-            </View>
+            </View>}
 
             <View style={styles.instructionContainer}>
                 <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8, marginLeft: 25}}>
@@ -582,7 +581,7 @@ export const Recipe = ({route, navigation}) => {
                 </View>
             </View>
 
-            <View styles={styles.descriptionContainer}>
+            {!filename && <View styles={styles.descriptionContainer}>
                 <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8, marginLeft: 25}}> 
                     <MaterialIcons name="military-tech" size={24} color="#5D420C" />
                     <Text style={styles.descriptionTitle}> Calificar </Text>
@@ -609,7 +608,7 @@ export const Recipe = ({route, navigation}) => {
                     onPress={()=> enviar()}>
                     <Text style={styles.buttonTextSend}>Enviar</Text>
                 </TouchableOpacity>
-            </View>
+            </View>}
 
             <Modal
                 animationType="slide"
