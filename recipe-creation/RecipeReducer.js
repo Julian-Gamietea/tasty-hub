@@ -7,10 +7,10 @@ export const initialState = {
     ownerId: 0,
     peopleAmount: 0,
     portions: 0,
-    typeId: 0,
+    typeId: null,
     enabled: false,
     typeDescription: "",
-    
+    ingredientQty: [],
 }
 
 export function recipeReducer (state = initialState, action) {

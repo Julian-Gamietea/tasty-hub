@@ -13,7 +13,7 @@ export const AddMultimediaForm = ({ title, data, onPress, onRemove, titleStyle})
             {data.length > 0 &&
                 <ScrollView style={{ flexDirection: 'row', marginTop: 5 }} horizontal>
                     {data.map((elem, index) => (
-                        <DeletableImage uri={elem.type.split("/")[0] === "image" ? elem.uri : elem.thumbnailUri} onPress={() => onRemove(index)} type={elem.type.split("/")[0] === "image" ? "Imagen" : "Video"} />
+                        <DeletableImage key={index} uri={elem.type.split("/")[0] === "image" ? elem.uri : elem.thumbnailUri} onPress={() => onRemove(index)} type={elem.type.split("/")[0] === "image" ? "Imagen" : "Video"} />
                     ))}
                 </ScrollView>}
         </View>

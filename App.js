@@ -44,6 +44,7 @@ import { InstructionCreation } from './recipe-creation/InstructionCreation';
 import { Saved } from './saved/Saved';
 import { SavedRecipeCard } from './shared-components/SavedRecipeCard';
 import { DefineType } from './recipe-creation/DefineType';
+import { DefineIngredients } from './recipe-creation/DefineIngredients';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -95,6 +96,8 @@ function RecipeTabStack() {
       <Stack.Screen name="RecipeForm" component={RecipeForm} />
       <Stack.Screen name="NoWifi" component={NoWifi}/>
       <Stack.Screen name="DefineType" component={DefineType}/>
+      <Stack.Screen name="DefineIngridient" component={DefineIngredients}/>
+      <Stack.Screen name="InstructionCreation" component={InstructionCreation}/>
     </Stack.Navigator>
     )
 }
@@ -223,7 +226,7 @@ export default function App() {
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
         <Stack.Screen name="SavedRecipeCard" component={SavedRecipeCard}/>
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
-        <Stack.Screen name="Test" component={InstructionCreation}/>
+        
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
 

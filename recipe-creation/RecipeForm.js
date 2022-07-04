@@ -1,21 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
-import { ButtonCustom } from '../shared-components/ButtonCustom';
 import { CustomNav } from '../shared-components/CustomNav';
-import { TextInput } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
 import { InputTasty } from '../shared-components/InputTasty';
 import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
 import * as ImagePicker from 'expo-image-picker';
 import { recipeReducer, initialState } from './RecipeReducer';
 import * as SecureStore from 'expo-secure-store';
-import { set } from 'react-native-reanimated';
 
 export const RecipeForm = ({ navigation, route }) => {
 
 	const [recipeState, recipeDispatch] = React.useReducer(recipeReducer, initialState);
-	const { id, description, duration, images, name, ownerId, peopleAmount, portions, typeId, typeDescription } = recipeState;
+	const { id, description, duration, images, name, 
+		ownerId, peopleAmount, portions, typeId, typeDescription, ingredientQty } = recipeState;
 
 	let recipeTitle = "";
 	if (route.params.recipeTitle) {
@@ -72,6 +70,13 @@ export const RecipeForm = ({ navigation, route }) => {
 		recipeDispatch({type: 'fieldUpdate', field: 'typeDescription', value: ""});
 	}
 
+	const handleRemoveIngredient = (index) => {
+		const aux = ingredientQty.slice(0, ingredientQty.length);
+		aux.splice(index, 1);
+		recipeDispatch({type: 'fieldUpdate', field: 'ingredientQty', value: aux});
+		// recipeDispatch({type: 'fieldUpdate', field: 'typeDescription', value: ""});
+	}
+
 	const [loaded] = useFonts({
 		InterMedium: require('../assets/fonts/Inter-Medium.ttf'),
 		InterBold: require('../assets/fonts/Inter-Bold.ttf'),
@@ -80,6 +85,26 @@ export const RecipeForm = ({ navigation, route }) => {
 	if (!loaded) {
 		return null;
 	}
+
+	console.log("RECETA HASTA AHORA ============================")
+    const recipe = {
+        description: description,
+		duration: duration,
+		enabled: false,
+		id: 0,
+		mainPhoto: images[0],
+		name: name,
+		ownerId: ownerId,
+		peopleAmount: peopleAmount,
+		portions: portions,
+		typeId: typeId,
+		ingredientQty: ingredientQty,
+		images: images
+    }
+	console.log(recipe);
+	console.log("INGREDIENTES =====");
+	console.log(ingredientQty);
+    console.log("RECETA HASTA AHORA ============================")
 
 	return (
 		<View style={{backgroundColor: '#fff', flex: 1, justifyContent: 'center', paddingTop: StatusBar.currentHeight + 5, }}>
@@ -152,8 +177,8 @@ export const RecipeForm = ({ navigation, route }) => {
 							<Text style={styles.textButton}>Añadir</Text>
 						</TouchableOpacity>
 						{typeId && 
-						<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '60%', marginTop: 10}}>
-							<Text style={{fontSize: 18}}> - {typeDescription}</Text>
+						<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10}}>
+							<Text style={{fontSize: 18}}>{`- ${typeDescription}`}</Text>
 							<TouchableOpacity 
 							style={{backgroundColor: "#E31C1C", borderRadius: 5, padding: 2, width: 24}}
 							onPress={handleRemoveType}
@@ -165,10 +190,25 @@ export const RecipeForm = ({ navigation, route }) => {
 					</View>
 					<View style={styles.margin}>
 						<Text style={styles.description}>Ingredientes</Text>
-						<TouchableOpacity onPress={() => console.log('Agregar ingrediente')} style={styles.addButton}>
+						<TouchableOpacity onPress={() => navigation.navigate('DefineIngridient', {state: recipeState})} style={styles.addButton}>
 							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
 							<Text style={styles.textButton}>Añadir</Text>
 						</TouchableOpacity>
+					{ingredientQty.length !== 0 && ingredientQty.map((qty, index) => {
+						return (
+							<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10}}>
+							<Text style={{fontSize: 18}}>{`- ${qty.ingredientName}`}</Text>
+							<TouchableOpacity 
+							style={{backgroundColor: "#E31C1C", borderRadius: 5, padding: 2, width: 24}}
+							onPress={() => handleRemoveIngredient(index)}
+							>
+								<MaterialIcons name="delete" size={20} color="white" />
+							</TouchableOpacity>
+						</View>
+						);
+					})
+						
+					}
 					</View>
 					<View style={[styles.margin, {marginBottom: 10}]}>
 						<AddMultimediaForm
@@ -181,7 +221,9 @@ export const RecipeForm = ({ navigation, route }) => {
 				</View>
 			</ScrollView>
 			<TouchableOpacity 
-			style={{position: 'absolute', right: 10, bottom: 10 ,alignSelf: 'flex-end', backgroundColor: "#583209", borderRadius: 500, padding: 5, marginTop: 30 }}>
+			style={{position: 'absolute', right: 10, bottom: 10 ,alignSelf: 'flex-end', backgroundColor: "#583209", borderRadius: 500, padding: 5, marginTop: 30 }}
+			onPress={() => {navigation.navigate('InstructionCreation',{recipe: recipe})}}
+			>
 						<MaterialIcons name="chevron-right" size={60} color="#fff" />
 			</TouchableOpacity>
 		</View>

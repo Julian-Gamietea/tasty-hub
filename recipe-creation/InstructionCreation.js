@@ -13,9 +13,11 @@ import axios from 'axios';
 // import { DeletableImage } from '../shared-components/DeletableImage';
 import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
 
-export const InstructionCreation = ({ navigation }) => {
+export const InstructionCreation = ({ navigation, route }) => {
 
-    const recipeId = 7;
+    const {recipe} = route.params;
+
+    const [recipeId, setRecipeId] = React.useState(recipe.id);
     const instructions = [
         {
             numberOfStep: 1,
@@ -184,6 +186,47 @@ export const InstructionCreation = ({ navigation }) => {
     }
 
     const upload = async () => {
+        const auxRecipe = 
+            {
+                description: recipe.description,
+                duration: recipe.duration,
+                enabled: false,
+                name: recipe.name,
+                ownerId: recipe.ownerId,
+                peopleAmount: recipe.peopleAmount,
+                portions: recipe.portions,
+                typeId: recipe.typeId,
+            }  
+        
+            console.log(auxRecipe)
+        const recipeData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
+        
+        const fdi = new FormData();
+        for (let image of recipe.images) {
+            fdi.append('images', image);
+        }
+
+        try {
+            const imageData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipeData.data.id}`, fdi, 
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+            );
+        } catch(e) {
+            console.log(e);
+        }
+
+        for (let qty of recipe.ingredientQty) {
+            qty.recipeId = recipeData.data.id;
+            try {
+                const iq = await axios.post(`https://tasty-hub.herokuapp.com/api/ingredientQuantity`, qty);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
         for (let step of steps) {
             try {
 
@@ -191,7 +234,7 @@ export const InstructionCreation = ({ navigation }) => {
                     {
                         description: step.description,
                         numberOfStep: step.numberOfStep,
-                        recipeId: step.recipeId,
+                        recipeId: recipeData.data.id,
                         title: step.title,
                     });
 
@@ -236,6 +279,7 @@ export const InstructionCreation = ({ navigation }) => {
 
     return (
         <View style={styles.mainContainer}>
+            
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -268,7 +312,7 @@ export const InstructionCreation = ({ navigation }) => {
                     </View>
                 </View>
             </Modal>
-            <CustomNav text={"Agregar Pasos"} />
+            <CustomNav text={"Agregar Pasos"} callback={() => navigation.goBack()} />
             <ScrollView style={styles.stepsContainer} horizontal showsHorizontalScrollIndicator={false}>
                 {steps.map((step, index) => (
                     <TouchableOpacity style={selectedStep.numberOfStep === step.numberOfStep ? styles.selectedStepButton : styles.stepButton} onPress={() => handleSelectStep(step.numberOfStep)} key={step.numberOfStep}>
@@ -313,22 +357,9 @@ export const InstructionCreation = ({ navigation }) => {
                     data={selectedStep.multimedia}
                     onRemove={removeMultimedia}
                     />
-                    {/* <View>
-                        <Text style={styles.InputText}>Multimedia</Text>
-                        <TouchableOpacity style={styles.addMultimedia} onPress={handleMultimedia}>
-                            <MaterialIcons name="add-a-photo" size={24} color="white" />
-                            <Text style={styles.addMultimediaText}>Añadir</Text>
-                        </TouchableOpacity>
-                        {selectedStep.multimedia.length > 0 &&
-                            <ScrollView style={{ flexDirection: 'row', marginTop: 5 }} horizontal>
-                                {selectedStep.multimedia.map((elem, index) => (
-                                    <DeletableImage uri={elem.type.split("/")[0] === "image" ? elem.uri : elem.thumbnailUri} onPress={() => removeMultimedia(index)} type={elem.type.split("/")[0] === "image" ? "Imagen":"Video"} />
-                                ))}
-                            </ScrollView>}
-                    </View> */}
                 </View>
             </ScrollView>
-            <View style={{ marginHorizontal: 80, marginBottom: 80, marginTop: 10 }}>
+            <View style={{ marginHorizontal: 80, marginBottom: 15, marginTop: 10 }}>
                 <ButtonCustom text={"Finalizar"} callback={upload}/>
             </View>
         </View>
@@ -339,7 +370,7 @@ const styles = StyleSheet.create({
     mainContainer: {
         paddingTop: StatusBar.currentHeight + 5,
         backgroundColor: "#fff",
-        height: Dimensions.get("screen").height
+        flex: 1
     },
     stepButton: {
         backgroundColor: "#D1CBBE",
