@@ -92,11 +92,12 @@ export const IngredientScreen = ({navigation, recipeId, userId}) => {
 				})
 				.catch((error) => console.log("ERROR 2 " + error))
 			}else{
+				const factor = ingredientQty / originalQty
 				axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert/ingredient?ingredientId=${ingredientId}&quantity=${ingredientQty}&recipeId=${recipeId}`)
 						.then((response) => {
 							console.log(response.data)
 							const result = response.data
-							navigation.navigate("Recipe", {userId: userId, id: recipeId, recalculated: result})
+							navigation.navigate("Recipe", {userId: userId, id: recipeId, recalculated: result, factor: factor})
 						})
 						.catch((error) => console.log("Second conversion error " + error ))
 			}

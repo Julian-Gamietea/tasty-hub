@@ -25,7 +25,7 @@ export const Recipe = ({route, navigation}) => {
     const {filename} = route.params
     
     React.useEffect(() => {
-        const getStoragedIngredients = async (filename) => {
+        const getStoragedIngredients = async () => {
             try{
                 const jsonValue = await AsyncStorage.getItem(`Receta_${id}`)
                 return JSON.parse(jsonValue).ingredientes;
@@ -40,9 +40,9 @@ export const Recipe = ({route, navigation}) => {
             try {
                 keys = await AsyncStorage.getAllKeys()
                 for (const key of keys){
-                    if(key ===`Receta_${id}`){
+                    if(key ===`Receta_${id}` && recalculated){
                         setOverwrite(true)
-                        const ingStoraged = await getStoragedIngredients(`Receta_${id}`)
+                        const ingStoraged = await getStoragedIngredients()
                         for (let index = 0; index < ingStoraged.length; index++) {
                             if(ingStoraged[index].quantity !== recalculated[index].quantity){
                                 setSaved(false)
@@ -465,7 +465,6 @@ export const Recipe = ({route, navigation}) => {
     }
     
     
-    
     return(
         <ScrollView style={styles.container}>
             <View style={styles.titleContainer}>
@@ -489,20 +488,20 @@ export const Recipe = ({route, navigation}) => {
             <View style={styles.profile}>
                 <MaterialIcons name="person" size={24} color="#5D420C" />
                 <Text style={styles.profileName}> {datos.ownerUserName} </Text> 
-                <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("UserProfile", {id: datos.ownerId})}>
+                {!filename && <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("UserProfile", {id: datos.ownerId})}>
                     <MaterialIcons name="portrait" size={24} color="white" />
                     <Text style={styles.buttonText}> Ver perfil</Text>
-                </TouchableOpacity>
+                </TouchableOpacity>}
             </View>
             <View style={styles.info}>
                 <View style={styles.infoItem1}>
                     <View style={{flexDirection:'row', marginBottom: 5}}>
                         <MaterialIcons name="group" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {factor ? datos.peopleAmount*factor : datos.peopleAmount } personas </Text>
+                        <Text style={styles.infoText}> {factor ? Math.ceil(datos.peopleAmount*factor) : datos.peopleAmount } personas </Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                         <Feather name="pie-chart" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {factor ? datos.portions*factor : datos.portions} porciones </Text>
+                        <Text style={styles.infoText}> {factor ? Math.ceil(datos.portions*factor) : datos.portions} porciones </Text>
                     </View>  
                 </View>
                 <View style={styles.infoItem2}>
@@ -517,13 +516,13 @@ export const Recipe = ({route, navigation}) => {
                 </View>
             </View>
             
-            <View style={styles.buttons}>
+            {!filename && <View style={styles.buttons}>
                 <TouchableOpacity onPress={()=> addFavorites()} style={styles.favouritesButton}>
                     {addedFavorites
                         ? <Ionicons name="bookmark" size={24} color="#fff" /> 
                         : <Ionicons name="bookmark-outline" size={24} color="#fff" />
                     }
-                        <Text style={styles.buttonText}> Añadir a {'\n'} favoritos </Text>
+                        <Text style={styles.buttonText}> {!addedFavorites ? 'Añadir a \n favoritos' : 'Eliminar de \n  favoritos'} </Text>
                 </TouchableOpacity>
                 {recalculated && <TouchableOpacity 
                     onPress={()=> save()}  
@@ -533,10 +532,10 @@ export const Recipe = ({route, navigation}) => {
                         ? <Ionicons name="download" size={24} color="white" /> 
                         : <Ionicons name="download-outline" size={24} color="white" />
                     }
-                    <Text style={styles.buttonText}> Guardar </Text>
+                    <Text style={styles.buttonText}> {!saved ? 'Guardar' : 'Guardada'} </Text>
                 </TouchableOpacity>}
                 
-            </View>
+            </View>}
 
             <CarrouselImages recipeImages = {recipeImages}/>
 
