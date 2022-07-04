@@ -1,7 +1,7 @@
 import { View, TextInput, StyleSheet, Text } from "react-native";
 import React from "react";
 
-export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, errorMessage, style, multiline}) => {
+export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, errorMessage, style, multiline, keyboardType, maxLength }) => {
     const color = isValid ? "hsla(48, 80%, 54%, 0.35)" : "#FF6D6D";
     const styles = StyleSheet.create(
         {
@@ -14,9 +14,9 @@ export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, erro
                 fontSize:16,
                 padding:15,
                 textAlign:"left"
-                
+
               },
-    
+
               container: {
                 // backgroundColor: '#fff',
                 alignItems: 'stretch',
@@ -33,16 +33,18 @@ export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, erro
         return(
             <View style = {styles.container}>
                 <TextInput
-                    style={!style ? styles.input : style}
+                    style={[styles.input, style]}
                     onChangeText={onChange}
                     value={value}
                     placeholder={placeholder}
                     secureTextEntry={passwrd}
                     multiline={multiline}
+                    keyboardType={keyboardType}
+                    maxLength={maxLength}
                 />
                 {!isValid && <Text style={styles.error}>{errorMessage}</Text>}
             </View>
-            
+
         );
 }
 

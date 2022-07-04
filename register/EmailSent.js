@@ -18,7 +18,7 @@ export const EmailSent = ({route, navigation}) =>{
     const {mail} = route.params;
 
     const checkMail = () => {
-        axios.get(`https://tasty-hub.herokuapp.com/api/user/check/registration/completion?email=${mail}`)
+        axios.get(`https://tasty-hub.herokuapp.com/api/user/check/link?email=${mail}`)
         .then(()=>{
             navigation.navigate('EnterData', {mail: mail})
         })

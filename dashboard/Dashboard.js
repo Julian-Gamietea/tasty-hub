@@ -274,9 +274,9 @@ const styles = StyleSheet.create({
     welcomeMessage: {
         fontFamily: "InterRegular",
         fontSize: 18,
-        marginLeft: 30,
         marginBottom: 30,
-        marginTop: 5
+        marginTop: 5,
+        alignSelf: 'center'
     },
     username: {
         fontFamily: "InterSemiBold"
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginLeft: 30,
-        marginRight: '48%'
+        marginRight: '48%',
     },
     dropdown: {
         backgroundColor: "#F7EAB5",
