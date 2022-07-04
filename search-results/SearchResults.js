@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView, Alert, BackHandler } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
@@ -14,7 +14,6 @@ import axios from 'axios';
 
 export const SearchResults = ({ route, navigation }) => {
     const recipesFilter = route.params.recipeList
-    console.log(recipesFilter)
     const { query } = route.params;
     const { type } = route.params;
 
@@ -24,6 +23,28 @@ export const SearchResults = ({ route, navigation }) => {
     const [selectedValue, setSelectedValue] = React.useState(type);
     const [inputValue, setInputValue] = React.useState(query);
     const [isFetching, setIsFetching] = React.useState(false);
+
+
+    const backAction = () => {
+        Alert.alert("Advertencia!", "estas seguro de volver al dashboard?", [
+          {
+            text: "Cancel",
+            onPress: () => null,
+            style: "cancel"
+          },
+          { text: "Aceptar", onPress: () => navigation.navigate("Dashboard") }
+        ]);
+        return true;
+      };
+    
+      useEffect(() => {
+        BackHandler.addEventListener("hardwareBackPress", backAction);
+    
+        return () =>
+          BackHandler.removeEventListener("hardwareBackPress", backAction);
+      }, []);
+
+      
     React.useEffect(() => {
         const fetchUserData = async () => {
             const userData = await SecureStore.getItemAsync("user");
