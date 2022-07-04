@@ -513,7 +513,7 @@ export const Recipe = ({route, navigation}) => {
                     </View>
                     <View style={{flexDirection: 'row'}}>
                         <AntDesign name="tags" size={24} color="#5D420C"  />
-                        <Text style={styles.infoText}>{datos.typeName}</Text>
+                        <Text style={styles.infoText}> {datos.typeName}</Text>
                     </View>
                 </View>
             </View>
@@ -557,7 +557,7 @@ export const Recipe = ({route, navigation}) => {
                 <View style={{flexDirection:'column'}}>
                     {ingredientes.map((element, index) => {
                         return( 
-                        <Text key={index} style={styles.ingredientItemText}> - {element.quantity} {element.unitName} de {element.ingredientName} </Text>);  
+                        <Text key={index} style={styles.ingredientItemText}> - {element.quantity.toFixed(2)} {element.unitName} de {element.ingredientName} </Text>);  
                     })
                     }
                     

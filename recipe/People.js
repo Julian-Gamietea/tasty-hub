@@ -2,21 +2,31 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity,View, Text, Image, StyleSheet, TextInput, KeyboardAvoidingView } from 'react-native';
 import group from '../assets/recalculate-recipe/group.png';
+import { InputTasty } from '../shared-components/InputTasty';
 
 export const People = ({userId,recipeId,navigation}) => {
 	const [peopleQty, setPeopleQty] = React.useState()
-
+	const [isValid, setIsValid] = useState(true)
 	const [recipe ,setRecipe]= useState([]);
+	const [errorMessage, setErrorMessage] = useState('')
 
-	const recalculateRecipeByPortions = async () => {
-		var conversionFactor = peopleQty/recipe.peopleAmount
-		await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
-	   .then((ingredientQuantityList)=>{
-			navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList.data, factor: conversionFactor})
-	})
-	   .catch((e)=>{
-			console.log(e)
-	   })
+	const recalculateRecipeByPeople = async () => {
+		if(peopleQty <= 0){
+			setIsValid(false)
+			setErrorMessage('La cantidad debe ser mayor o igual a 1')
+		}else{
+			setIsValid(true)
+			setErrorMessage('')
+			var conversionFactor = peopleQty/recipe.peopleAmount
+			await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
+			.then((ingredientQuantityList)=>{
+					navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList.data, factor: conversionFactor})
+				})
+			.catch((e)=>{
+					console.log(e)
+			})
+		}
+		
 	 }
 
 	 const fetchRecipe = async (recipeId) => {
@@ -35,16 +45,19 @@ export const People = ({userId,recipeId,navigation}) => {
 			<Text style={styles.instructionsText}>Ingrese la cantidad de personas deseadas.</Text>
 			<KeyboardAvoidingView>
 				<View style={styles.qtyContainer}>
-					<TextInput
+					<InputTasty
 						style={styles.input}
 						keyboardType="numeric"
 						maxLength={2}
-						onChangeText={(qty) => setPeopleQty(qty)}
+						errorMessage={''}
+						isValid={isValid}
+						onChange={(qty) => setPeopleQty(qty)}
 					/>
 					<Text style={styles.inputText}>personas</Text>
 				</View>	
 			</KeyboardAvoidingView>
-			<TouchableOpacity onPress={()=>recalculateRecipeByPortions()} style={styles.button}>
+			{!isValid && <Text style={styles.textError}>{errorMessage}</Text>}
+			<TouchableOpacity onPress={()=>recalculateRecipeByPeople()} style={styles.button}>
 				<Text style={styles.buttonText}>Recalcular</Text>
 			</TouchableOpacity>
 		</View>
@@ -73,10 +86,9 @@ const styles = StyleSheet.create({
 	},
 	qtyContainer: {
 		flexDirection: 'row',
-		padding: 50
+		paddingTop: 50
 	},
 	input: {
-		borderColor: '#DC9518',
 		borderWidth: 1,
 		borderRadius: 30,
 		paddingHorizontal: 20,
@@ -102,4 +114,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		color: 'white'
 	},
+	textError:{
+		color:"#FF6D6D", 
+		fontWeight:'bold',
+		marginLeft: 10,
+		fontSize: 14
+		  
+	}
 });

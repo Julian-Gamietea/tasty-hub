@@ -2,20 +2,31 @@ import axios, { Axios } from 'axios';
 import React, { useEffect, useState } from 'react';
 import {TouchableOpacity, View, Text, Image, StyleSheet, TextInput } from 'react-native';
 import chart from '../assets/recalculate-recipe/chart.png';
+import { InputTasty } from '../shared-components/InputTasty';
 
 export const Portions = ({userId,recipeId,navigation}) => {
-    const [ portionsQty, setPortionsQty ] = useState();
-	const [recipe ,setRecipe]= useState([]);
+    const [portionsQty, setPortionsQty ] = useState();
+	const [recipe ,setRecipe] = useState([]);
+	const [isValid, setIsValid] = useState(true)
+	const [errorMsg, setErrorMsg] = useState('')
 
 	const recalculateRecipeByPortions =  async () => {
-		var conversionFactor = portionsQty/recipe.portions
-		await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
-	   .then((ingredientQuantityList)=>{
-		   navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList.data, factor: conversionFactor})
-	   })
-	   .catch( (e)=>{
-			console.log(e)
-	   })
+		if(portionsQty <= 0){
+			setIsValid(false)
+			setErrorMsg('La cantidad debe ser mayor o igual a 1')
+		}else{
+			setIsValid(true)
+			setErrorMsg('')
+			var conversionFactor = portionsQty/recipe.portions
+			await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert?recipeId=${recipe.id}&conversionFactor=${conversionFactor}`)
+			.then((ingredientQuantityList)=>{
+				navigation.navigate('Recipe',{userId: userId, id: recipeId,recalculated:ingredientQuantityList.data, factor: conversionFactor})
+			})
+			.catch( (e)=>{
+					console.log(e)
+			})
+		}
+		
 	 }
 
 	 const fetchRecipe = async (recipeId) => {
@@ -33,9 +44,10 @@ export const Portions = ({userId,recipeId,navigation}) => {
 			<Image style={styles.image} source={chart} />
 			<Text style={styles.instructionsText}>Ingrese la cantidad de porciones deseadas.</Text>
 			<View style={styles.qtyContainer}>
-				<TextInput style={styles.input} keyboardType="numeric" maxLength={2} onChangeText={(cantidad) => setPortionsQty(cantidad)} />
+				<InputTasty style={styles.input} errorMessage={''} isValid={isValid} keyboardType="numeric" maxLength={2} onChange={(cantidad) => setPortionsQty(cantidad)} />
 				<Text style={styles.inputText}>porciones</Text>
 			</View>
+			{!isValid && <Text style={styles.textError}>{errorMsg}</Text>}
 			<TouchableOpacity onPress={()=> recalculateRecipeByPortions()} style={styles.button}>
 					<Text style={styles.buttonText}>Recalcular</Text>
 			</TouchableOpacity>
@@ -66,10 +78,9 @@ const styles = StyleSheet.create({
 	},
     qtyContainer: {
 		flexDirection: 'row',
-		padding: 50
+		paddingTop: 50
 	},
     input: {
-		borderColor: '#DC9518',
 		borderWidth: 1,
 		borderRadius: 30,
 		paddingHorizontal: 20,
@@ -95,4 +106,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		color: 'white'
 	},
+	textError:{
+		color:"#FF6D6D", 
+		fontWeight:'bold',
+		marginLeft: 10,
+		fontSize: 14
+		  
+	}
 });

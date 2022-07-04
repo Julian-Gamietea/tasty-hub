@@ -3,7 +3,7 @@ import { TouchableOpacity,View, Text, Image, StyleSheet, TextInput } from 'react
 import fork from '../assets/recalculate-recipe/fork.png';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
-
+import { InputTasty } from '../shared-components/InputTasty'; 
 
 export const IngredientScreen = ({navigation, recipeId, userId}) => {
 
@@ -13,6 +13,8 @@ export const IngredientScreen = ({navigation, recipeId, userId}) => {
 	const [unit, setUnit] = React.useState([]);
 	const [ingredient, setIngredient] = React.useState([]);
 	const [ingredientId, setIngredientId] = React.useState(null)
+	const [isValid, setIsValid] = React.useState(true)
+	const [errorMessage, setErrorMessage] = React.useState('')
 
 	React.useEffect (()=>{
 		const getData = () => {
@@ -46,76 +48,60 @@ export const IngredientScreen = ({navigation, recipeId, userId}) => {
 	
 
 	const recalculate = async () => {
-		const origen= ingredient.filter((element) => {return element.ingredientId == ingredientId});
-		const sourceId = origen[0].unitId;
-		const originalQty = origen[0].quantity;
-		const sourceUnit = origen[0].unitName
-		if(sourceUnit !== selectedType){
-			axios.get(`https://tasty-hub.herokuapp.com/api/unit/description/${selectedType}`)
-			.then((response)=>{
-				const destinoId = response.data.id;
-				axios.get(`https://tasty-hub.herokuapp.com/api/conversion/convert?sourceUnitId=${destinoId}&targetUnitId=${sourceId}`)
-				.then((response) => {
-					const newQty = response.data.conversionFactor * ingredientQty
-					const factor = (newQty/originalQty)
-					console.log(factor)
-					console.log(newQty)
-					console.log(originalQty)
-					axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert/ingredient?ingredientId=${ingredientId}&quantity=${newQty}&recipeId=${recipeId}`)
-					.then((response) => {
-						const data = response.data
-						const result = []
-						data.forEach(element => {
-							if(element.ingredientId === ingredientId){
-								result.push(
-									{
-										ingredientName: element.ingredientName,
-										quantity: ingredientQty,
-										unitName: selectedType
-									}
-								)
-							}else{
-								result.push(element)
-							}
-
-							console.log(result)
-							navigation.navigate("Recipe", {userId: userId, id: recipeId, recalculated: result, factor: factor})
-						});
-					})
-					.catch((error) => console.log("First conversion error " + error ))
-				})
-				.catch((error) => console.log("ERROR 3 " + error))
-			})
-			.catch((error) => console.log("ERROR 2 " + error))
+		if(ingredientQty<=0){
+			setIsValid(false)
+			setErrorMessage('La cantidad debe ser mayor o igual a 1')
 		}else{
-			axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert/ingredient?ingredientId=${ingredientId}&quantity=${ingredientQty}&recipeId=${recipeId}`)
+			setIsValid(true)
+			setErrorMessage('')
+			const origen= ingredient.filter((element) => {return element.ingredientId == ingredientId});
+			const sourceId = origen[0].unitId;
+			const originalQty = origen[0].quantity;
+			const sourceUnit = origen[0].unitName
+			if(sourceUnit !== selectedType){
+				axios.get(`https://tasty-hub.herokuapp.com/api/unit/description/${selectedType}`)
+				.then((response)=>{
+					const destinoId = response.data.id;
+					axios.get(`https://tasty-hub.herokuapp.com/api/conversion/convert?sourceUnitId=${destinoId}&targetUnitId=${sourceId}`)
 					.then((response) => {
-						console.log(response.data)
-						const result = response.data
-						navigation.navigate("Recipe", {userId: userId, id: recipeId, recalculated: result})
-					})
-					.catch((error) => console.log("Second conversion error " + error ))
-		}
-	
-		// axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert/ingredient?ingredientId=${ingredientId}&quantity=${oldIngredientQty}&recipeId=${recipeId}`)
-		// .then((response) => {
-		// 	const data = response.data
-		// 	const result = []
-		// 	data.forEach(element => {
-		// 		if(element.ingredientId === ingredientId){
-		// 			const newQuantity = element.quantity * conversion;
-		// 			result.push({
-		// 				ingredientName: element.ingredientName,
-		// 				unitName: selectedType,
-		// 				quantity: newQuantity 
-		// 			})
-		// 		}else{
-		// 			result.push(element)
-		// 		}
-		// 	});
+						const newQty = response.data.conversionFactor * ingredientQty
+						const factor = (newQty/originalQty)
+						axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert/ingredient?ingredientId=${ingredientId}&quantity=${newQty}&recipeId=${recipeId}`)
+						.then((response) => {
+							const data = response.data
+							const result = []
+							data.forEach(element => {
+								if(element.ingredientId === ingredientId){
+									result.push(
+										{
+											ingredientName: element.ingredientName,
+											quantity: ingredientQty,
+											unitName: selectedType
+										}
+									)
+								}else{
+									result.push(element)
+								}
 
-		// 	console.log(result);
-		// })
+								console.log(result)
+								navigation.navigate("Recipe", {userId: userId, id: recipeId, recalculated: result, factor: factor})
+							});
+						})
+						.catch((error) => console.log("First conversion error " + error ))
+					})
+					.catch((error) => console.log("ERROR 3 " + error))
+				})
+				.catch((error) => console.log("ERROR 2 " + error))
+			}else{
+				axios.get(`https://tasty-hub.herokuapp.com/api/recipes/convert/ingredient?ingredientId=${ingredientId}&quantity=${ingredientQty}&recipeId=${recipeId}`)
+						.then((response) => {
+							console.log(response.data)
+							const result = response.data
+							navigation.navigate("Recipe", {userId: userId, id: recipeId, recalculated: result})
+						})
+						.catch((error) => console.log("Second conversion error " + error ))
+			}
+		}
 	}
 
 	const getCurrentQty = (itemValue) => {
@@ -149,7 +135,7 @@ export const IngredientScreen = ({navigation, recipeId, userId}) => {
 			</View>
             <View style={styles.qtyContainer}>
                 <Text style={styles.inputText}>Cantidad</Text>
-				<TextInput style={styles.input} keyboardType="numeric" maxLength={5} value={ingredientQty} onChangeText={(qty)=>setIngredientQty(qty)}/>
+				<InputTasty style={styles.input} isValid={isValid} errorMessage={''} keyboardType="numeric" maxLength={5} value={ingredientQty} onChange={(qty)=>setIngredientQty(qty)}/>
                 <View style={styles.pickerContainer}>
 					<Picker
 						style={styles.picker}
@@ -163,6 +149,7 @@ export const IngredientScreen = ({navigation, recipeId, userId}) => {
 					</Picker>
 				</View>
 			</View>
+			{!isValid && <Text style={styles.textError}>{errorMessage}</Text>}
 			<TouchableOpacity onPress={() => recalculate()} style={styles.button}>
 				<Text style={styles.buttonText}>Recalcular</Text>
 			</TouchableOpacity>
@@ -196,11 +183,12 @@ const styles = StyleSheet.create({
 	},
     qtyContainer: {
 		flexDirection: 'row',
-		padding: 50,
+		paddingTop: 50,
+		paddingBottom: 15,
         justifyContent: "space-between"
 	},
     input: {
-		borderColor: '#DC9518',
+		
 		borderWidth: 1,
 		borderRadius: 20,
 		paddingHorizontal: 20,
@@ -268,4 +256,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		color: 'white'
 	},
+	textError:{
+		color:"#FF6D6D", 
+		fontWeight:'bold',
+		marginLeft: 10,
+		fontSize: 14,
+		paddingBottom: 30
+	}
 });
