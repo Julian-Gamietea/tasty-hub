@@ -1,10 +1,9 @@
 import React from 'react';
 import { TouchableOpacity,View, Text, Image, StyleSheet, TextInput } from 'react-native';
-import fork from '../assets/recalculate-recipe/fork.png';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { InputTasty } from '../shared-components/InputTasty'; 
-
+import { MaterialIcons } from '@expo/vector-icons'; 
 export const IngredientScreen = ({navigation, recipeId, userId}) => {
 
     const [selectedType, setSelectedType ] = React.useState();
@@ -117,7 +116,7 @@ export const IngredientScreen = ({navigation, recipeId, userId}) => {
 
 	return (
 		<View style={styles.container}>
-			<Image style={styles.image} source={fork} />
+			<MaterialIcons style={styles.image} name="restaurant" size={120} color='#312102' />
 			<Text style={styles.instructionsText}>Ingrese el ingrediente que usará como base.</Text>
 			<View style={styles.pickerIngredientContainer}>
 				{ingredient && 
@@ -165,10 +164,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
 	image: {
-		marginTop: 50,
-		height: 150,
-		width: 150,
-		justifyContent: 'center'
+		paddingTop: 40,
+		justifyContent: 'center',
+		paddingBottom: 30
 	},
     instructionsText: {
 		fontFamily: 'InterSemiBold',

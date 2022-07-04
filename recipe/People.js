@@ -1,8 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity,View, Text, Image, StyleSheet, TextInput, KeyboardAvoidingView } from 'react-native';
-import group from '../assets/recalculate-recipe/group.png';
 import { InputTasty } from '../shared-components/InputTasty';
+import { MaterialIcons } from '@expo/vector-icons'; 
 
 export const People = ({userId,recipeId,navigation}) => {
 	const [peopleQty, setPeopleQty] = React.useState(0)
@@ -41,7 +41,7 @@ export const People = ({userId,recipeId,navigation}) => {
 
 	return (
 		<View style={styles.container}>
-			<Image style={styles.image} source={group} />
+			<MaterialIcons style={styles.image} name="groups" size={120} color='#312102' />
 			<Text style={styles.instructionsText}>Ingrese la cantidad de personas deseadas.</Text>
 			<KeyboardAvoidingView>
 				<View style={styles.qtyContainer}>
@@ -70,10 +70,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	image: {
-		marginTop: 50,
-		height: 150,
-		width: 150,
-		justifyContent: 'center'
+		paddingTop: 50,
+		justifyContent: 'center',
+		paddingBottom: 40
 	},
 	instructionsText: {
 		fontFamily: 'InterSemiBold',

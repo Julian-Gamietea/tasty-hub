@@ -1,8 +1,8 @@
 import axios, { Axios } from 'axios';
 import React, { useEffect, useState } from 'react';
 import {TouchableOpacity, View, Text, Image, StyleSheet, TextInput } from 'react-native';
-import chart from '../assets/recalculate-recipe/chart.png';
 import { InputTasty } from '../shared-components/InputTasty';
+import { Feather } from '@expo/vector-icons';
 
 export const Portions = ({userId,recipeId,navigation}) => {
     const [portionsQty, setPortionsQty ] = useState(0);
@@ -41,7 +41,7 @@ export const Portions = ({userId,recipeId,navigation}) => {
 	  
 	  return (
 		<View style={styles.container}>
-			<Image style={styles.image} source={chart} />
+			<Feather style={styles.image}  name="pie-chart" size={120} color='#312102' />
 			<Text style={styles.instructionsText}>Ingrese la cantidad de porciones deseadas.</Text>
 			<View style={styles.qtyContainer}>
 				<InputTasty style={styles.input} errorMessage={''} isValid={isValid} keyboardType="numeric" maxLength={2} onChange={(cantidad) => setPortionsQty(cantidad)} />
@@ -62,10 +62,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
 	image: {
-		marginTop: 50,
-		height: 150,
-		width: 150,
-		justifyContent: 'center'
+		paddingTop: 50,
+		justifyContent: 'center',
+		paddingBottom: 40
 	},
     instructionsText: {
 		fontFamily: 'InterSemiBold',
