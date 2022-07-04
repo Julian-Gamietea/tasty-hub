@@ -26,7 +26,7 @@ export const SearchResults = ({ route, navigation }) => {
 
 
     const backAction = () => {
-        Alert.alert("Advertencia!", "estas seguro de volver al dashboard?", [
+        Alert.alert("Advertencia!", "Estas seguro de que desea volver a la pantalla de Recomendados?", [
           {
             text: "Cancel",
             onPress: () => null,
