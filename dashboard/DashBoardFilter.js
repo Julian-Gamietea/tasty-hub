@@ -20,8 +20,6 @@ export const DashBoardFilter = ({ route, navigation }) => {
   const [filteredRecipes,setFilterRecipes] = useState([])
 
 
-
-
   const onChangeText = (text) => {
     setDuration(text)
   }
@@ -163,6 +161,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
   useEffect(() => {
     fetchTypes()
     fetchIngredients();
+   
   }, []);
 
   const submit = async () => {

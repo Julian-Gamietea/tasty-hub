@@ -139,7 +139,6 @@ export const Dashboard = ({ route, navigation }) => {
                 transparent={true}
                 visible={isModalVisible}
                 onRequestClose={() => {setIsModalVisible(false)}}>
-
                     <View style={styles.modalContainer}>
                         <TouchableOpacity onPress={()=>organizeRecipes()} style={{alignSelf:"center"}}>
                             <Feather name="filter" size={55} color="#553900" />

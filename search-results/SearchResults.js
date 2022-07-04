@@ -243,7 +243,7 @@ export const SearchResults = ({ route, navigation }) => {
                     </View>
                 </Modal>
             <View style={styles.filtersContainer}>
-                <TouchableOpacity style={styles.filterButton}>
+                <TouchableOpacity onPress={()=>navigation.navigate("DashBoardFilter")} style={styles.filterButton}>
                     <Text style={styles.filterText}>Filtrar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>setIsModalVisible(true)}>
