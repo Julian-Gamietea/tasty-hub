@@ -15,7 +15,7 @@ import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
 
 export const InstructionCreation = ({ navigation, route }) => {
 
-    const {recipe} = route.params;
+    const { recipe } = route.params;
 
     const [recipeId, setRecipeId] = React.useState(recipe.id);
     const instructions = [
@@ -186,35 +186,35 @@ export const InstructionCreation = ({ navigation, route }) => {
     }
 
     const upload = async () => {
-        const auxRecipe = 
-            {
-                description: recipe.description,
-                duration: recipe.duration,
-                enabled: false,
-                name: recipe.name,
-                ownerId: recipe.ownerId,
-                peopleAmount: recipe.peopleAmount,
-                portions: recipe.portions,
-                typeId: recipe.typeId,
-            }  
-        
-            console.log(auxRecipe)
+        const auxRecipe =
+        {
+            description: recipe.description,
+            duration: recipe.duration,
+            enabled: false,
+            name: recipe.name,
+            ownerId: recipe.ownerId,
+            peopleAmount: recipe.peopleAmount,
+            portions: recipe.portions,
+            typeId: recipe.typeId,
+        }
+
+        console.log(auxRecipe)
         const recipeData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
-        
+
         const fdi = new FormData();
         for (let image of recipe.images) {
             fdi.append('images', image);
         }
 
         try {
-            const imageData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipeData.data.id}`, fdi, 
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
+            const imageData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipeData.data.id}`, fdi,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
                 }
-            }
             );
-        } catch(e) {
+        } catch (e) {
             console.log(e);
         }
 
@@ -239,7 +239,7 @@ export const InstructionCreation = ({ navigation, route }) => {
                     });
 
                 const instructionId = res.data.id;
-                
+
                 console.log(step.multimedia);
                 const fd = new FormData();
                 for (let multim of step.multimedia) {
@@ -250,7 +250,7 @@ export const InstructionCreation = ({ navigation, route }) => {
                     }
                     fd.append('multimedia', aux);
                 }
-                
+
                 var config = {
                     method: 'post',
                     url: `https://tasty-hub.herokuapp.com/api/multimedia?instructionId=${instructionId}`,
@@ -261,7 +261,7 @@ export const InstructionCreation = ({ navigation, route }) => {
                 };
 
                 await axios(config);
-                
+
             } catch (e) {
                 console.log(e);
             }
@@ -279,7 +279,7 @@ export const InstructionCreation = ({ navigation, route }) => {
 
     return (
         <View style={styles.mainContainer}>
-            
+
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -313,55 +313,59 @@ export const InstructionCreation = ({ navigation, route }) => {
                 </View>
             </Modal>
             <CustomNav text={"Agregar Pasos"} callback={() => navigation.goBack()} />
-            <ScrollView style={styles.stepsContainer} horizontal showsHorizontalScrollIndicator={false}>
-                {steps.map((step, index) => (
-                    <TouchableOpacity style={selectedStep.numberOfStep === step.numberOfStep ? styles.selectedStepButton : styles.stepButton} onPress={() => handleSelectStep(step.numberOfStep)} key={step.numberOfStep}>
-                        <Text style={selectedStep.numberOfStep === step.numberOfStep ? styles.selectedStepText : styles.stepText}>Paso {step.numberOfStep}</Text>
+            <ScrollView>
+
+                <ScrollView style={styles.stepsContainer} horizontal showsHorizontalScrollIndicator={false}>
+                    {steps.map((step, index) => (
+                        <TouchableOpacity style={selectedStep.numberOfStep === step.numberOfStep ? styles.selectedStepButton : styles.stepButton} onPress={() => handleSelectStep(step.numberOfStep)} key={step.numberOfStep}>
+                            <Text style={selectedStep.numberOfStep === step.numberOfStep ? styles.selectedStepText : styles.stepText}>Paso {step.numberOfStep}</Text>
+                        </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity style={{ ...styles.stepButton, marginRight: 15 }} onPress={handleAddStep}>
+                        <MaterialIcons name="add" size={50} color="#553900" />
                     </TouchableOpacity>
-                ))}
-                <TouchableOpacity style={{ ...styles.stepButton, marginRight: 15 }} onPress={handleAddStep}>
-                    <MaterialIcons name="add" size={50} color="#553900" />
-                </TouchableOpacity>
-            </ScrollView>
-            <ScrollView nestedScrollEnabled={true} style={styles.dataScroll}>
-                <View style={styles.dataContainer}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 30 }}>
-                        <Text style={styles.stepNumber}>Paso {selectedStep.numberOfStep}</Text>
-                        {selectedStep.numberOfStep !== 1 &&
-                            <TouchableOpacity style={styles.deleteStepBtn} onPress={handleDelete}>
-                                <Text style={styles.deleteText}>Eliminar Paso</Text>
-                            </TouchableOpacity>}
-                    </View>
-                    <View>
-                        <View>
-                            <Text style={styles.InputText}>Título</Text>
-                            <InputTasty
-                                style={styles.input}
-                                value={selectedStep.title}
-                                onChange={(text) => handleTitleChange(text)}
-                            />
+                </ScrollView>
+                <ScrollView nestedScrollEnabled={true} style={styles.dataScroll}>
+                    <View style={styles.dataContainer}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 30 }}>
+                            <Text style={styles.stepNumber}>Paso {selectedStep.numberOfStep}</Text>
+                            {selectedStep.numberOfStep !== 1 &&
+                                <TouchableOpacity style={styles.deleteStepBtn} onPress={handleDelete}>
+                                    <Text style={styles.deleteText}>Eliminar Paso</Text>
+                                </TouchableOpacity>}
                         </View>
                         <View>
-                            <Text style={styles.InputText}>Descripción</Text>
-                            <InputTasty
-                                style={styles.descriptionInput}
-                                value={selectedStep.description}
-                                onChange={(text) => handleDescriptionChange(text)}
-                                multiline
-                            />
+                            <View>
+                                <Text style={styles.InputText}>Título</Text>
+                                <InputTasty
+                                    style={styles.input}
+                                    value={selectedStep.title}
+                                    onChange={(text) => handleTitleChange(text)}
+                                />
+                            </View>
+                            <View>
+                                <Text style={styles.InputText}>Descripción</Text>
+                                <InputTasty
+                                    style={styles.descriptionInput}
+                                    value={selectedStep.description}
+                                    onChange={(text) => handleDescriptionChange(text)}
+                                    multiline
+                                />
+                            </View>
                         </View>
+                        <AddMultimediaForm
+                            title={"Multimedia"}
+                            onPress={handleMultimedia}
+                            data={selectedStep.multimedia}
+                            onRemove={removeMultimedia}
+                        />
                     </View>
-                    <AddMultimediaForm 
-                    title={"Multimedia"} 
-                    onPress={handleMultimedia}
-                    data={selectedStep.multimedia}
-                    onRemove={removeMultimedia}
-                    />
-                </View>
+                    <View style={{ marginHorizontal: 80, marginBottom: 15, marginTop: 10 }}>
+                        <ButtonCustom text={"Finalizar"} callback={upload} />
+                    </View>
+                </ScrollView>
             </ScrollView>
-            <View style={{ marginHorizontal: 80, marginBottom: 15, marginTop: 10 }}>
-                <ButtonCustom text={"Finalizar"} callback={upload}/>
-            </View>
+
         </View>
     )
 }
