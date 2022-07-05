@@ -56,6 +56,7 @@ export const DefineIngredients = ({ navigation, route }) => {
     const handleChangeUnit = (value, index) => {
         const aux = ingredientQty.slice(0, ingredientQty.length);
         aux[index].unitId = value;
+        aux[index].unitName = units[value - 1].shortened;
         setIngredientQty(aux);
     }
 
@@ -99,7 +100,8 @@ export const DefineIngredients = ({ navigation, route }) => {
                                                         unitId: 1,
                                                         quantity: 1,
                                                         recipeId: 0,
-                                                        observations: ""
+                                                        observations: "",
+                                                        unitName: 'gr'
                                                     });
                                                     console.log(aux);
                                                     setIngredientQty(aux);

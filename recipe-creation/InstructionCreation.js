@@ -220,10 +220,19 @@ export const InstructionCreation = ({ navigation, route }) => {
             console.log(e);
         }
 
+        let qtyAux = {};
         for (let qty of recipe.ingredientQty) {
-            qty.recipeId = recipeData.data.id;
+
+            qtyAux = {
+                recipeId: recipeData.data.id,
+                ingredientId: qty.ingredientId,
+                unitId: qty.unitId,
+                quantity: qty.quantity,
+                observations: "",
+            }
+
             try {
-                const iq = await axios.post(`https://tasty-hub.herokuapp.com/api/ingredientQuantity`, qty);
+                const iq = await axios.post(`https://tasty-hub.herokuapp.com/api/ingredientQuantity`, qtyAux);
             } catch (e) {
                 console.log(e);
             }
