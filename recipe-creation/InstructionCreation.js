@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, StatusBar, TouchableOpacity, FlatList, Dimensions, Image, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, TouchableOpacity, FlatList, Dimensions, Image, Modal, Pressable, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { CustomNav } from '../shared-components/CustomNav';
 import React from 'react';
@@ -16,7 +16,7 @@ import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
 export const InstructionCreation = ({ navigation, route }) => {
 
     const { recipe } = route.params;
-
+    const [isUploading, setIsUploading] = React.useState(false);
     const [recipeId, setRecipeId] = React.useState(recipe.id);
     const instructions = [
         {
@@ -186,6 +186,7 @@ export const InstructionCreation = ({ navigation, route }) => {
     }
 
     const upload = async () => {
+        setIsUploading(true);
         const auxRecipe =
         {
             description: recipe.description,
@@ -199,8 +200,9 @@ export const InstructionCreation = ({ navigation, route }) => {
         }
 
         console.log(auxRecipe)
-        const recipeData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
-
+        
+            const recipeData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
+        
         const fdi = new FormData();
         for (let image of recipe.images) {
             fdi.append('images', image);
@@ -261,11 +263,14 @@ export const InstructionCreation = ({ navigation, route }) => {
                 };
 
                 await axios(config);
-
+                
+                
             } catch (e) {
                 console.log(e);
             }
         }
+        setIsUploading(false);
+        navigation.navigate('SuccessNormal');
     }
 
     const [loaded] = useFonts({
@@ -360,9 +365,15 @@ export const InstructionCreation = ({ navigation, route }) => {
                             onRemove={removeMultimedia}
                         />
                     </View>
-                    <View style={{ marginHorizontal: 80, marginBottom: 15, marginTop: 10 }}>
+                    {!isUploading && <View style={{ marginHorizontal: 80, marginBottom: 15, marginTop: 10 }}>
                         <ButtonCustom text={"Finalizar"} callback={upload} />
-                    </View>
+                    </View>}
+                    {isUploading && 
+                    <View style={{ marginHorizontal: 80, marginBottom: 15, marginTop: 10 }}>
+                        <TouchableOpacity style={styles.spinner}>
+                            <ActivityIndicator color={"#553900"} />
+                        </TouchableOpacity>
+                    </View>}
                 </ScrollView>
             </ScrollView>
 
@@ -518,5 +529,11 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: "center"
+    },
+    spinner: { 
+        elevation: 8,
+        backgroundColor: "#F3A200",
+        borderRadius: 15,
+        padding: 15
     }
 })

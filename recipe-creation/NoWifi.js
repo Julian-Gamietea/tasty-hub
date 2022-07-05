@@ -28,8 +28,8 @@ export const NoWifi = ({ navigation, route }) => {
                 {'\n\n'}¿Desea continuar de todas formas?
                 </Text>
                 <View style={styles.button}>
-                    <ButtonCustom style={{width: 150}} callback={() => navigation.navigate(nextScreen, {cellular: true, data: data})} text="Continuar" />
-                    <ButtonCustom style={{width: 150}} callback={() => navigation.navigate('WelcomeScreen')} text="Descartar" />
+                    <ButtonCustom style={{width: 150, elevation: 0, borderRadius: 5}} callback={() => navigation.navigate(nextScreen, {cellular: true, data: data})} text="Continuar" />
+                    <ButtonCustom style={{width: 150, elevation: 0, borderRadius: 5}} callback={() => navigation.navigate('WelcomeScreen')} text="Descartar" />
                 </View>
             </View>
 		</View>

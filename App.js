@@ -45,6 +45,8 @@ import { Saved } from './saved/Saved';
 import { SavedRecipeCard } from './shared-components/SavedRecipeCard';
 import { DefineType } from './recipe-creation/DefineType';
 import { DefineIngredients } from './recipe-creation/DefineIngredients';
+import { RecipeNameExists } from './recipe-creation/RecipeNameExists';
+import { RecipeSuccessNormal } from './recipe-creation/RecipeSuccessNormal';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -98,6 +100,8 @@ function RecipeTabStack() {
       <Stack.Screen name="DefineType" component={DefineType}/>
       <Stack.Screen name="DefineIngridient" component={DefineIngredients}/>
       <Stack.Screen name="InstructionCreation" component={InstructionCreation}/>
+      <Stack.Screen name="RecipeNameExists" component={RecipeNameExists}/>
+      <Stack.Screen name="SuccessNormal" component={RecipeSuccessNormal}/>
     </Stack.Navigator>
     )
 }
@@ -229,7 +233,6 @@ export default function App() {
         
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
-
         <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
         <Stack.Screen name="CreateRecipeName" component={CreateRecipeName} />
         <Stack.Screen name="RecipeForm" component={RecipeForm} />
