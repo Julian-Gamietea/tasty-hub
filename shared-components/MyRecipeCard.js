@@ -24,7 +24,6 @@ export const MyRecipeCard = ({ onPress, image, title, timeToMake, id }) => {
             try {
                 const res = await axios.get(`https://tasty-hub.herokuapp.com/api/rating/average/${id}`);
                 setRating(parseInt(res.data));
-                setIsLoading(false);
                 const resf = await axios.get(`https://tasty-hub.herokuapp.com/api/favorite/isfavourite?recipeId=${id}&userId=${userId}`);
                 setIsBookmarked(Boolean(resf.data));
             } catch (e) {
@@ -40,7 +39,7 @@ export const MyRecipeCard = ({ onPress, image, title, timeToMake, id }) => {
 
 
     let arrayRating = [];
-    for (let index = 0; index < 5; index++) {
+    for (let index = 0; index < rating; index++) {
         arrayRating.push(1);
     }
 
