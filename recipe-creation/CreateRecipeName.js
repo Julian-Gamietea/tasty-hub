@@ -48,7 +48,6 @@ export const CreateRecipeName = ({ navigation, route }) => {
 		} else {
 			if (recipeName) {
 				try {
-					console.log(`https://tasty-hub.herokuapp.com/api/recipes?ownerId=${user.id}`);
 					const res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes?ownerId=${user.id}`);
 					if (res.data.length > 0) {
 						const aux = res.data.filter((recipe) => recipe.name === recipeName);

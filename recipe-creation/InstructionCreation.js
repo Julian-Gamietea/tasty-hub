@@ -28,7 +28,11 @@ export const InstructionCreation = ({ navigation, route }) => {
         }
     ]
 
+	const [errors, setErrors] = React.useState([]);
+
     const [modalVisible, setModalVisible] = React.useState(false);
+    
+    const [ErrorModalVisible, setErrorModalVisible] = React.useState(false);
 
     const [steps, setSteps] = React.useState(instructions);
 
@@ -185,101 +189,128 @@ export const InstructionCreation = ({ navigation, route }) => {
 
     }
 
+    const hasErrors = () => {
+        const aux = errors.slice(0, errors.length);
+        for (let step of steps) {
+            
+            if (step.title === "") {
+                aux.push(`El paso ${step.numberOfStep} no contiene título`);
+            }
+
+            if (step.description === "") {
+                aux.push(`El paso ${step.numberOfStep} no contiene una descripción`);
+            }
+        }
+        if (aux.length > 0) {
+            setErrors(aux);
+            setErrorModalVisible(true);
+            return true;
+        } else {
+            return false;
+        }
+
+
+    }
+
     const upload = async () => {
         setIsUploading(true);
-        const auxRecipe =
-        {
-            description: recipe.description,
-            duration: recipe.duration,
-            enabled: false,
-            name: recipe.name,
-            ownerId: recipe.ownerId,
-            peopleAmount: recipe.peopleAmount,
-            portions: recipe.portions,
-            typeId: recipe.typeId,
-        }
-
-        console.log(auxRecipe)
-        
-            const recipeData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
-        
-        const fdi = new FormData();
-        for (let image of recipe.images) {
-            fdi.append('images', image);
-        }
-
-        try {
-            const imageData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipeData.data.id}`, fdi,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            );
-        } catch (e) {
-            console.log(e);
-        }
-
-        let qtyAux = {};
-        for (let qty of recipe.ingredientQty) {
-
-            qtyAux = {
-                recipeId: recipeData.data.id,
-                ingredientId: qty.ingredientId,
-                unitId: qty.unitId,
-                quantity: qty.quantity,
-                observations: "",
+        if (!hasErrors()) {
+            const auxRecipe =
+            {
+                description: recipe.description,
+                duration: recipe.duration,
+                enabled: false,
+                name: recipe.name,
+                ownerId: recipe.ownerId,
+                peopleAmount: recipe.peopleAmount,
+                portions: recipe.portions,
+                typeId: recipe.typeId,
             }
-
-            try {
-                const iq = await axios.post(`https://tasty-hub.herokuapp.com/api/ingredientQuantity`, qtyAux);
-            } catch (e) {
-                console.log(e);
+    
+            console.log(auxRecipe)
+            
+                const recipeData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
+            
+            const fdi = new FormData();
+            for (let image of recipe.images) {
+                fdi.append('images', image);
             }
-        }
-
-        for (let step of steps) {
+    
             try {
-
-                const res = await axios.post(`https://tasty-hub.herokuapp.com/api/instruction`,
+                const imageData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipeData.data.id}`, fdi,
                     {
-                        description: step.description,
-                        numberOfStep: step.numberOfStep,
-                        recipeId: recipeData.data.id,
-                        title: step.title,
-                    });
-
-                const instructionId = res.data.id;
-
-                console.log(step.multimedia);
-                const fd = new FormData();
-                for (let multim of step.multimedia) {
-                    const aux = {
-                        uri: multim.uri,
-                        type: multim.type,
-                        name: multim.name
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
                     }
-                    fd.append('multimedia', aux);
-                }
-
-                var config = {
-                    method: 'post',
-                    url: `https://tasty-hub.herokuapp.com/api/multimedia?instructionId=${instructionId}`,
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                    data: fd
-                };
-
-                await axios(config);
-                
-                
+                );
             } catch (e) {
                 console.log(e);
             }
+    
+            let qtyAux = {};
+            for (let qty of recipe.ingredientQty) {
+    
+                qtyAux = {
+                    recipeId: recipeData.data.id,
+                    ingredientId: qty.ingredientId,
+                    unitId: qty.unitId,
+                    quantity: qty.quantity,
+                    observations: "",
+                }
+    
+                try {
+                    const iq = await axios.post(`https://tasty-hub.herokuapp.com/api/ingredientQuantity`, qtyAux);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+    
+            for (let step of steps) {
+                try {
+    
+                    const res = await axios.post(`https://tasty-hub.herokuapp.com/api/instruction`,
+                        {
+                            description: step.description,
+                            numberOfStep: step.numberOfStep,
+                            recipeId: recipeData.data.id,
+                            title: step.title,
+                        });
+    
+                    const instructionId = res.data.id;
+    
+                    console.log(step.multimedia);
+                    const fd = new FormData();
+                    for (let multim of step.multimedia) {
+                        const aux = {
+                            uri: multim.uri,
+                            type: multim.type,
+                            name: multim.name
+                        }
+                        fd.append('multimedia', aux);
+                    }
+    
+                    var config = {
+                        method: 'post',
+                        url: `https://tasty-hub.herokuapp.com/api/multimedia?instructionId=${instructionId}`,
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        },
+                        data: fd
+                    };
+    
+                    await axios(config);
+                    
+                    
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+            setIsUploading(false);
+            navigation.navigate('SuccessNormal');
+        } else {
+            setIsUploading(false);
         }
-        setIsUploading(false);
-        navigation.navigate('SuccessNormal');
     }
 
     const [loaded] = useFonts({
@@ -293,7 +324,33 @@ export const InstructionCreation = ({ navigation, route }) => {
 
     return (
         <View style={styles.mainContainer}>
-
+            <Modal
+				animationType="slide"
+				transparent={true}
+				visible={ErrorModalVisible}
+				onRequestClose={() => {
+					Alert.alert("Modal has been closed.");
+					setErrorModalVisible(!ErrorModalVisible);
+				}}
+			>
+				<View style={styles.centeredViewError}>
+					<View style={styles.modalViewError}>
+						<Text style={styles.modalTextError}>No puede avanzar debido a los siguientes problemas:</Text>
+						{errors.map((errormsg, index) => (
+							<Text key={index} style={{textAlign: 'center', marginBottom: 15}}>{index + 1}. {errormsg}</Text>
+						))}
+						<Pressable
+							style={[styles.buttonError, styles.buttonCloseError]}
+							onPress={() => {
+								setErrorModalVisible(!ErrorModalVisible);
+								setErrors([]);
+							}}
+						>
+							<Text style={styles.textStyleError}>Entendido</Text>
+						</Pressable>
+					</View>
+				</View>
+			</Modal>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -544,5 +601,47 @@ const styles = StyleSheet.create({
         backgroundColor: "#F3A200",
         borderRadius: 15,
         padding: 15
-    }
+    },
+    centeredViewError: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		marginTop: 22
+	},
+	modalViewError: {
+		margin: 20,
+		backgroundColor: "white",
+		borderRadius: 20,
+		padding: 35,
+		alignItems: "center",
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+		elevation: 5
+	},
+	buttonError: {
+		borderRadius: 5,
+		padding: 10,
+		paddingHorizontal: 20
+	},
+	buttonOpenError: {
+		backgroundColor: "#F194FF",
+	},
+	buttonCloseError: {
+		backgroundColor: "#F3A200",
+	},
+	textStyleError: {
+		color: "white",
+		fontWeight: "bold",
+		textAlign: "center"
+	},
+	modalTextError: {
+		marginBottom: 15,
+		textAlign: "center",
+		fontFamily: 'InterSemiBold'
+	}
 })
