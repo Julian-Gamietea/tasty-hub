@@ -215,8 +215,8 @@ export const InstructionCreation = ({ navigation, route }) => {
     const upload = async () => {
         setIsUploading(true);
         if (!hasErrors()) {
-            const auxRecipe =
-            {
+
+            const auxRecipe = {
                 description: recipe.description,
                 duration: recipe.duration,
                 enabled: false,
@@ -226,10 +226,16 @@ export const InstructionCreation = ({ navigation, route }) => {
                 portions: recipe.portions,
                 typeId: recipe.typeId,
             }
-    
-            console.log(auxRecipe)
-            
-                const recipeData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
+
+            let recipeData = null;
+
+            if (recipe.id !== 0) {
+                auxRecipe.id = recipe.id;
+                await overwriteOldRecipe(recipe.id);
+                recipeData = await axios.put(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
+            } else {
+                recipeData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
+            }
             
             const fdi = new FormData();
             for (let image of recipe.images) {
@@ -312,6 +318,18 @@ export const InstructionCreation = ({ navigation, route }) => {
             setIsUploading(false);
         }
     }
+
+    const overwriteOldRecipe = async (id) => {
+        const url = 'https://tasty-hub.herokuapp.com/api'
+		//BORRAR FOTOS
+		await axios.delete(`${url}/recipePhotos/deleteall/${id}`);
+		//BORRAR MULTIMEDIA
+        await axios.delete(`${url}/multimedia/deleteall/${id}`);
+		//BORRAR INGQ
+        await axios.delete(`${url}/ingredientQuantity?recipeId=${id}`);
+		//BORRAR INSTRUCCIONES
+        await axios.delete(`${url}/instruction?recipeId=${id}`);
+	}
 
     const [loaded] = useFonts({
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf'),

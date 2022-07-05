@@ -1,5 +1,5 @@
 export const initialState = {
-    id: null,
+    id: 0,
     description: "",
     duration: 0,
     images: [],

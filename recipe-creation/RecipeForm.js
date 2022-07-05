@@ -8,9 +8,11 @@ import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
 import * as ImagePicker from 'expo-image-picker';
 import { recipeReducer, initialState } from './RecipeReducer';
 import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 
 export const RecipeForm = ({ navigation, route }) => {
 
+	const {type} = route.params;
 	const [errors, setErrors] = React.useState([]);
 	const [modalVisible, setModalVisible] = React.useState(false);
 	const [recipeState, recipeDispatch] = React.useReducer(recipeReducer, initialState);
@@ -33,6 +35,10 @@ export const RecipeForm = ({ navigation, route }) => {
 		fetchUserData();
 		if (route.params.state) {
 			recipeDispatch({ type: 'set', state: route.params.state });
+		}
+		if (type === 'overwrite') {
+			recipeDispatch({type: 'fieldUpdate', field: 'id', value: route.params.recipeId});
+			console.log("hi, i'm overwriting");
 		}
 	}, [route.params])
 
@@ -94,7 +100,7 @@ export const RecipeForm = ({ navigation, route }) => {
 			description: description,
 			duration: duration,
 			enabled: false,
-			id: 0,
+			id: id,
 			mainPhoto: images[0],
 			name: name,
 			ownerId: ownerId,
@@ -104,6 +110,7 @@ export const RecipeForm = ({ navigation, route }) => {
 			ingredientQty: ingredientQty,
 			images: images
 		}
+		console.log(recipe)
 
 		if (description === "" || duration === 0 || name === "" || peopleAmount === 0 || !typeId || images.length === 0 || ingredientQty.length === 0) {
 			errorsAux.push("No puede dejar campos vacíos");

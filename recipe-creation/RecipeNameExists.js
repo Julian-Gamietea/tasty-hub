@@ -26,7 +26,7 @@ export const RecipeNameExists = ({navigation, route}) => {
                 <ButtonCustom 
                 text={'Sobrescribir'} 
                 style={[styles.btn, {marginRight: 25}]}
-                callback={() => navigation.navigate("RecipeForm", {type: 'overwrite', recipeTitle: recipeName})}
+                callback={() => navigation.navigate("RecipeForm", {type: 'overwrite', recipeTitle: recipeName, recipeId: route.params.recipe.id})}
                 />
             </View>
         </View>
