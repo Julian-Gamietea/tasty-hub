@@ -14,9 +14,9 @@ export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, erro
                 fontSize:16,
                 padding:15,
                 textAlign:"left"
-                
+
               },
-    
+
               container: {
                 // backgroundColor: '#fff',
                 alignItems: 'stretch',
@@ -44,6 +44,6 @@ export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, erro
                 />
                 {!isValid && <Text style={styles.error}>{errorMessage}</Text>}
             </View>
-            
+
         );
 }

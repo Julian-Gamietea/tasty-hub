@@ -57,9 +57,20 @@ export const Profile = ({ navigation }) => {
         return null;
     }
 
+    const disconnect = async () => {
+        await SecureStore.deleteItemAsync("user")
+        navigation.navigate("Login")
+    }
+
     return (
         <View style={styles.mainContainer}>
-            <CustomNav text={"Mi Perfil"} callback={() => navigation.goBack()} />
+            <View style={styles.navItems}>
+                <CustomNav text={"Mi Perfil"} callback={() => navigation.goBack()} />
+                <TouchableOpacity style={styles.disconectButton} onPress={()=> disconnect()}> 
+                    <Text style={styles.textButton}> Cerrar Sesión </Text>
+                </TouchableOpacity>
+            </View>
+            
             <View style={styles.profileInfo}>
                 <View style={styles.userData}>
                     <Text style={styles.name}>{user.name}</Text>
@@ -94,7 +105,7 @@ export const Profile = ({ navigation }) => {
                 </View>
                 <View style={styles.saved}>
                     <Text style={styles.bigButtonText}>Guardados</Text>
-                    <TouchableOpacity style={styles.bigButton}>
+                    <TouchableOpacity style={styles.bigButton} onPress={()=> navigation.navigate("Saved")}>
                         <View style={styles.buttonIcon}>
                             <Feather name="download" size={80} color="#553900" />
                         </View>
@@ -110,6 +121,11 @@ const styles = StyleSheet.create({
         paddingTop: StatusBar.currentHeight + 5,
         backgroundColor: '#fff',
         flex: 1,
+    },
+    navItems:{
+        flexDirection: 'row', 
+        alignItems:'center', 
+        justifyContent: 'space-between'
     },
     profileInfo: {
         marginTop: 10,
@@ -192,5 +208,11 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'space-around',
+    },
+    disconectButton:{
+        flexDirection: 'row', 
+        paddingRight: 10, 
+        height: '100%', 
+        alignItems:'center'
     }
 })
