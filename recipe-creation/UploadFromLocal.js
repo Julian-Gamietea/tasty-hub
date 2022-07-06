@@ -12,6 +12,14 @@ const getQueue = async (queueType, userId) => {
     }
 }
 
+export const hasQueues = async (userId) => {
+    const up = await AsyncStorage.getItem(`user_${userId}_upload_queue`);
+    const ow = await AsyncStorage.getItem(`user_${userId}_overwrite_queue`);
+    const ed = await AsyncStorage.getItem(`user_${userId}_edit_queue`);
+
+    return up || ow || ed;
+}
+
 export const UploadNormal = async (userId) => {
     const queue = getQueue('upload', userId);
     if (queue !== null) {

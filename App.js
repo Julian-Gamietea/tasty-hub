@@ -237,9 +237,9 @@ export default function App() {
         
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
-        <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
-        <Stack.Screen name="CreateRecipeName" component={CreateRecipeName} />
-        <Stack.Screen name="RecipeForm" component={RecipeForm} />
+        {/* <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} /> */}
+        {/* <Stack.Screen name="CreateRecipeName" component={CreateRecipeName} /> */}
+        {/* <Stack.Screen name="RecipeForm" component={RecipeForm} /> */}
 
         {/* habría que ir agregando las screens aca */}
       </Stack.Navigator>
