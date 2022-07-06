@@ -47,6 +47,8 @@ import { DefineType } from './recipe-creation/DefineType';
 import { DefineIngredients } from './recipe-creation/DefineIngredients';
 import { RecipeNameExists } from './recipe-creation/RecipeNameExists';
 import { RecipeSuccessNormal } from './recipe-creation/RecipeSuccessNormal';
+import { RecipeFormEdit } from './recipe-creation/RecipeFormEdit';
+import { InstructionEdit } from './recipe-creation/InstructionEdit';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -102,6 +104,8 @@ function RecipeTabStack() {
       <Stack.Screen name="InstructionCreation" component={InstructionCreation}/>
       <Stack.Screen name="RecipeNameExists" component={RecipeNameExists}/>
       <Stack.Screen name="SuccessNormal" component={RecipeSuccessNormal}/>
+      <Stack.Screen name="RecipeFormEdit" component={RecipeFormEdit}/>
+      <Stack.Screen name="InstructionEdit" component={InstructionEdit} />
     </Stack.Navigator>
     )
 }

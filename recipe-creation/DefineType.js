@@ -8,6 +8,7 @@ import axios from 'axios';
 
 export const DefineType = ({ navigation, route }) => {
     const recipe = route.params.state;
+    const {origin} = route.params;
 
     const [checked, setChecked] = React.useState({
         typeId: recipe.typeId,
@@ -21,7 +22,7 @@ export const DefineType = ({ navigation, route }) => {
         recipe.typeId = checked.typeId;
         recipe.typeDescription = checked.description;
         console.log(recipe);
-        navigation.navigate('RecipeForm', { state: recipe })
+        navigation.navigate(origin, { state: recipe })
     }
 
     React.useEffect(() => {

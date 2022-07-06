@@ -14,6 +14,7 @@ import axios from "axios";
 
 export const DefineIngredients = ({ navigation, route }) => {
     const { state } = route.params;
+    const { origin } = route.params;
     const [ingredientQty, setIngredientQty] = React.useState(state.ingredientQty.length > 0 ? state.ingredientQty : []);
     const [ingredients, setIngredients] = React.useState([]);
     const [units, setUnits] = React.useState([]);
@@ -62,7 +63,7 @@ export const DefineIngredients = ({ navigation, route }) => {
 
     const handlePress = () => {
         state.ingredientQty = ingredientQty;
-        navigation.navigate("RecipeForm", { state: state });
+        navigation.navigate(origin, { state: state });
     }
 
     return (
@@ -139,7 +140,7 @@ export const DefineIngredients = ({ navigation, route }) => {
                                             keyboardType={'numeric'}
                                             maxLength={3}
                                             style={{ textAlign: 'center', minWidth: 70, maxWidth: 70, paddingHorizontal: 20, marginRight: 10, paddingVertical: 0, borderColor: '#000' }}
-                                            value={ingredient.quantity}
+                                            value={ingredient.quantity.toString()}
                                             onChange={(value) => handleChangeQty(value, index)}
                                         />
                                         <View style={styles.pickerContainer}>

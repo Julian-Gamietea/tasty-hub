@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Dimensions, StatusBar, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Pressable, Modal, StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 import { CustomNav } from '../shared-components/CustomNav';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,37 +8,65 @@ import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
 import * as ImagePicker from 'expo-image-picker';
 import { recipeReducer, initialState } from './RecipeReducer';
 import * as SecureStore from 'expo-secure-store';
+import * as VideoThumbnails from 'expo-video-thumbnails';
 import axios from 'axios';
 
-export const RecipeForm = ({ navigation, route }) => {
+export const RecipeFormEdit = ({ navigation, route }) => {
 
-	const {type} = route.params;
-	const [errors, setErrors] = React.useState([]);
-	const [modalVisible, setModalVisible] = React.useState(false);
+	const url = 'https://tasty-hub.herokuapp.com/api'
 	const [recipeState, recipeDispatch] = React.useReducer(recipeReducer, initialState);
 	const { id, description, duration, images, name,
 		ownerId, peopleAmount, portions, typeId, typeDescription, ingredientQty } = recipeState;
 
-	let recipeTitle = "";
-	if (route.params.recipeTitle) {
-		recipeTitle = route.params.recipeTitle;
-	} else {
-		recipeTitle = route.params.data;
-	}
+	// const [modalVisible, setModalVisible] = React.useState(false);
+	// const [deleteIndex, setDeleteIndex] = React.useState(null);
+	const [deletedImages, setDeletedImages] = React.useState(null);
 
 	React.useEffect(() => {
-		recipeDispatch({ type: 'fieldUpdate', field: 'name', value: recipeTitle });
-		const fetchUserData = async () => {
-			const userData = await SecureStore.getItemAsync("user");
-			recipeDispatch({ type: 'fieldUpdate', field: 'ownerId', value: JSON.parse(userData).id })
+		const { recipe } = route.params;
+		const fetchData = async (id) => {
+			const imagesRes = await axios.get(`${url}/recipePhotos/recipe/${id}`);
+			const auxImages = [{
+				uri: recipe.mainPhoto,
+				type: 'image/'
+			}]
+			imagesRes.data.forEach((image) => {
+				image['type'] = 'image/' + image['extension'];
+				delete image['extension'];
+				image['uri'] = image['photoUrl'];
+				delete image['photoUrl'];
+			})
+			const imagesFinal = auxImages.concat(imagesRes.data);
+			recipeDispatch({ type: 'fieldUpdate', field: 'images', value: imagesFinal });
+
+			const ingredientQtyRes = await axios.get(`${url}/ingredientQuantity?recipeId=${id}`);
+			ingredientQtyRes.data.forEach((iq) => {
+				iq.id = 0
+			})
+			recipeDispatch({ type: 'fieldUpdate', field: 'ingredientQty', value: ingredientQtyRes.data });
 		}
-		fetchUserData();
+
+		console.log(recipe);
+		const auxObject = {
+			id: recipe.id,
+			description: recipe.description,
+			duration: recipe.duration,
+			images: [],
+			name: recipe.name,
+			ownerId: recipe.ownerId,
+			peopleAmount: recipe.peopleAmount,
+			portions: recipe.portions,
+			typeId: recipe.typeId,
+			typeDescription: recipe.typeName,
+			ingredientQty: []
+		}
+		recipeDispatch({ type: 'set', state: auxObject });
+		fetchData(recipe.id);
+	}, [])
+
+	React.useEffect(() => {
 		if (route.params.state) {
 			recipeDispatch({ type: 'set', state: route.params.state });
-		}
-		if (type === 'overwrite') {
-			recipeDispatch({type: 'fieldUpdate', field: 'id', value: route.params.recipeId});
-			console.log("hi, i'm overwriting");
 		}
 	}, [route.params])
 
@@ -67,9 +95,38 @@ export const RecipeForm = ({ navigation, route }) => {
 		}
 	}
 
+	const handleInstructions = async () => {
+		const instructions = await axios.get(`${url}/instruction/recipe/${id}`);
+		let multim;
+		for (let instruction of instructions.data) {
+			multim = await axios.get(`${url}/multimedia/instruction/${instruction.id}`);
+			for (let m of multim.data) {
+				if (m.typeContent.split("/")[0] === 'video') {
+
+					const { uri } = await VideoThumbnails.getThumbnailAsync(
+						m.urlContent
+						, { quality: .5, time: 3000 });
+
+					m.thumbnailUri = uri
+				}
+				m['type'] = m['typeContent'];
+				delete m['typeContent'];
+				m['uri'] = m['urlContent'];
+				delete m['urlContent'];
+			}
+			instruction.multimedia = multim.data;
+		}
+		navigation.navigate('InstructionEdit', { recipe: recipeAux, instructions: instructions.data, deletedImages: deletedImages })
+	}
+
 	const removePhoto = (index) => {
-		const aux = images.slice(0, images.length)
-		aux.splice(index, 1);
+		//CREAR UN ARRAY DE LAS FOTOS QUE SE SACARON, AL FINAL, CUANDO SE DA EN FINALIZAR
+		//ELIMINAR TODAS LAS QUE ESTÉN AHI
+		const aux = images.slice(0, images.length);
+		const deletedElems = aux.splice(index, 1);
+		const auxDel = deletedImages.slice(0, deletedImages.length);
+		const deleted = auxDel.concat(deletedElems);
+		setDeletedImages(deleted);
 		recipeDispatch({ type: 'fieldUpdate', field: 'images', value: aux });
 	}
 
@@ -82,7 +139,6 @@ export const RecipeForm = ({ navigation, route }) => {
 		const aux = ingredientQty.slice(0, ingredientQty.length);
 		aux.splice(index, 1);
 		recipeDispatch({ type: 'fieldUpdate', field: 'ingredientQty', value: aux });
-		// recipeDispatch({type: 'fieldUpdate', field: 'typeDescription', value: ""});
 	}
 
 	const [loaded] = useFonts({
@@ -94,77 +150,23 @@ export const RecipeForm = ({ navigation, route }) => {
 		return null;
 	}
 
-	const handlePress = () => {
-		const errorsAux = errors.slice(0, errors.length);
-		const recipe = {
-			description: description,
-			duration: duration,
-			enabled: false,
-			id: id,
-			mainPhoto: images[0],
-			name: name,
-			ownerId: ownerId,
-			peopleAmount: peopleAmount,
-			portions: portions,
-			typeId: typeId,
-			ingredientQty: ingredientQty,
-			images: images
-		}
-		console.log(recipe)
-
-		if (description === "" || duration === 0 || name === "" || peopleAmount === 0 || !typeId || images.length === 0 || ingredientQty.length === 0) {
-			errorsAux.push("No puede dejar campos vacíos");
-		}
-
-		if (duration <= 0 || peopleAmount <= 0 || portions <= 0) {
-			errorsAux.push("El número de porciones/personas/duración no puede ser negativo ni cero");
-		}
-
-		const aux = ingredientQty.filter((iq) => iq.quantity <= 0);
-
-		if (aux.length > 0) {
-			errorsAux.push("La cantidad de un ingrediente no puede ser cero ni negativa");
-		}
-
-		if (errorsAux.length > 0) {
-			setErrors(errorsAux);
-			setModalVisible(true);
-		} else {
-			navigation.navigate('InstructionCreation', { recipe: recipe })
-		}
+	const recipeAux = {
+		description: description,
+		duration: duration,
+		enabled: false,
+		id: id,
+		mainPhoto: images[0],
+		name: name,
+		ownerId: ownerId,
+		peopleAmount: peopleAmount,
+		portions: portions,
+		typeId: typeId,
+		ingredientQty: ingredientQty,
+		images: images
 	}
-
-
 
 	return (
 		<View style={{ backgroundColor: '#fff', flex: 1, justifyContent: 'center', paddingTop: StatusBar.currentHeight + 5, }}>
-			<Modal
-				animationType="slide"
-				transparent={true}
-				visible={modalVisible}
-				onRequestClose={() => {
-					Alert.alert("Modal has been closed.");
-					setModalVisible(!modalVisible);
-				}}
-			>
-				<View style={styles.centeredView}>
-					<View style={styles.modalView}>
-						<Text style={styles.modalText}>No puede avanzar debido a los siguientes problemas:</Text>
-						{errors.map((errormsg, index) => (
-							<Text style={{textAlign: 'center', marginBottom: 15}}>{index + 1}. {errormsg}</Text>
-						))}
-						<Pressable
-							style={[styles.button, styles.buttonClose]}
-							onPress={() => {
-								setModalVisible(!modalVisible);
-								setErrors([]);
-							}}
-						>
-							<Text style={styles.textStyle}>Entendido</Text>
-						</Pressable>
-					</View>
-				</View>
-			</Modal>
 			<View style={{ backgroundColor: '#fff' }}>
 				<CustomNav
 					callback={() => {
@@ -198,7 +200,7 @@ export const RecipeForm = ({ navigation, route }) => {
 								keyboardType={'numeric'}
 								maxLength={3}
 								onChange={(minutes) => recipeDispatch({ type: 'fieldUpdate', field: 'duration', value: minutes })}
-								value={duration}
+								value={duration.toString()}
 							/>
 							<Text style={styles.inputText}>minutos</Text>
 						</View>
@@ -209,7 +211,7 @@ export const RecipeForm = ({ navigation, route }) => {
 								keyboardType={'numeric'}
 								maxLength={3}
 								onChange={(plp) => recipeDispatch({ type: 'fieldUpdate', field: 'peopleAmount', value: plp })}
-								value={peopleAmount}
+								value={peopleAmount.toString()}
 							/>
 							<Text style={styles.inputText}>personas</Text>
 						</View>
@@ -220,7 +222,7 @@ export const RecipeForm = ({ navigation, route }) => {
 								keyboardType={'numeric'}
 								maxLength={3}
 								onChange={(ptions) => recipeDispatch({ type: 'fieldUpdate', field: 'portions', value: ptions })}
-								value={portions}
+								value={portions.toString()}
 							/>
 							<Text style={styles.inputText}>porciones</Text>
 						</View>
@@ -228,7 +230,7 @@ export const RecipeForm = ({ navigation, route }) => {
 
 					<View style={styles.margin}>
 						<Text style={styles.description}>Tipo de plato</Text>
-						<TouchableOpacity onPress={() => navigation.navigate('DefineType', { state: recipeState, origin: 'RecipeForm' })} style={styles.addButton}>
+						<TouchableOpacity onPress={() => navigation.navigate('DefineType', { state: recipeState, origin: 'RecipeFormEdit' })} style={styles.addButton}>
 							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
 							<Text style={styles.textButton}>Añadir</Text>
 						</TouchableOpacity>
@@ -246,7 +248,7 @@ export const RecipeForm = ({ navigation, route }) => {
 					</View>
 					<View style={styles.margin}>
 						<Text style={styles.description}>Ingredientes</Text>
-						<TouchableOpacity onPress={() => navigation.navigate('DefineIngridient', { state: recipeState, origin: 'RecipeForm' })} style={styles.addButton}>
+						<TouchableOpacity onPress={() => navigation.navigate('DefineIngridient', { state: recipeState, origin: 'RecipeFormEdit' })} style={styles.addButton}>
 							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
 							<Text style={styles.textButton}>Añadir</Text>
 						</TouchableOpacity>
@@ -278,7 +280,7 @@ export const RecipeForm = ({ navigation, route }) => {
 			</ScrollView>
 			<TouchableOpacity
 				style={{ position: 'absolute', right: 10, bottom: 10, alignSelf: 'flex-end', backgroundColor: "#583209", borderRadius: 500, padding: 5, marginTop: 30 }}
-				onPress={handlePress}
+				onPress={handleInstructions}
 			>
 				<MaterialIcons name="chevron-right" size={60} color="#fff" />
 			</TouchableOpacity>
@@ -385,47 +387,5 @@ const styles = StyleSheet.create({
 		color: 'white',
 		marginTop: 2,
 		marginRight: 2
-	},
-	centeredView: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		marginTop: 22
-	},
-	modalView: {
-		margin: 20,
-		backgroundColor: "white",
-		borderRadius: 20,
-		padding: 35,
-		alignItems: "center",
-		shadowColor: "#000",
-		shadowOffset: {
-			width: 0,
-			height: 2
-		},
-		shadowOpacity: 0.25,
-		shadowRadius: 4,
-		elevation: 5
-	},
-	button: {
-		borderRadius: 5,
-		padding: 10,
-		paddingHorizontal: 20
-	},
-	buttonOpen: {
-		backgroundColor: "#F194FF",
-	},
-	buttonClose: {
-		backgroundColor: "#F3A200",
-	},
-	textStyle: {
-		color: "white",
-		fontWeight: "bold",
-		textAlign: "center"
-	},
-	modalText: {
-		marginBottom: 15,
-		textAlign: "center",
-		fontFamily: 'InterSemiBold'
 	}
 });
