@@ -22,6 +22,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
+import { RadioButton } from 'react-native-paper';
+import { MaterialIcons } from '@expo/vector-icons';
+import { SimpleLineIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import {useIsFocused} from "@react-navigation/native";
 import * as UploadFromLocal from "../recipe-creation/UploadFromLocal";
 import {useNetInfo} from "@react-native-community/netinfo";
@@ -41,6 +45,8 @@ export const Dashboard = ({ route, navigation }) => {
     const [recipesModalVisible, setRecipesModalVisible] = React.useState(false);
     const [pendingRecipes, setPendingRecipes] = React.useState(null);
     const [isUploading, setIsUploading] = React.useState(false);
+    const [isModalVisible,setIsModalVisible]=React.useState(false);
+    const [checked, setChecked] = React.useState();
 
     React.useEffect(() => {
         const fetchUserData = async () => {
@@ -77,6 +83,7 @@ export const Dashboard = ({ route, navigation }) => {
         return resf.data;
     }
 
+
     React.useEffect(() => {
         fetchData();
     }, [user])
@@ -99,7 +106,40 @@ export const Dashboard = ({ route, navigation }) => {
     if (!loaded || !dataLoaded) {
         return null;
     }
+    const organizeRecipes = () => {
+        if(checked=="alfabeticamente"){
+            recipeList.sort((a, b) => {
+            let fa = a.name.toLowerCase(),
+                fb = b.name.toLowerCase();
+            if (fa < fb) {
+                return -1;
+            }
+            if (fa > fb) {
+                return 1;
+            }
+            return 0;
+            });
+        }else if(checked=="antiguedad"){
+            recipeList.sort((a, b) => {
+                return a.id > b.id;
+            });
+        }else if(checked=="usuario"){
+            recipeList.sort((a, b) => {
+                let fa = a.ownerUserName.toLowerCase(),
+                    fb = b.ownerUserName.toLowerCase();
+                if (fa < fb) {
+                    return -1;
+                }
+                if (fa > fb) {
+                    return 1;
+                }
+                return 0;
+                });
 
+        }
+
+        setIsModalVisible(false)
+    }
     return (
 
         <KeyboardAvoidingView style={{...styles.mainContainer, paddingTop: StatusBar.currentHeight+5}} >
@@ -170,10 +210,58 @@ export const Dashboard = ({ route, navigation }) => {
                 />
             </View>
             <View style={styles.filtersContainer}>
-                <TouchableOpacity style={styles.filterButton}>
+            <Modal
+                style={styles.modalContent}
+                animationType="slide"
+                transparent={true}
+                visible={isModalVisible}
+                onRequestClose={() => {setIsModalVisible(false)}}>
+                    <View style={styles.modalContainer}>
+                        <TouchableOpacity onPress={()=>organizeRecipes()} style={{alignSelf:"center"}}>
+                            <Feather name="filter" size={55} color="#553900" />
+                        </TouchableOpacity>
+                        <Text style={styles.titleModal}>Ordenar por</Text>
+
+                        <View style={styles.radioContainer}>
+                            <MaterialIcons name="sort-by-alpha" size={24} color="#F7EAB5" />
+                            <RadioButton
+                                    value="alfabeticamente"
+                                    color='#fff'
+                                    uncheckedColor='553900'
+                                    status={ checked === 'alfabeticamente' ? 'checked' : 'unchecked' }
+                                    onPress={() => setChecked('alfabeticamente')}
+                                        />
+                            <Text style={styles.modalTextItem}>Alfabéticamente</Text>
+                        </View>
+
+                        <View style={styles.radioContainer}>
+                            <SimpleLineIcons name="event" size={24} color="#F7EAB5" />
+                                <RadioButton
+                                        color='#fff'
+                                        uncheckedColor='553900'
+                                        value="antiguedad"
+                                        status={ checked === 'antiguedad' ? 'checked' : 'unchecked' }
+                                        onPress={() => setChecked('antiguedad')}
+                                            />
+                            <Text style={styles.modalTextItem}>Antiguedad</Text>
+                        </View>
+                        <View style={styles.radioContainer}>
+                        <Ionicons name="person-outline" size={24} color="#F7EAB5" />
+                            <RadioButton
+                                    color='#fff'
+                                    value="usuario"
+                                    uncheckedColor='553900'
+                                    status={ checked === 'usuario' ? 'checked' : 'unchecked' }
+                                    onPress={() => setChecked('usuario')}
+                                        />
+                            <Text style={styles.modalTextItem}>Nombre de Usuario</Text>
+                        </View>
+                    </View>
+                </Modal>
+                <TouchableOpacity onPress={()=>navigation.navigate("DashBoardFilter")}style={styles.filterButton}>
                     <Text style={styles.filterText}>Filtrar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>setIsModalVisible(true)}>
                     <Feather name="filter" size={32} color="#553900" />
                 </TouchableOpacity>
             </View>
@@ -233,6 +321,20 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         marginBottom: 20
     },
+    modalContent: {
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
+        alignSelf:"flex-end",
+
+        margin: 0
+    },
+    modalContainer:{
+        backgroundColor: "#F3A200",
+        marginTop:"48%",
+        borderRadius:25,
+        flex:1,
+        justifyContent:"space-evenly"
+    },
     filterButton: {
         backgroundColor: "#F7EAB5",
         minWidth: 230,
@@ -249,7 +351,10 @@ const styles = StyleSheet.create({
         fontFamily: "InterRegular",
         fontSize: 18,
 
-        alignSelf: 'center'
+        alignSelf: 'center',
+        marginBottom: 30,
+        marginTop: 5,
+        marginLeft: 30
     },
     username: {
         fontFamily: "InterSemiBold"
@@ -335,5 +440,24 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: "center"
+    },
+    titleModal:{
+        fontWeight: "600",
+        fontSize:35,
+        color:"#fff",
+        alignSelf:"center",
+        marginBottom:"4%"
+    },
+    modalTextItem:{
+        marginBottom:"2%",
+        color:"#fff",
+        fontWeight:"600",
+        fontSize:25
+    },
+    radioContainer: {
+        flexDirection: "row",
+        marginLeft: "10%",
+        alignItems: "center"
     }
+
 })

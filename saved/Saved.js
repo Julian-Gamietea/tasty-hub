@@ -5,21 +5,31 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SavedRecipeCard } from '../shared-components/SavedRecipeCard';
 import { useIsFocused } from "@react-navigation/native";
 import { MaterialIcons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 
 export const Saved = ({navigation}) => {
 
     const [recipes, setRecipes] = React.useState([]);
     const focus = useIsFocused();
     const [isRefreshing, setIsRefreshing] = React.useState(false);
+    const [idUser, setUserId] = React.useState(null)
 
     const getStoragedData = async () => {
         let keys = []
         let recipesAux = []
+
+        const userData = await SecureStore.getItemAsync("user");
+        setUserId(JSON.parse(userData).id)
+
         try {
             keys = await AsyncStorage.getAllKeys()
             for await (const key of keys) {
-                const jsonValue = await AsyncStorage.getItem(key)
-                recipesAux.push(JSON.parse(jsonValue))
+                const data = key.split('_')
+                const user = data[data.length-1]
+                if(user == idUser){
+                    const jsonValue = await AsyncStorage.getItem(key)
+                    recipesAux.push(JSON.parse(jsonValue))
+                }
             }
             setRecipes(recipesAux)
             setIsRefreshing(false)
@@ -29,7 +39,7 @@ export const Saved = ({navigation}) => {
     }
     React.useEffect(()=>{
         getStoragedData() 
-    },[focus])
+    },[focus, idUser])
 
    
     const onRefresh = () => {
@@ -52,9 +62,9 @@ export const Saved = ({navigation}) => {
                     {
                         recipes.map((element,index) => {
                             return(
-                                <View style={{height: 614, width: '100%'}}>
+                                <View key={index} style={{height: 614, width: '100%'}}>
                                     <SavedRecipeCard 
-                                        key={index}
+                                        userId={idUser}
                                         navigation={navigation}
                                         id={element.datos.id}
                                         rating={element.rating} 

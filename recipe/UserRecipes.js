@@ -71,6 +71,8 @@ export const UserRecipes = ({ navigation }) => {
                         timeToMake={elem.duration}
                         title={elem.name}
                         id={elem.id}
+                        // {type: 'edit', recipe: recipe}
+                        // onPressEdit={() => navigation.navigate('Recipe')}
                     />);
                 }}
             />}

@@ -18,7 +18,6 @@ import { EmailNotConfirmed } from './register/EmailNotConfirmed';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Octicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import { RecipeIcon } from '../tasty-hub/assets/icons/recipe-button-icon.png';
 import { Image, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
@@ -49,6 +48,9 @@ import { RecipeNameExists } from './recipe-creation/RecipeNameExists';
 import { RecipeSuccessNormal } from './recipe-creation/RecipeSuccessNormal';
 import { RecipeFormEdit } from './recipe-creation/RecipeFormEdit';
 import { InstructionEdit } from './recipe-creation/InstructionEdit';
+import { DashBoardFilter } from './dashboard/DashBoardFilter';
+
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -61,6 +63,7 @@ function DashboardTabStack() {
       <Stack.Screen name="SearchResults" component={SearchResults}/>
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="UserProfile" component={UserProfile} />
+      <Stack.Screen name="DashBoardFilter" component={DashBoardFilter} />
     </Stack.Navigator>
   );
 }
@@ -234,7 +237,7 @@ export default function App() {
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
         <Stack.Screen name="SavedRecipeCard" component={SavedRecipeCard}/>
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
-        
+
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />
         {/* <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} /> */}
