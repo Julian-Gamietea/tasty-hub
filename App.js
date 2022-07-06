@@ -18,7 +18,6 @@ import { EmailNotConfirmed } from './register/EmailNotConfirmed';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Octicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import { RecipeIcon } from '../tasty-hub/assets/icons/recipe-button-icon.png';
 import { Image, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
@@ -37,6 +36,7 @@ import { RecalculateRecipe } from './recipe/RecalculateRecipe';
 import { InstructionCreation } from './recipe-creation/InstructionCreation';
 import { Saved } from './saved/Saved';
 import { SavedRecipeCard } from './shared-components/SavedRecipeCard';
+import { DashBoardFilter } from './dashboard/DashBoardFilter';
 
 
 
@@ -51,6 +51,7 @@ function DashboardTabStack() {
       <Stack.Screen name="SearchResults" component={SearchResults}/>
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="UserProfile" component={UserProfile}/>
+      <Stack.Screen name="DashBoardFilter" component={DashBoardFilter} />
     </Stack.Navigator>
     );
 }

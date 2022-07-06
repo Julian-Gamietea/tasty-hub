@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions, RefreshControl, SafeAreaView, FlatList, KeyboardAvoidingView } from 'react-native';
+import React, { useEffect } from 'react';
+import { Modal,View, Text, StatusBar, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView, Alert, BackHandler } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
@@ -9,53 +9,160 @@ import { DashboardInput } from '../dashboard/DashboardInput';
 
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
-
+import { RadioButton } from 'react-native-paper';
+import { MaterialIcons } from '@expo/vector-icons';
+import { SimpleLineIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 
 export const SearchResults = ({ route, navigation }) => {
-
     const { query } = route.params;
     const { type } = route.params;
-
     const [user, setUser] = React.useState(null);
     const [recipeList, setRecipeList] = React.useState([]);
     const [dataLoaded, setDataLoaded] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState(type);
     const [inputValue, setInputValue] = React.useState(query);
     const [isFetching, setIsFetching] = React.useState(false);
+    const [recipesFilter,setRecipesFilter]=React.useState([]);
+    const [reload, setReload] = React.useState(false)
+    const [isModalVisible,setIsModalVisible]=React.useState(false);
+    const [checked, setChecked] = React.useState();
+    /*onst backAction = () => {
+        Alert.alert("Advertencia!", "¿Estas seguro de que desea volver a la pantalla de Recomendados?", [
+          {
+            text: "Cancel",
+            onPress: () => null,
+            style: "cancel"
+          },
+          { text: "Aceptar", onPress: () => navigation.navigate("Dashboard") }
+        ]);
+        return true;
+      };
+    
+      useEffect(() => {
+        BackHandler.addEventListener("hardwareBackPress", backAction);
+    
+        return () =>
+          BackHandler.removeEventListener("hardwareBackPress", backAction);
+      }, []);*/
+
+      
     React.useEffect(() => {
+        
         const fetchUserData = async () => {
             const userData = await SecureStore.getItemAsync("user");
             setUser(JSON.parse(userData));
         }
         fetchUserData();
+
+        
     }, [])
 
     const onRefresh = () => {
         setIsFetching(true);
         fetchData();
+        
     }
 
     const fetchData = async () => {
-        try {
-            let res;
-            if (selectedValue === 'plato') {
-                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/like?name=${inputValue}`);
-            } else {
-                res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/username/like?username=${inputValue}`)
+
+            try {
+                let res;
+                if (selectedValue === 'plato') {
+                    res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/like?name=${inputValue}`);
+                } else {
+                    res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/username/like?username=${inputValue}`)
+                }
+                setRecipeList(res.data.slice(0, res.data.length));
+                if(!route.params.recipeList){
+                    setRecipesFilter([])
+                }else{
+                    setRecipesFilter(route.params.recipeList)
+                }
+                setDataLoaded(true);
+                setIsFetching(false);
+            } catch (error) {
+                console.log(error);
             }
-            setRecipeList(res.data.slice(0, res.data.length));
-            setDataLoaded(true);
-            setIsFetching(false);
-        } catch (error) {
-            console.log(error);
-        }
+    
     }
 
     React.useEffect(() => {
         fetchData();
-    }, [user])
+        setReload(false)
+    }, [user,reload])
 
+    const organizeRecipes = () => {
+        if(checked=="alfabeticamente"){
+            if(recipeList.length>0){
+                recipeList.sort((a, b) => {
+                    let fa = a.name.toLowerCase(),
+                        fb = b.name.toLowerCase();
+                    if (fa < fb) {
+                        return -1;
+                    }
+                    if (fa > fb) {
+                        return 1;
+                    }
+                    return 0;
+                    });
+            }
+            if(recipesFilter.length>0){
+                recipesFilter.sort((a, b) => {
+                    let fa = a.name.toLowerCase(),
+                        fb = b.name.toLowerCase();
+                    if (fa < fb) {
+                        return -1;
+                    }
+                    if (fa > fb) {
+                        return 1;
+                    }
+                    return 0;
+                    });
+            }
+            
+        }else if(checked=="antiguedad"){
+            if(recipeList.length>0){
+                recipeList.sort((a, b) => {
+                    return a.id > b.id;
+                });}
+            if(recipesFilter.length>0){
+                recipesFilter.sort((a, b) => {
+                    return a.id > b.id;
+                });}
+        }else if(checked=="usuario"){
+            if(recipeList.length>0){
+                    recipeList.sort((a, b) => {
+                        let fa = a.ownerUserName.toLowerCase(),
+                            fb = b.ownerUserName.toLowerCase();
+                        if (fa < fb) {
+                            return -1;
+                        }
+                        if (fa > fb) {
+                            return 1;
+                        }
+                        return 0;
+                        })
+                }
+            if(recipesFilter.length>0){  
+                recipesFilter.sort((a, b) => {
+                    let fa = a.ownerUserName.toLowerCase(),
+                        fb = b.ownerUserName.toLowerCase();
+                    if (fa < fb) {
+                        return -1;
+                    }
+                    if (fa > fb) {
+                        return 1;
+                    }
+                    return 0;
+                    })
+            }
+            }
+    
+       
+        setIsModalVisible(false)
+    }
 
     const [loaded] = useFonts({
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf'),
@@ -65,12 +172,11 @@ export const SearchResults = ({ route, navigation }) => {
     if (!loaded || !dataLoaded) {
         return null;
     }
-
+    
     return (
 
         <KeyboardAvoidingView style={{ ...styles.mainContainer, paddingTop: StatusBar.currentHeight + 15 }} >
             <StatusBar backgroundColor={"#fff"} />
-
             <View style={styles.ddcontainer}>
                 <Text>Buscar por </Text>
                 <View style={styles.pickerContainer}>
@@ -92,18 +198,68 @@ export const SearchResults = ({ route, navigation }) => {
                     placeholder={selectedValue === 'plato' ? "Buscar por plato..." : "Buscar por usuario..."}
                 />
             </View>
+            <Modal
+                style={styles.modalContent}
+                animationType="slide"
+                transparent={true}
+                visible={isModalVisible}
+                onRequestClose={() => {setIsModalVisible(false)}}>
+
+                    <View style={styles.modalContainer}>
+                        <TouchableOpacity onPress={()=>organizeRecipes()} style={{alignSelf:"center"}}>
+                            <Feather name="filter" size={55} color="#553900" />
+                        </TouchableOpacity>
+                        <Text style={styles.titleModal}>Ordenar por</Text>
+
+                        <View style={styles.radioContainer}>
+                            <MaterialIcons name="sort-by-alpha" size={24} color="#F7EAB5" />
+                            <RadioButton
+                                    value="alfabeticamente"
+                                    color='#fff'
+                                    uncheckedColor='553900'
+                                    status={ checked === 'alfabeticamente' ? 'checked' : 'unchecked' }
+                                    onPress={() => setChecked('alfabeticamente')}
+                                        />
+                            <Text style={styles.modalTextItem}>Alfabéticamente</Text>
+                        </View>
+
+                        <View style={styles.radioContainer}>
+                            <SimpleLineIcons name="event" size={24} color="#F7EAB5" />
+                                <RadioButton
+                                        color='#fff'
+                                        uncheckedColor='553900'
+                                        value="antiguedad"
+                                        status={ checked === 'antiguedad' ? 'checked' : 'unchecked' }
+                                        onPress={() => setChecked('antiguedad')}
+                                            />
+                            <Text style={styles.modalTextItem}>Antiguedad</Text>
+                        </View>
+                        <View style={styles.radioContainer}>
+                        <Ionicons name="person-outline" size={24} color="#F7EAB5" />
+                            <RadioButton
+                                    color='#fff'
+                                    value="usuario"
+                                    uncheckedColor='553900'
+                                    status={ checked === 'usuario' ? 'checked' : 'unchecked' }
+                                    onPress={() => setChecked('usuario')}                                    
+                                        />
+                            <Text style={styles.modalTextItem}>Nombre de Usuario</Text>
+                        </View>
+                    </View>
+                </Modal>
             <View style={styles.filtersContainer}>
-                <TouchableOpacity style={styles.filterButton}>
+                <TouchableOpacity onPress={()=>navigation.navigate("DashBoardFilter")} style={styles.filterButton}>
                     <Text style={styles.filterText}>Filtrar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>setIsModalVisible(true)}>
                     <Feather name="filter" size={32} color="#553900" />
                 </TouchableOpacity>
             </View>
 
             <StatusBar style='dark' />
             <Text style={styles.text}>Resultados de búsqueda</Text>
-            {recipeList.length > 0 && <FlatList
+
+            {recipeList.length >0 && <FlatList
                 onRefresh={onRefresh}
                 refreshing={isFetching}
                 data={recipeList}
@@ -127,18 +283,44 @@ export const SearchResults = ({ route, navigation }) => {
                 }}
             />
             }
-            {recipeList.length === 0 &&
+            
+            {recipesFilter.length>0 && <FlatList
+                  onRefresh={onRefresh}
+                  refreshing={isFetching}
+                  data={recipesFilter}
+                  style={{ ...styles.recipesContainer }}
+                  nestedScrollEnabled={true}
+                  key={item => item.id}
+                  renderItem={(recipe) => {
+                   const elem = recipe.item
+                      return (<RecipeDashboardCard
+                          key={elem.id}
+                          onPress={() => navigation.navigate('Recipe', { id: elem.id, userId: user.id })}
+                          id={elem.id}
+                          title={elem.name}
+                          author={elem.ownerUserName}
+                          image={elem.mainPhoto}
+                          shortDescription={elem.description}
+                          timeToMake={elem.duration}
+                          userId={user.id}
+                          isFav={isFetching}
+                      />);
+                  }}
+            />
+            }
+              {recipesFilter.length == 0 && recipeList.length == 0 &&
                 <FlatList
                     data={[{}]}
-                    renderItem={() => (
+                    renderItem={() => 
+                        (
                         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 40, marginTop: 40}}>
                             <Text style={{ textAlign: 'center', fontFamily: "InterRegular", fontSize: 20 }}>Lo sentimos, no tenemos lo que estas buscando...</Text>
                             <MaterialCommunityIcons name="cookie-alert-outline" size={150} color="#e8e8e8" />
                         </View>
                     )}
                 >
-                    
                 </FlatList>}
+
         </KeyboardAvoidingView>
 
     );
@@ -231,5 +413,30 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: '#F7EAB5',
         marginLeft: 5
+    },
+    titleModal:{
+        fontWeight: "600",
+        fontSize:35,
+        color:"#fff",
+        alignSelf:"center",
+        marginBottom:"4%"
+    },    
+    modalContainer:{
+        backgroundColor: "#F3A200",
+        marginTop:"48%",
+        borderRadius:25,
+        flex:1,
+        justifyContent:"space-evenly"
+    },
+    modalTextItem:{
+        marginBottom:"2%",
+        color:"#fff",
+        fontWeight:"600",
+        fontSize:25
+    },
+    radioContainer:{
+        flexDirection:"row",
+        marginLeft:"10%",
+        alignItems:"center"
     }
 })
