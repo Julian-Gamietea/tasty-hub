@@ -578,7 +578,7 @@ export const Recipe = ({route, navigation}) => {
                     <Text style={styles.descriptionTitle}>  Instrucciones </Text>
                 </View>
                 <View style={styles.instructionGreyContainer}>
-                    <Carrousel id={id}/>
+                    <Carrousel id={id} multimediaSaved={multimedia} instructionsSaved={instructions}/>
                 </View>
             </View>
 

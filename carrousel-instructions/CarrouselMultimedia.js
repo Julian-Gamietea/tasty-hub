@@ -7,7 +7,7 @@ import { Video } from 'expo-av';
 
 
 
-export const CarrouselMultimedia = ({ id }) => {
+export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
   const [multimedia, setMultimedia] = useState([]);
 
   const video = React.useRef(null);
@@ -50,10 +50,15 @@ export const CarrouselMultimedia = ({ id }) => {
   };
 
   const fetchmultimediaInstruction = (idInstruction) => {
-    const resp = axios.get(`https://tasty-hub.herokuapp.com/api/multimedia/instruction/${idInstruction}`);
-    resp.then((multimediaData) => {
-      setMultimedia(multimediaData.data)
-    })
+    if(!multimedia){
+      const resp = axios.get(`https://tasty-hub.herokuapp.com/api/multimedia/instruction/${idInstruction}`);
+      resp.then((multimediaData) => {
+        setMultimedia(multimediaData.data)
+      })
+    }else{
+      setMultimedia(multimediaSaved)
+    }
+    
   }
   useEffect(() => {
     fetchmultimediaInstruction(id);
