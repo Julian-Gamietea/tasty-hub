@@ -25,10 +25,10 @@ export const SearchResults = ({ route, navigation }) => {
     const [inputValue, setInputValue] = React.useState(query);
     const [isFetching, setIsFetching] = React.useState(false);
     const [recipesFilter,setRecipesFilter]=React.useState([]);
-
+    const [reload, setReload] = React.useState(false)
     const [isModalVisible,setIsModalVisible]=React.useState(false);
     const [checked, setChecked] = React.useState();
-    const backAction = () => {
+    /*onst backAction = () => {
         Alert.alert("Advertencia!", "¿Estas seguro de que desea volver a la pantalla de Recomendados?", [
           {
             text: "Cancel",
@@ -45,7 +45,7 @@ export const SearchResults = ({ route, navigation }) => {
     
         return () =>
           BackHandler.removeEventListener("hardwareBackPress", backAction);
-      }, []);
+      }, []);*/
 
       
     React.useEffect(() => {
@@ -55,9 +55,7 @@ export const SearchResults = ({ route, navigation }) => {
             setUser(JSON.parse(userData));
         }
         fetchUserData();
-        if(route.params.recipeList){
-            setRecipesFilter(route.params.recipeList)
-        }
+
         
     }, [])
 
@@ -77,6 +75,11 @@ export const SearchResults = ({ route, navigation }) => {
                     res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes/username/like?username=${inputValue}`)
                 }
                 setRecipeList(res.data.slice(0, res.data.length));
+                if(!route.params.recipeList){
+                    setRecipesFilter([])
+                }else{
+                    setRecipesFilter(route.params.recipeList)
+                }
                 setDataLoaded(true);
                 setIsFetching(false);
             } catch (error) {
@@ -87,7 +90,8 @@ export const SearchResults = ({ route, navigation }) => {
 
     React.useEffect(() => {
         fetchData();
-    }, [user])
+        setReload(false)
+    }, [user,reload])
 
     const organizeRecipes = () => {
         if(checked=="alfabeticamente"){
@@ -164,6 +168,7 @@ export const SearchResults = ({ route, navigation }) => {
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf'),
         InterRegular: require('../assets/fonts/Inter-Regular.ttf')
     });
+
     if (!loaded || !dataLoaded) {
         return null;
     }
@@ -254,8 +259,7 @@ export const SearchResults = ({ route, navigation }) => {
             <StatusBar style='dark' />
             <Text style={styles.text}>Resultados de búsqueda</Text>
 
-
-            {recipeList.length > 0 && <FlatList
+            {recipeList.length >0 && <FlatList
                 onRefresh={onRefresh}
                 refreshing={isFetching}
                 data={recipeList}
@@ -279,6 +283,7 @@ export const SearchResults = ({ route, navigation }) => {
                 }}
             />
             }
+            
             {recipesFilter.length>0 && <FlatList
                   onRefresh={onRefresh}
                   refreshing={isFetching}

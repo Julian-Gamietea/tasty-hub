@@ -1,11 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Alert, BackHandler, FlatList,  ScrollView,  StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, FlatList,  ScrollView,  StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import StarRating from "react-native-star-rating";
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 export const DashBoardFilter = ({ route, navigation }) => {
-  const [reload, setReload] = useState(false)
   const [ingredients, setIngredients] = useState([]);
   const [types, setTypes] = useState([]);
   const [selectedIngridients,setSelectedIngridients] = useState([])
@@ -18,12 +17,13 @@ export const DashBoardFilter = ({ route, navigation }) => {
   const [selectedValue, setSelectedValue] = React.useState('Duracion');
   const [duration, setDuration] = useState(null)
   const [filteredRecipes,setFilterRecipes] = useState([])
-
-
   const onChangeText = (text) => {
     setDuration(text)
+    if(duration!=null && duration.length==0){
+      setDuration(null)
+    }
   }
-
+  
   const handleOnPressIncludeIngredient = (ingredient) => {
     const auxSet = new Set(includedIngredientElems.values())
     selectedIngridients.push(ingredient.id)
@@ -103,7 +103,6 @@ export const DashBoardFilter = ({ route, navigation }) => {
     else if (isPress == false && included == false) {
       handleOnPressExcludeIngredient(ingredient)
     }
-    setReload(!reload)
   }
 
   const handleTypePress = (isPress,type) => {
@@ -113,7 +112,6 @@ export const DashBoardFilter = ({ route, navigation }) => {
     else {
       handleOnPressType(type)
     }
-    setReload(!reload)
   }
 
   const renderItem = (item, included) => {
@@ -153,7 +151,6 @@ export const DashBoardFilter = ({ route, navigation }) => {
     return resp.data
   }
   const getAverageOfRating = async (recipeId)=>{//obtengo la el avg de la receta
-
     const resp = await axios.get(`https://tasty-hub.herokuapp.com/api/rating/average/${recipeId}`);
     var avg = Math.floor(resp.data)
     return avg
@@ -161,30 +158,45 @@ export const DashBoardFilter = ({ route, navigation }) => {
   useEffect(() => {
     fetchTypes()
     fetchIngredients();
-   
   }, []);
 
   const submit = async () => {
+    if(selectedValue=='Duracion' && duration!=null  ){
+      Alert.alert("Error!", "Estas ingresando una cantidad de tiempo pero no seleccionando como buscar", [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel"
+        },
+       
+      ]);
+      return true
+    };
+
     const recipes = await fetchRecipes()
     recipes.map((recipe)=>
-      filterRecipe(recipe)
-    )  
+      filterRecipe(recipe
+      )
+    )
     navigation.navigate("SearchResults",{navigation:navigation,recipeList:filteredRecipes})
+    setFilterRecipes([])
+    
   }
-  const filterRecipe = async (recipe) =>{
+  const filterRecipe =  async (recipe) =>{
     const average = await getAverageOfRating(recipe.id)
     if(starCount == 0 && isValidDuration(recipe)){
       filteredRecipes.push(recipe)
     }
-    else if(duration===null && average==starCount){
+    else if(duration==null && average==starCount){
       filteredRecipes.push(recipe)
     }
     else if(isValidDuration(recipe) && average==starCount){
       filteredRecipes.push(recipe)
     }
-    else if(duration===null && starCount == 0){
+    else if( duration==null   && starCount == 0){
       filteredRecipes.push(recipe)
     }
+
   }
 
   const isValidDuration = (recipe) =>{
@@ -210,7 +222,6 @@ export const DashBoardFilter = ({ route, navigation }) => {
         <FlatList
           data={types}
           horizontal
-          extraData={reload}
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           renderItem={renderItem}
@@ -239,19 +250,21 @@ export const DashBoardFilter = ({ route, navigation }) => {
       <View style={styles.dropdownContainer}>
         <Text style={styles.listTitle}>Tiempo</Text>
         <View style={styles.pickerContainer}>
-          <Picker style={styles.picker} selectedValue={selectedValue} onValueChange={(value) => setSelectedValue(value)}>
-            <Picker.Item style={styles.pickerItem} label='Seleccione' value=''/>
-            <Picker.Item style={styles.pickerItem} label='Igual a' value='=' />
-            <Picker.Item style={styles.pickerItem} label='Menor a' value='<' />
-            <Picker.Item style={styles.pickerItem} label='Mayor a' value='>' />
-          </Picker>
-          <TextInput
-            style={styles.durationInput}
-            onChangeText={onChangeText}
-            value={duration}
-            maxLength={3}
-          />
-          <Text style={styles.inputText}>Min</Text>
+      
+            <Picker style={styles.picker} selectedValue={selectedValue} onValueChange={(value) => setSelectedValue(value)}>
+              <Picker.Item style={styles.pickerItem} label='Seleccione' value=''/>
+              <Picker.Item style={styles.pickerItem} label='Igual a' value='=' />
+              <Picker.Item style={styles.pickerItem} label='Menor a' value='<' />
+              <Picker.Item style={styles.pickerItem} label='Mayor a' value='>' />
+            </Picker>
+        
+            <TextInput
+              style={styles.durationInput}
+              onChangeText={onChangeText}
+              value={duration}
+              maxLength={3}
+            />
+            <Text style={styles.inputText}>Min</Text>
         </View>
 
       </View>
@@ -277,7 +290,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
       <View >
         <TouchableOpacity onPress={() => submit()} style={{alignSelf:"center",marginTop:"3%"}}>
           <MaterialIcons name="done" size={50} color="white" />
-          <Text style={styles.inputText}>Aceptar</Text>
+          <Text style={styles.acceptanceText}>Aceptar</Text>
         </TouchableOpacity>
       </View>
    </ScrollView>
@@ -312,7 +325,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#ffffff",
     fontSize: 16,
+    marginLeft:"2%"
 
+  },
+  acceptanceText:{
+    alignSelf: "center",
+    fontWeight: "600",
+    color: "#ffffff",
+    fontSize: 16,
   },
   dropdownContainer: {
     justifyContent: "flex-start",
@@ -350,18 +370,17 @@ const styles = StyleSheet.create({
     minWidth:80
   },
   pickerItem: {
-    borderRadius: 8,
+    borderRadius: 100,
   },
   picker: {
-    borderRadius: 8,
-    width: 150,
+    width:"50%",
     marginHorizontal: "2%",
     color: '#11110D',
     backgroundColor: "#F7EAB5",
   },
   pickerContainer: {
     flexDirection: "row",
-    width: 200,
+  
     borderRadius: 8,
     marginRight: "2%"
   },

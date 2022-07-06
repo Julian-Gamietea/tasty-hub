@@ -18,7 +18,6 @@ import { EmailNotConfirmed } from './register/EmailNotConfirmed';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Octicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import { RecipeIcon } from '../tasty-hub/assets/icons/recipe-button-icon.png';
 import { Image, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
