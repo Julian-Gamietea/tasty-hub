@@ -20,7 +20,7 @@ export const RecipeFormEdit = ({ navigation, route }) => {
 
 	// const [modalVisible, setModalVisible] = React.useState(false);
 	// const [deleteIndex, setDeleteIndex] = React.useState(null);
-	const [deletedImages, setDeletedImages] = React.useState(null);
+	const [deletedImages, setDeletedImages] = React.useState([]);
 
 	React.useEffect(() => {
 		const { recipe } = route.params;
@@ -127,6 +127,7 @@ export const RecipeFormEdit = ({ navigation, route }) => {
 		const auxDel = deletedImages.slice(0, deletedImages.length);
 		const deleted = auxDel.concat(deletedElems);
 		setDeletedImages(deleted);
+		console.log(deleted);
 		recipeDispatch({ type: 'fieldUpdate', field: 'images', value: aux });
 	}
 

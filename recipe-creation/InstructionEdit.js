@@ -22,16 +22,6 @@ export const InstructionEdit = ({ navigation, route }) => {
     const [deletedMultimedia, setDeletedMultimedia] = React.useState([]);
     const [deletedSteps, setDeletedSteps] = React.useState([]);
 
-    const instructions = [
-        {
-            numberOfStep: 1,
-            description: "",
-            recipeId: recipeId,
-            title: "",
-            multimedia: []
-        }
-    ]
-
     const [errors, setErrors] = React.useState([]);
 
     const [modalVisible, setModalVisible] = React.useState(false);
@@ -89,7 +79,7 @@ export const InstructionEdit = ({ navigation, route }) => {
     }
 
     const handleDelete = () => {
-        const stepNum = selectedStep.numberOfStep
+        const stepNum = selectedStep.numberOfStep;
         const aux = steps.slice(0, steps.length);
         let deletedElems;
         if (steps.length - 1 > stepNum - 1) {
@@ -104,11 +94,15 @@ export const InstructionEdit = ({ navigation, route }) => {
                 setSelectedStep(aux[0]);
             }
             const delAux = deletedSteps.concat(deletedElems);
+            console.log("caso intermedio")
+            console.log(delAux);
             setDeletedSteps(delAux);
         } else {
-            deletedElems = aux.pop();
+            deletedElems = aux.splice(aux.length - 1, 1);
             setSelectedStep(aux[aux.length - 1])
-            const delAux = deletedSteps.slice(0, deletedSteps.length - 1).push(deletedElems);
+            const delAux = deletedSteps.concat(deletedElems);
+            console.log("caso ultimo")
+            console.log(delAux);
             setDeletedSteps(delAux);
         }
         setSteps(aux);
@@ -241,18 +235,19 @@ export const InstructionEdit = ({ navigation, route }) => {
             //BORRO IQ VIEJAS
             await overwriteOldRecipe(recipe.id);
             //ACTUALIZO LA RECETA
-            recipeData = await axios.put(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
+            await axios.put(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
             
             //BORRO IMAGENES QUE HABIA BORRADO EN LA PANTALLA FORM
             try {
                 if (deletedImages) {
                     for (let img of deletedImages) {
                         if (img.id) {
-                            await axios.delete(`http://localhost:8080/api/recipePhotos?recipeId=${recipe.id}&recipePhotoId=${img.id}`);
-                        } else {
-                            if (img.uri.split("/")[0] !== 'file:') {
-                                await axios.delete(`https://tasty-hub.herokuapp.com/api/recipes/mainphoto/${recipe.id}`);
-                            }
+                            await axios.delete(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${auxRecipe.id}&recipePhotoId=${img.id}`);
+                        }
+                    }
+                    for (let img of deletedImages) {
+                        if(!img.id && img.uri && !img.uri.includes('file:///')) {
+                                await axios.delete(`https://tasty-hub.herokuapp.com/api/recipes/mainphoto/${auxRecipe.id}`);
                         }
                     }
                 }
@@ -263,12 +258,15 @@ export const InstructionEdit = ({ navigation, route }) => {
             //SUBO IMAGENES NUEVAS
             const fdi = new FormData();
             for (let image of recipe.images) {
-                fdi.append('images', image);
+                if (!image.id && image.uri.includes('file:///')) {
+                    console.log(image);
+                    fdi.append('images', image);
+                }
             }
 
             try {
                 
-                const imageData = await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipe.id}`, fdi,
+                await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipe.id}`, fdi,
                     {
                         headers: {
                             'Content-Type': 'multipart/form-data'
@@ -318,10 +316,11 @@ export const InstructionEdit = ({ navigation, route }) => {
 
                 if (deletedSteps.length > 0) {
                     for (let delStep of deletedSteps) {
+                        console.log(delStep);
                         if (delStep.id) {
-                            for (let mm of delStep.multimeda) {
+                            for (let mm of delStep.multimedia) {
                                 if (mm.id) {
-                                    await axios.delete(`https://tasty-hub.herokuapp.com/api/multimedia?multimediaId=${m.id}`);
+                                    await axios.delete(`https://tasty-hub.herokuapp.com/api/multimedia?multimediaId=${mm.id}`);
                                 }
                             }
                             await axios.delete(`https://tasty-hub.herokuapp.com/api/instruction/${delStep.id}`);
@@ -348,7 +347,6 @@ export const InstructionEdit = ({ navigation, route }) => {
 
                         const instructionId = res.data.id;
 
-                        // console.log(step.multimedia);
                         const fd = new FormData();
                         for (let multim of step.multimedia) {
                             const aux = {
@@ -359,7 +357,7 @@ export const InstructionEdit = ({ navigation, route }) => {
                             fd.append('multimedia', aux);
                         }
 
-                        var config = {
+                        const configPost = {
                             method: 'post',
                             url: `https://tasty-hub.herokuapp.com/api/multimedia?instructionId=${instructionId}`,
                             headers: {
@@ -368,7 +366,7 @@ export const InstructionEdit = ({ navigation, route }) => {
                             data: fd
                         };
 
-                        await axios(config);
+                        await axios(configPost);
 
 
                     } catch (e) {
@@ -399,18 +397,18 @@ export const InstructionEdit = ({ navigation, route }) => {
                             }
                         }
     
-                        var config = {
+                        const configPut = {
                             method: 'post',
-                            url: `https://tasty-hub.herokuapp.com/api/multimedia?instructionId=${instructionId}`,
+                            url: `https://tasty-hub.herokuapp.com/api/multimedia?instructionId=${step.id}`,
                             headers: {
                                 'Content-Type': 'multipart/form-data'
                             },
                             data: fd
                         };
     
-                        await axios(config);
+                        await axios(configPut);
                     } catch(e) {
-                        console.log("Error final: " + e);
+                        console.log("Error final put: " + e);
                     }
                 }
             }

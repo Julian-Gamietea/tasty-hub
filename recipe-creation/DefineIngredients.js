@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     pickerContainer: {
-        borderRadius: 500,
+        // borderRadius: 500,
         backgroundColor: '#EBEBEB',
         width: 85,
         borderRadius: 50,
