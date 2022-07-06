@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Modal, Pressable, Dimensions } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, View, Text, TouchableOpacity, Modal, Pressable } from "react-native";
 import {useFonts} from 'expo-font'
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons'; 
@@ -62,8 +62,9 @@ export const Recipe = ({route, navigation}) => {
 
         if(!filename){
             const array = []
-
+            
             const fetchData = () => {
+                
                 var axios = require('axios');
                 var config = {
                 method: 'get',
@@ -73,7 +74,7 @@ export const Recipe = ({route, navigation}) => {
     
                 axios(config)
                 .then(function (response) {
-     
+                    setLoading(true)
                     // SETTING THE RECIPE INFORMATION 
                     setDatos(response.data)
                     array.push(response.data.mainPhoto)
@@ -167,20 +168,22 @@ export const Recipe = ({route, navigation}) => {
                     response.data.forEach(element => {
                         array.push(element.photoUrl)
                     });
-    
+                    setLoading(false)
                 })
                 .catch((error)=>
                 
                  console.log("ERROR 6" + error)
                  )
     
-    
+                
                 setRecipeImages(array)
+                
     
             }
             fetchData();
-        }else{
             
+        }else{
+            setLoading(true)
             const fetchStoragedData = async () => {
                 try {
                     const jsonValue = await AsyncStorage.getItem(filename)
@@ -192,7 +195,7 @@ export const Recipe = ({route, navigation}) => {
                         setRecipeImages(JSON.parse(jsonValue).images)
                         setStarCount2(JSON.parse(jsonValue).rating)
                         setSaved(true)
-                       
+                        setLoading(false)
                     }
                 } catch(e) {
                     console.log(e)
@@ -205,7 +208,7 @@ export const Recipe = ({route, navigation}) => {
         
     },[focus, recalculated]);
 
-
+    const [loading, setLoading] = React.useState(false)
     const focus = useIsFocused();
     const [overwrite, setOverwrite] = React.useState(false)
     const [userProfilePhoto, setUserProfilePhoto] = React.useState("")
@@ -466,210 +469,218 @@ export const Recipe = ({route, navigation}) => {
         }
     }
     
-  
-
-    return(
-        <ScrollView style={styles.container}>
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}> {datos.name} </Text>
-                <View style={styles.ratings}>
-                    <StarRating
-                        disabled={true}
-                        emptyStar={'star'}
-                        fullStar={'star'}
-                        halfStar={'star'}
-                        iconSet={'Feather'}
-                        maxStars={starCount2}
-                        rating={starCount2}
-                        fullStarColor={'#553900'}
-                        starSize={26}
-                        halfStarEnabled={true}
-                    />
-                </View>
-               
+    if(loading){
+        return(
+            <View style={{flex: 1, justifyContent: 'center', flexDirection: 'row', backgroundColor: '#ffff'}}>
+                <ActivityIndicator size="large" color='#553900' /> 
             </View>
-            <View style={styles.profile}>
-                <MaterialIcons name="person" size={24} color="#5D420C" />
-                <Text style={styles.profileName}> {datos.ownerUserName} </Text> 
-                {!filename && <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("UserProfile", {id: datos.ownerId})}>
-                    <MaterialIcons name="portrait" size={24} color="white" />
-                    <Text style={styles.buttonText}> Ver perfil</Text>
-                </TouchableOpacity>}
-            </View>
-            <View style={styles.info}>
-                <View style={styles.infoItem1}>
-                    <View style={{flexDirection:'row', marginBottom: 5}}>
-                        <MaterialIcons name="group" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {factor ? Math.ceil(datos.peopleAmount*factor) : Math.ceil(datos.peopleAmount) } personas </Text>
+        )
+    }else{
+        return(
+        
+            <ScrollView style={styles.container}>  
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}> {datos.name} </Text>
+                    <View style={styles.ratings}>
+                        <StarRating
+                            disabled={true}
+                            emptyStar={'star'}
+                            fullStar={'star'}
+                            halfStar={'star'}
+                            iconSet={'Feather'}
+                            maxStars={starCount2}
+                            rating={starCount2}
+                            fullStarColor={'#553900'}
+                            starSize={26}
+                            halfStarEnabled={true}
+                        />
                     </View>
-                    <View style={{flexDirection:'row'}}>
-                        <Feather name="pie-chart" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {factor ? Math.ceil(datos.portions*factor) : Math.ceil(datos.portions)} porciones </Text>
-                    </View>  
+                   
                 </View>
-                <View style={styles.infoItem2}>
-                    <View style={{flexDirection: 'row', marginBottom: 5}}>
-                        <Feather name="clock" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {datos.duration} min </Text>
+                <View style={styles.profile}>
+                    <MaterialIcons name="person" size={24} color="#5D420C" />
+                    <Text style={styles.profileName}> {datos.ownerUserName} </Text> 
+                    {!filename && <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("UserProfile", {id: datos.ownerId})}>
+                        <MaterialIcons name="portrait" size={24} color="white" />
+                        <Text style={styles.buttonText}> Ver perfil</Text>
+                    </TouchableOpacity>}
+                </View>
+                <View style={styles.info}>
+                    <View style={styles.infoItem1}>
+                        <View style={{flexDirection:'row', marginBottom: 5}}>
+                            <MaterialIcons name="group" size={24} color="#5D420C" />
+                            <Text style={styles.infoText}> {factor ? Math.ceil(datos.peopleAmount*factor) : Math.ceil(datos.peopleAmount) } personas </Text>
+                        </View>
+                        <View style={{flexDirection:'row'}}>
+                            <Feather name="pie-chart" size={24} color="#5D420C" />
+                            <Text style={styles.infoText}> {factor ? Math.ceil(datos.portions*factor) : Math.ceil(datos.portions)} porciones </Text>
+                        </View>  
                     </View>
-                    <View style={{flexDirection: 'row'}}>
-                        <AntDesign name="tags" size={24} color="#5D420C"  />
-                        <Text style={styles.infoText}> {datos.typeName}</Text>
-                    </View>
-                </View>
-            </View>
-            
-            {!filename && <View style={styles.buttons}>
-                <TouchableOpacity onPress={()=> addFavorites()} style={styles.favouritesButton}>
-                    {addedFavorites
-                        ? <Ionicons name="bookmark" size={24} color="#fff" /> 
-                        : <Ionicons name="bookmark-outline" size={24} color="#fff" />
-                    }
-                        <Text style={styles.buttonText}> {!addedFavorites ? 'Añadir a \n favoritos' : 'Eliminar de \n  favoritos'} </Text>
-                </TouchableOpacity>
-                {recalculated && <TouchableOpacity 
-                    onPress={()=> save()}  
-                    style={styles.profileButton}
-                >
-                    {saved
-                        ? <Ionicons name="download" size={24} color="white" /> 
-                        : <Ionicons name="download-outline" size={24} color="white" />
-                    }
-                    <Text style={styles.buttonText}> {!saved ? 'Guardar' : 'Guardada'} </Text>
-                </TouchableOpacity>}
-                
-            </View>}
-
-            <CarrouselImages recipeImages = {recipeImages}/>
-
-            <View style={styles.descriptionContainer}>
-                <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8}}>
-                    <MaterialIcons name="info" size={24} color="#5D420C" />
-                    <Text style={styles.descriptionTitle} > Descripción </Text>
-                </View>
-                <Text style={styles.descripcionContent}> {datos.description}</Text>
-            </View>
-
-            <View style={styles.descriptionContainer}>
-                <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8}}>
-                    <MaterialIcons name="restaurant" size={24} color="#5D420C" />
-                    <Text style={styles.descriptionTitle}> Ingredientes </Text> 
-                </View>
-                <View style={{flexDirection:'column'}}>
-                    {ingredientes.map((element, index) => {
-                        return( 
-                        <Text key={index} style={styles.ingredientItemText}> - {parseFloat(element.quantity).toFixed(2)} {element.unitName} de {element.ingredientName} </Text>);  
-                    })
-                    }
-                    
-                </View>
-               
-            </View>
-            
-            {!filename && <View style={styles.recalculateContainer}>
-                <Text style={styles.recalculateText}>¿Necesitas {'\n'} otras {'\n'} proporciones {'\n'} de esta receta? </Text>
-                <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("RecalculateRecipe", {userId: userId, recipeId: id})}>
-                <Text style={styles.buttonTextRecalculate}>Recalcular {'\n'} receta</Text>
-                </TouchableOpacity>
-            </View>}
-
-            <View style={styles.instructionContainer}>
-                <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8, marginLeft: 25}}>
-                    <MaterialIcons name="menu-book" size={24} color="#5D420C"/>
-                    <Text style={styles.descriptionTitle}>  Instrucciones </Text>
-                </View>
-                <View style={styles.instructionGreyContainer}>
-                    <Carrousel id={id} multimediaSaved={multimedia} instructionsSaved={instructions}/>
-                </View>
-            </View>
-
-            {!filename && <View styles={styles.descriptionContainer}>
-                <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8, marginLeft: 25}}> 
-                    <MaterialIcons name="military-tech" size={24} color="#5D420C" />
-                    <Text style={styles.descriptionTitle}> Calificar </Text>
-                </View>
-                <Text style={styles.calificationText}>¿Cómo calificarías esta receta?</Text>
-                <View style={styles.starsContainer}>
-                    <StarRating
-                        disabled={false}
-                        emptyStar={'star-fill'}
-                        fullStar={'star-fill'}
-                        halfStar={'star-fill'}
-                        iconSet={'Octicons'}
-                        maxStars={5}
-                        rating={starCount}
-                        selectedStar={(rating) => onStarRatingPress(rating)}
-                        fullStarColor={'#967127'}
-                        emptyStarColor={'#EFD87B'}
-                        starSize={52}
-                    />
-                </View>
-
-                <TouchableOpacity 
-                    style={styles.sendButton}
-                    onPress={()=> enviar()}>
-                    <Text style={styles.buttonTextSend}>Enviar</Text>
-                </TouchableOpacity>
-            </View>}
-
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                setModalVisible(!modalVisible);
-                }}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <View> 
-                            <Text style={styles.modalText}>¿Desea dejar algun comentario a la receta?</Text>
-                            <InputTasty
-                                placeholder = 'Ingrese aqui (opcional)'
-                                value =  {comments}
-                                onChange={(text) => setComments(text)}
-                                isValid = {true}   
-                            />
-                            <View style={{flexDirection: 'row', justifyContent:'center', backgroundColor: '#fff'}}> 
-                                <Pressable
-                                style={[styles.button, styles.buttonClose]}
-                                onPress={() => closeModalSend()}
-                                >
-                                <Text style={styles.textStyle}>Continuar</Text>
-                                </Pressable>
-                                <Pressable
-                                style={[styles.button, styles.buttonClose]}
-                                onPress={() => closeModalNoSend()}
-                                >
-                                <Text style={styles.textStyle}>Volver</Text>
-                                </Pressable>
-                            </View>
-                            
+                    <View style={styles.infoItem2}>
+                        <View style={{flexDirection: 'row', marginBottom: 5}}>
+                            <Feather name="clock" size={24} color="#5D420C" />
+                            <Text style={styles.infoText}> {datos.duration} min </Text>
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                            <AntDesign name="tags" size={24} color="#5D420C"  />
+                            <Text style={styles.infoText}> {datos.typeName}</Text>
                         </View>
                     </View>
                 </View>
-            </Modal>
-
-            {recalculated && saved && <NotificationModal
-                visible={notificationRecordat}
-                onRequestClose={()=>setNotificationRecordat(!notificationRecordat)}
-                onPress={()=>setNotificationRecordat(!notificationRecordat)}
-                message={"¡RECUERDE! Cualquier modificacion que desee guardar sobreescribirá la ya guardada"}
-            />}
-            <NotificationModal
-                visible={notificationGuardadas}
-                onRequestClose={()=>setNotificationGuardadas(!notificationGuardadas)}
-                onPress={()=>setNotificationGuardadas(!notificationGuardadas)}
-                message={"Ha alcanzado el máximo de 5 recetas guardadas"}
-            />
-            <NotificationModal
-                visible={notification}
-                onRequestClose={()=>setNotification(!notification)}
-                onPress={()=>setNotification(!notification)}
-                message={addedFavorites ? "Receta agregada a Favoritos!" : "Receta eliminada de Favoritos!"}
-            />
-        </ScrollView>
-    );
+                
+                {!filename && <View style={styles.buttons}>
+                    <TouchableOpacity onPress={()=> addFavorites()} style={styles.favouritesButton}>
+                        {addedFavorites
+                            ? <Ionicons name="bookmark" size={24} color="#fff" /> 
+                            : <Ionicons name="bookmark-outline" size={24} color="#fff" />
+                        }
+                            <Text style={styles.buttonText}> {!addedFavorites ? 'Añadir a \n favoritos' : 'Eliminar de \n  favoritos'} </Text>
+                    </TouchableOpacity>
+                    {recalculated && <TouchableOpacity 
+                        onPress={()=> save()}  
+                        style={styles.profileButton}
+                    >
+                        {saved
+                            ? <Ionicons name="download" size={24} color="white" /> 
+                            : <Ionicons name="download-outline" size={24} color="white" />
+                        }
+                        <Text style={styles.buttonText}> {!saved ? 'Guardar' : 'Guardada'} </Text>
+                    </TouchableOpacity>}
+                    
+                </View>}
+    
+                <CarrouselImages recipeImages = {recipeImages}/>
+    
+                <View style={styles.descriptionContainer}>
+                    <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8}}>
+                        <MaterialIcons name="info" size={24} color="#5D420C" />
+                        <Text style={styles.descriptionTitle} > Descripción </Text>
+                    </View>
+                    <Text style={styles.descripcionContent}> {datos.description}</Text>
+                </View>
+    
+                <View style={styles.descriptionContainer}>
+                    <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8}}>
+                        <MaterialIcons name="restaurant" size={24} color="#5D420C" />
+                        <Text style={styles.descriptionTitle}> Ingredientes </Text> 
+                    </View>
+                    <View style={{flexDirection:'column'}}>
+                        {ingredientes.map((element, index) => {
+                            return( 
+                            <Text key={index} style={styles.ingredientItemText}> - {parseFloat(element.quantity).toFixed(2)} {element.unitName} de {element.ingredientName} </Text>);  
+                        })
+                        }
+                        
+                    </View>
+                   
+                </View>
+                
+                {!filename && <View style={styles.recalculateContainer}>
+                    <Text style={styles.recalculateText}>¿Necesitas {'\n'} otras {'\n'} proporciones {'\n'} de esta receta? </Text>
+                    <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("RecalculateRecipe", {userId: userId, recipeId: id})}>
+                    <Text style={styles.buttonTextRecalculate}>Recalcular {'\n'} receta</Text>
+                    </TouchableOpacity>
+                </View>}
+    
+                <View style={styles.instructionContainer}>
+                    <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8, marginLeft: 25}}>
+                        <MaterialIcons name="menu-book" size={24} color="#5D420C"/>
+                        <Text style={styles.descriptionTitle}>  Instrucciones </Text>
+                    </View>
+                    <View style={styles.instructionGreyContainer}>
+                        <Carrousel id={id} multimediaSaved={multimedia} instructionsSaved={instructions}/>
+                    </View>
+                </View>
+    
+                {!filename && <View styles={styles.descriptionContainer}>
+                    <View style={{flexDirection: 'row', alignItems:'center', marginBottom: 8, marginLeft: 25}}> 
+                        <MaterialIcons name="military-tech" size={24} color="#5D420C" />
+                        <Text style={styles.descriptionTitle}> Calificar </Text>
+                    </View>
+                    <Text style={styles.calificationText}>¿Cómo calificarías esta receta?</Text>
+                    <View style={styles.starsContainer}>
+                        <StarRating
+                            disabled={false}
+                            emptyStar={'star-fill'}
+                            fullStar={'star-fill'}
+                            halfStar={'star-fill'}
+                            iconSet={'Octicons'}
+                            maxStars={5}
+                            rating={starCount}
+                            selectedStar={(rating) => onStarRatingPress(rating)}
+                            fullStarColor={'#967127'}
+                            emptyStarColor={'#EFD87B'}
+                            starSize={52}
+                        />
+                    </View>
+    
+                    <TouchableOpacity 
+                        style={styles.sendButton}
+                        onPress={()=> enviar()}>
+                        <Text style={styles.buttonTextSend}>Enviar</Text>
+                    </TouchableOpacity>
+                </View>}
+    
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                    }}
+                >
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <View> 
+                                <Text style={styles.modalText}>¿Desea dejar algun comentario a la receta?</Text>
+                                <InputTasty
+                                    placeholder = 'Ingrese aqui (opcional)'
+                                    value =  {comments}
+                                    onChange={(text) => setComments(text)}
+                                    isValid = {true}   
+                                />
+                                <View style={{flexDirection: 'row', justifyContent:'center', backgroundColor: '#fff'}}> 
+                                    <Pressable
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => closeModalSend()}
+                                    >
+                                    <Text style={styles.textStyle}>Continuar</Text>
+                                    </Pressable>
+                                    <Pressable
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => closeModalNoSend()}
+                                    >
+                                    <Text style={styles.textStyle}>Volver</Text>
+                                    </Pressable>
+                                </View>
+                                
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+    
+                {recalculated && saved && <NotificationModal
+                    visible={notificationRecordat}
+                    onRequestClose={()=>setNotificationRecordat(!notificationRecordat)}
+                    onPress={()=>setNotificationRecordat(!notificationRecordat)}
+                    message={"¡RECUERDE! Cualquier modificacion que desee guardar sobreescribirá la ya guardada"}
+                />}
+                <NotificationModal
+                    visible={notificationGuardadas}
+                    onRequestClose={()=>setNotificationGuardadas(!notificationGuardadas)}
+                    onPress={()=>setNotificationGuardadas(!notificationGuardadas)}
+                    message={"Ha alcanzado el máximo de 5 recetas guardadas"}
+                />
+                <NotificationModal
+                    visible={notification}
+                    onRequestClose={()=>setNotification(!notification)}
+                    onPress={()=>setNotification(!notification)}
+                    message={addedFavorites ? "Receta agregada a Favoritos!" : "Receta eliminada de Favoritos!"}
+                />
+            </ScrollView>
+        );
+    }
+    
 }
 
 const styles = StyleSheet.create({
