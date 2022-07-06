@@ -6,16 +6,20 @@ import { useFonts } from 'expo-font';
 import { MaterialIcons } from '@expo/vector-icons';
 import { InputTasty } from '../shared-components/InputTasty';
 import { ButtonCustom } from '../shared-components/ButtonCustom';
-import { DeletableImage } from '../shared-components/DeletableImage';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import axios from 'axios';
-// import { DeletableImage } from '../shared-components/DeletableImage';
 import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
+import * as NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const InstructionCreation = ({ navigation, route }) => {
 
-    const { recipe } = route.params;
+    const {recipe} = route.params;
+    const [networkType, setNetworkType] = React.useState('');
+    const [networkModalVisible, setNetworkModalVisible] = React.useState(false);
+    const unsuscribe = React.useRef(null);
+    const [modalShown, setModalShown] = React.useState(route.params.modalShown);
     const [isUploading, setIsUploading] = React.useState(false);
     const [recipeId, setRecipeId] = React.useState(recipe.id);
     const instructions = [
@@ -28,15 +32,26 @@ export const InstructionCreation = ({ navigation, route }) => {
         }
     ]
 
-	const [errors, setErrors] = React.useState([]);
+    const [errors, setErrors] = React.useState([]);
 
     const [modalVisible, setModalVisible] = React.useState(false);
-    
+
     const [ErrorModalVisible, setErrorModalVisible] = React.useState(false);
 
     const [steps, setSteps] = React.useState(instructions);
 
     const [selectedStep, setSelectedStep] = React.useState(instructions[0]);
+
+    React.useEffect(() => {
+        unsuscribe.current = NetInfo.addEventListener(state => {
+            if (state.type === 'cellular' && !modalShown) {
+                setNetworkModalVisible(true);
+                setModalShown(true);
+            }
+            setNetworkType(state.type);
+        })
+        return unsuscribe.current;
+    }, [modalShown])
 
     const handleAddStep = () => {
         const aux = steps.slice();
@@ -214,7 +229,7 @@ export const InstructionCreation = ({ navigation, route }) => {
 
     const upload = async () => {
         setIsUploading(true);
-        if (!hasErrors()) {
+        if (!hasErrors() && networkType !== 'cellular') {
 
             const auxRecipe = {
                 description: recipe.description,
@@ -313,8 +328,82 @@ export const InstructionCreation = ({ navigation, route }) => {
                 }
             }
             setIsUploading(false);
+            unsuscribe.current();
             navigation.navigate('SuccessNormal');
-        } else {
+        }
+        else if (!hasErrors() && networkType === 'cellular') {
+
+            if (recipe.id === null) {
+
+                const auxRecipe = {
+                    description: recipe.description,
+                    duration: recipe.duration,
+                    enabled: false,
+                    name: recipe.name,
+                    ownerId: recipe.ownerId,
+                    peopleAmount: recipe.peopleAmount,
+                    portions: recipe.portions,
+                    typeId: recipe.typeId,
+                    images: recipe.images,
+                    ingredientQty: recipe.ingredientQty,
+                    steps: steps
+                }
+
+                try {
+                    const res = await AsyncStorage.getItem(`user_${recipe.ownerId}_upload_queue`);
+                    let data = null
+                    if (res === null) {
+                        data = {
+                            queue: [auxRecipe]
+                        }
+                    } else {
+                        data = JSON.parse(res);
+                        data.queue.push(auxRecipe);
+                    }
+                    await AsyncStorage.setItem(`user_${recipe.ownerId}_upload_queue`, JSON.stringify(data));
+                    console.log(data.queue);
+                } catch (e) {
+                    console.log(e);
+                }
+
+            } else {
+                const auxRecipe = {
+                    id: recipe.id,
+                    description: recipe.description,
+                    duration: recipe.duration,
+                    enabled: false,
+                    name: recipe.name,
+                    ownerId: recipe.ownerId,
+                    peopleAmount: recipe.peopleAmount,
+                    portions: recipe.portions,
+                    typeId: recipe.typeId,
+                    images: recipe.images,
+                    ingredientQty: recipe.ingredientQty,
+                    steps: steps
+                }
+
+                try {
+                    const res = await AsyncStorage.getItem(`user_${recipe.ownerId}_overwrite_queue`);
+                    let data = null
+                    if (res === null) {
+                        data = {
+                            queue: [auxRecipe]
+                        }
+                    } else {
+                        data = JSON.parse(res);
+                        data.queue.push(auxRecipe);
+                    }
+                    await AsyncStorage.setItem(`user_${recipe.ownerId}_overwrite_queue`, JSON.stringify(data));
+                    console.log(data.queue);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+
+            setIsUploading(false);
+
+        }
+        else {
             setIsUploading(false);
         }
     }
@@ -369,6 +458,44 @@ export const InstructionCreation = ({ navigation, route }) => {
 					</View>
 				</View>
 			</Modal>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={networkModalVisible}
+                onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setNetworkModalVisible(!networkModalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Se detectó que ya no se encuentra en una red sin cargo.Continuar con esta red puede generar costos adicionales.{'\n'}¿Desea continuar?</Text>
+                        <Text style={{textAlign: 'center', marginBottom: 15}}>(La receta no se subirá hasta que se disponga de una red sin cargo)</Text>
+                        <View style={{
+                            flexDirection: 'row',
+                        }}>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose, {marginRight: 10}]}
+                                onPress={() => {
+                                    setNetworkModalVisible(!networkModalVisible);
+                                    navigation.navigate('WelcomeScreen');
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Descartar receta</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => {
+                                    setNetworkModalVisible(!networkModalVisible);
+                                    setErrors([]);
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Continuar</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
             <Modal
                 animationType="slide"
                 transparent={true}

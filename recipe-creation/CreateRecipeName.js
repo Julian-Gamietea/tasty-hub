@@ -14,7 +14,7 @@ import * as SecureStore from 'expo-secure-store'
 
 export const CreateRecipeName = ({ navigation, route }) => {
 
-	const cellular = route.params ? route.params.cellular : null;
+	const cellular = route.params ? route.params.cellular : false;
 	const netInfo = useNetInfo();
 	const [isValid, setIsValid] = React.useState(true);
 	const [recipeName, setRecipeName] = React.useState('');
@@ -47,20 +47,24 @@ export const CreateRecipeName = ({ navigation, route }) => {
 			} });
 		} else {
 			if (recipeName) {
-				try {
-					const res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes?ownerId=${user.id}`);
-					if (res.data.length > 0) {
-						const aux = res.data.filter((recipe) => recipe.name === recipeName);
-						if (aux.length > 0) {
-							navigation.navigate('RecipeNameExists', { recipeName: recipeName, recipe: aux[0]});
+				if (cellular) {
+					navigation.navigate('RecipeForm', {recipeTitle: recipeName, cellular: true});
+				} else {
+					try {
+						const res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes?ownerId=${user.id}`);
+						if (res.data.length > 0) {
+							const aux = res.data.filter((recipe) => recipe.name === recipeName);
+							if (aux.length > 0) {
+								navigation.navigate('RecipeNameExists', { recipeName: recipeName, recipe: aux[0]});
+							} else {
+								navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: false });
+							}
 						} else {
-							navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: cellular });
+							navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: false });
 						}
-					} else {
-						navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: cellular });
+					} catch (e) {
+						console.log(e);
 					}
-				} catch (e) {
-					console.log(e);
 				}
 			} else {
 				setIsValid(false);

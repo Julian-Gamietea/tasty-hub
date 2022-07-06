@@ -18,10 +18,14 @@ import {AddMultimediaForm} from '../shared-components/AddMultimediaForm';
 import * as ImagePicker from 'expo-image-picker';
 import {recipeReducer, initialState} from './RecipeReducer';
 import * as SecureStore from 'expo-secure-store';
-import axios from 'axios';
+import {useIsFocused} from "@react-navigation/native";
+import * as NetInfo from "@react-native-community/netinfo"
 
 export const RecipeForm = ({navigation, route}) => {
 
+    const focus = useIsFocused();
+    const unsuscribe = React.useRef(null);
+    const [modalShown, setModalShown] = React.useState(Boolean(route.params.cellular));
     const {type} = route.params;
     const [errors, setErrors] = React.useState([]);
     const [modalVisible, setModalVisible] = React.useState(false);
@@ -39,8 +43,7 @@ export const RecipeForm = ({navigation, route}) => {
         typeDescription,
         ingredientQty
     } = recipeState;
-    const cellular = route.params.cellular;
-
+    const [networkModalVisible, setNetworkModalVisible] = React.useState(false);
 
     let recipeTitle = "";
     if (route.params.recipeTitle) {
@@ -64,6 +67,17 @@ export const RecipeForm = ({navigation, route}) => {
             console.log("hi, i'm overwriting");
         }
     }, [route.params])
+
+
+    React.useEffect(() => {
+        unsuscribe.current = NetInfo.addEventListener(state => {
+            if (state.type === 'cellular' && !modalShown) {
+                setModalShown(true);
+                setNetworkModalVisible(true);
+            }
+        })
+        return unsuscribe.current;
+}, [modalShown])
 
 
     const AddPhoto = async () => {
@@ -152,7 +166,8 @@ export const RecipeForm = ({navigation, route}) => {
             setErrors(errorsAux);
             setModalVisible(true);
         } else {
-            navigation.navigate('InstructionCreation', {recipe: recipe})
+            unsuscribe.current();
+            navigation.navigate('InstructionCreation', {recipe: recipe, modalShown: modalShown})
         }
     }
 
@@ -188,6 +203,44 @@ export const RecipeForm = ({navigation, route}) => {
                         >
                             <Text style={styles.textStyle}>Entendido</Text>
                         </Pressable>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={networkModalVisible}
+                onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setNetworkModalVisible(!networkModalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Se detectó que ya no se encuentra en una red sin cargo. Continuar con esta red puede generar costos adicionales.{'\n'}¿Desea continuar?</Text>
+                        <Text style={{textAlign: 'center', marginBottom: 15}}>(La receta no se subirá hasta que se disponga de una red sin cargo)</Text>
+                        <View style={{
+                            flexDirection: 'row',
+                        }}>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose, {marginRight: 10}]}
+                                onPress={() => {
+                                    setNetworkModalVisible(!networkModalVisible);
+                                    navigation.navigate('WelcomeScreen');
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Descartar receta</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => {
+                                    setNetworkModalVisible(!networkModalVisible);
+                                    setErrors([]);
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Continuar</Text>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
             </Modal>
@@ -232,7 +285,7 @@ export const RecipeForm = ({navigation, route}) => {
                                     field: 'duration',
                                     value: minutes
                                 })}
-                                value={duration}
+                                value={duration.toString()}
                             />
                             <Text style={styles.inputText}>minutos</Text>
                         </View>
@@ -247,7 +300,7 @@ export const RecipeForm = ({navigation, route}) => {
                                     field: 'peopleAmount',
                                     value: plp
                                 })}
-                                value={peopleAmount}
+                                value={peopleAmount.toString()}
                             />
                             <Text style={styles.inputText}>personas</Text>
                         </View>
@@ -262,7 +315,7 @@ export const RecipeForm = ({navigation, route}) => {
                                     field: 'portions',
                                     value: ptions
                                 })}
-                                value={portions}
+                                value={portions.toString()}
                             />
                             <Text style={styles.inputText}>porciones</Text>
                         </View>
