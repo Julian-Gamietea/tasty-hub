@@ -10,13 +10,18 @@ import { DeletableImage } from '../shared-components/DeletableImage';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import axios from 'axios';
-// import { DeletableImage } from '../shared-components/DeletableImage';
 import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
+import * as NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const InstructionEdit = ({ navigation, route }) => {
 
     const { recipe } = route.params;
     const { deletedImages } = route.params;
+    const [networkType, setNetworkType] = React.useState('');
+    const [networkModalVisible, setNetworkModalVisible] = React.useState(false);
+    const unsuscribe = React.useRef(null);
+    const [modalShown, setModalShown] = React.useState(route.params.modalShown);
     const [isUploading, setIsUploading] = React.useState(false);
     const [recipeId, setRecipeId] = React.useState(recipe.id);
     const [deletedMultimedia, setDeletedMultimedia] = React.useState([]);
@@ -31,6 +36,17 @@ export const InstructionEdit = ({ navigation, route }) => {
     const [steps, setSteps] = React.useState(route.params.instructions);
 
     const [selectedStep, setSelectedStep] = React.useState(route.params.instructions[0]);
+
+    React.useEffect(() => {
+        unsuscribe.current = NetInfo.addEventListener(state => {
+            if (state.type === 'cellular' && !modalShown) {
+                setNetworkModalVisible(true);
+                setModalShown(true);
+            }
+            setNetworkType(state.type);
+        })
+        return unsuscribe.current;
+    }, [modalShown])
 
     const handleAddStep = () => {
         const aux = steps.slice();
@@ -218,7 +234,7 @@ export const InstructionEdit = ({ navigation, route }) => {
 
     const upload = async () => {
         setIsUploading(true);
-        if (!hasErrors()) {
+        if (!hasErrors && networkType !== 'cellular') {
 
             const auxRecipe = {
                 id: recipe.id,
@@ -414,7 +430,47 @@ export const InstructionEdit = ({ navigation, route }) => {
             }
             setIsUploading(false);
             navigation.navigate('SuccessNormal');
-        } else {
+        }
+        else if (!hasErrors() && networkType === 'cellular') {
+            const auxRecipe = {
+                id: recipe.id,
+                description: recipe.description,
+                duration: recipe.duration,
+                enabled: true,
+                name: recipe.name,
+                ownerId: recipe.ownerId,
+                peopleAmount: recipe.peopleAmount,
+                portions: recipe.portions,
+                typeId: recipe.typeId,
+                mainPhoto: recipe.mainPhoto.uri,
+                images: recipe.images,
+                ingredientQty: recipe.ingredientQty,
+                steps: steps,
+                deletedImages: deletedImages,
+                deletedMultimedia: deletedMultimedia,
+                deletedSteps: deletedSteps,
+            }
+
+            try {
+                const res = await AsyncStorage.getItem(`user_${recipe.ownerId}_edit_queue`);
+                let data = null
+                if (res === null) {
+                    data = {
+                        queue: [auxRecipe]
+                    }
+                } else {
+                    data = JSON.parse(res);
+                    data.queue.push(auxRecipe);
+                }
+                await AsyncStorage.setItem(`user_${recipe.ownerId}_edit_queue`, JSON.stringify(data));
+                console.log(data.queue);
+            } catch (e) {
+                console.log(e);
+            }
+
+
+        }
+        else {
             setIsUploading(false);
         }
     }
@@ -459,6 +515,44 @@ export const InstructionEdit = ({ navigation, route }) => {
                         >
                             <Text style={styles.textStyleError}>Entendido</Text>
                         </Pressable>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={networkModalVisible}
+                onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setNetworkModalVisible(!networkModalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Se detectó que ya no se encuentra en una red sin cargo.Continuar con esta red puede generar costos adicionales.{'\n'}¿Desea continuar?</Text>
+                        <Text style={{textAlign: 'center', marginBottom: 15}}>(La receta no se subirá hasta que se disponga de una red sin cargo)</Text>
+                        <View style={{
+                            flexDirection: 'row',
+                        }}>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose, {marginRight: 10}]}
+                                onPress={() => {
+                                    setNetworkModalVisible(!networkModalVisible);
+                                    navigation.navigate('WelcomeScreen');
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Descartar receta</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => {
+                                    setNetworkModalVisible(!networkModalVisible);
+                                    setErrors([]);
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Continuar</Text>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
             </Modal>

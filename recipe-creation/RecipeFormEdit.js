@@ -7,20 +7,21 @@ import { InputTasty } from '../shared-components/InputTasty';
 import { AddMultimediaForm } from '../shared-components/AddMultimediaForm';
 import * as ImagePicker from 'expo-image-picker';
 import { recipeReducer, initialState } from './RecipeReducer';
-import * as SecureStore from 'expo-secure-store';
+import * as NetInfo from '@react-native-community/netinfo';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import axios from 'axios';
 
 export const RecipeFormEdit = ({ navigation, route }) => {
 
 	const url = 'https://tasty-hub.herokuapp.com/api'
+	const unsuscribe = React.useRef(null);
 	const [recipeState, recipeDispatch] = React.useReducer(recipeReducer, initialState);
-	const { id, description, duration, images, name,
-		ownerId, peopleAmount, portions, typeId, typeDescription, ingredientQty } = recipeState;
-
-	// const [modalVisible, setModalVisible] = React.useState(false);
-	// const [deleteIndex, setDeleteIndex] = React.useState(null);
+	const { id, description, duration, images, name, ownerId, peopleAmount, portions, typeId, typeDescription, ingredientQty } = recipeState;
 	const [deletedImages, setDeletedImages] = React.useState([]);
+	const [errors, setErrors] = React.useState([]);
+	const [modalVisible, setModalVisible] = React.useState(false);
+	const [networkModalVisible, setNetworkModalVisible] = React.useState(false);
+	const [modalShown, setModalShown] = React.useState(Boolean(route.params.cellular));
 
 	React.useEffect(() => {
 		const { recipe } = route.params;
@@ -70,7 +71,16 @@ export const RecipeFormEdit = ({ navigation, route }) => {
 		}
 	}, [route.params])
 
-	const cellular = route.params.cellular;
+	React.useEffect(() => {
+		unsuscribe.current = NetInfo.addEventListener(state => {
+			if (state.type === 'cellular' && !modalShown) {
+				setModalShown(true);
+				setNetworkModalVisible(true);
+			}
+		})
+		return unsuscribe.current;
+	}, [modalShown])
+
 
 	const AddPhoto = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -96,27 +106,50 @@ export const RecipeFormEdit = ({ navigation, route }) => {
 	}
 
 	const handleInstructions = async () => {
-		const instructions = await axios.get(`${url}/instruction/recipe/${id}`);
-		let multim;
-		for (let instruction of instructions.data) {
-			multim = await axios.get(`${url}/multimedia/instruction/${instruction.id}`);
-			for (let m of multim.data) {
-				if (m.typeContent.split("/")[0] === 'video') {
+		const errorsAux = errors.slice(0, errors.length);
 
-					const { uri } = await VideoThumbnails.getThumbnailAsync(
-						m.urlContent
-						, { quality: .5, time: 3000 });
-
-					m.thumbnailUri = uri
-				}
-				m['type'] = m['typeContent'];
-				delete m['typeContent'];
-				m['uri'] = m['urlContent'];
-				delete m['urlContent'];
-			}
-			instruction.multimedia = multim.data;
+		if (description === "" || duration === 0 || name === "" || peopleAmount === 0 || !typeId || images.length === 0 || ingredientQty.length === 0) {
+			errorsAux.push("No puede dejar campos vacíos");
 		}
-		navigation.navigate('InstructionEdit', { recipe: recipeAux, instructions: instructions.data, deletedImages: deletedImages })
+
+		if (duration <= 0 || peopleAmount <= 0 || portions <= 0) {
+			errorsAux.push("El número de porciones/personas/duración no puede ser negativo ni cero");
+		}
+
+		const aux = ingredientQty.filter((iq) => iq.quantity <= 0);
+
+		if (aux.length > 0) {
+			errorsAux.push("La cantidad de un ingrediente no puede ser cero ni negativa");
+		}
+
+		if (errorsAux.length > 0) {
+			setErrors(errorsAux);
+			setModalVisible(true);
+		} else {
+			const instructions = await axios.get(`${url}/instruction/recipe/${id}`);
+			let multim;
+			for (let instruction of instructions.data) {
+				multim = await axios.get(`${url}/multimedia/instruction/${instruction.id}`);
+				for (let m of multim.data) {
+					if (m.typeContent.split("/")[0] === 'video') {
+
+						const { uri } = await VideoThumbnails.getThumbnailAsync(
+							m.urlContent
+							, { quality: .5, time: 3000 });
+
+						m.thumbnailUri = uri
+					}
+					m['type'] = m['typeContent'];
+					delete m['typeContent'];
+					m['uri'] = m['urlContent'];
+					delete m['urlContent'];
+				}
+				instruction.multimedia = multim.data;
+			}
+
+			unsuscribe.current();
+			navigation.navigate('InstructionEdit', { recipe: recipeAux, instructions: instructions.data, deletedImages: deletedImages })
+		}
 	}
 
 	const removePhoto = (index) => {
@@ -168,6 +201,44 @@ export const RecipeFormEdit = ({ navigation, route }) => {
 
 	return (
 		<View style={{ backgroundColor: '#fff', flex: 1, justifyContent: 'center', paddingTop: StatusBar.currentHeight + 5, }}>
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={networkModalVisible}
+				onRequestClose={() => {
+					Alert.alert("Modal has been closed.");
+					setNetworkModalVisible(!networkModalVisible);
+				}}
+			>
+				<View style={styles.centeredView}>
+					<View style={styles.modalView}>
+						<Text style={styles.modalText}>Se detectó que ya no se encuentra en una red sin cargo. Continuar con esta red puede generar costos adicionales.{'\n'}¿Desea continuar?</Text>
+						<Text style={{textAlign: 'center', marginBottom: 15}}>(La receta no se subirá hasta que se disponga de una red sin cargo)</Text>
+						<View style={{
+							flexDirection: 'row',
+						}}>
+							<Pressable
+								style={[styles.button, styles.buttonClose, {marginRight: 10}]}
+								onPress={() => {
+									setNetworkModalVisible(!networkModalVisible);
+									navigation.navigate('WelcomeScreen');
+								}}
+							>
+								<Text style={styles.textStyle}>Descartar receta</Text>
+							</Pressable>
+							<Pressable
+								style={[styles.button, styles.buttonClose]}
+								onPress={() => {
+									setNetworkModalVisible(!networkModalVisible);
+									setErrors([]);
+								}}
+							>
+								<Text style={styles.textStyle}>Continuar</Text>
+							</Pressable>
+						</View>
+					</View>
+				</View>
+			</Modal>
 			<View style={{ backgroundColor: '#fff' }}>
 				<CustomNav
 					callback={() => {

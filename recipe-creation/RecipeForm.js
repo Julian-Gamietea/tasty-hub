@@ -18,12 +18,10 @@ import {AddMultimediaForm} from '../shared-components/AddMultimediaForm';
 import * as ImagePicker from 'expo-image-picker';
 import {recipeReducer, initialState} from './RecipeReducer';
 import * as SecureStore from 'expo-secure-store';
-import {useIsFocused} from "@react-navigation/native";
 import * as NetInfo from "@react-native-community/netinfo"
 
 export const RecipeForm = ({navigation, route}) => {
 
-    const focus = useIsFocused();
     const unsuscribe = React.useRef(null);
     const [modalShown, setModalShown] = React.useState(Boolean(route.params.cellular));
     const {type} = route.params;
@@ -64,7 +62,6 @@ export const RecipeForm = ({navigation, route}) => {
         }
         if (type === 'overwrite') {
             recipeDispatch({type: 'fieldUpdate', field: 'id', value: route.params.recipeId});
-            console.log("hi, i'm overwriting");
         }
     }, [route.params])
 
