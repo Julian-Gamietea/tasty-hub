@@ -39,7 +39,7 @@ export const Saved = ({navigation}) => {
     }
     React.useEffect(()=>{
         getStoragedData() 
-    },[focus])
+    },[focus, idUser])
 
    
     const onRefresh = () => {

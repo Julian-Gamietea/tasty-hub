@@ -23,7 +23,7 @@ export const Recipe = ({route, navigation}) => {
     const {id} = route.params;
     const {recalculated} = route.params;
     const {filename} = route.params
-    
+
     React.useEffect(() => {
         const getStoragedIngredients = async () => {
             try{
@@ -329,7 +329,6 @@ export const Recipe = ({route, navigation}) => {
     }
 
     
-
     const save = async () => {
 
         const filename = `Receta_${datos.id}_${userId}`
@@ -349,6 +348,7 @@ export const Recipe = ({route, navigation}) => {
             }else{
                 
                 if(!overwrite){
+                    
                     FileSystem.makeDirectoryAsync(directory)
                     .then((response)=>console.log("Directorio Creado"))
                     .catch((error)=>console.log(error))
@@ -466,7 +466,8 @@ export const Recipe = ({route, navigation}) => {
         }
     }
     
-    
+  
+
     return(
         <ScrollView style={styles.container}>
             <View style={styles.titleContainer}>
@@ -578,7 +579,7 @@ export const Recipe = ({route, navigation}) => {
                     <Text style={styles.descriptionTitle}>  Instrucciones </Text>
                 </View>
                 <View style={styles.instructionGreyContainer}>
-                    <Carrousel id={id}/>
+                    <Carrousel id={id} multimediaSaved={multimedia} instructionsSaved={instructions}/>
                 </View>
             </View>
 
