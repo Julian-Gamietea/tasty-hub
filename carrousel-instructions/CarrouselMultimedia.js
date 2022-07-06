@@ -4,12 +4,10 @@ import { Text, Image, ScrollView, StyleSheet, View } from "react-native";
 import { Video } from 'expo-av';
 
 export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
-
   const [multimedia, setMultimedia] = useState([]);
   const video = React.useRef(null);
   const MultimediaVideo = ({ item }) => {
-
-    if(multimediaSaved){
+    if(multimediaSaved.length!=0){
       return (
         <Video
           source={{ uri: item}}
@@ -39,12 +37,13 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
   };
 
   const MultimediaImage = ({ item, index }) => {
-    if(multimediaSaved){
+    if(multimediaSaved.length!=0){
+      return(
       <Image
         key={index}
         source={{ uri: item}}
         style={{ width: 300, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
-      />
+      />)
     }
     else{
       return (
@@ -58,32 +57,42 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
   };
 
   const RenderMultimediaItem = ({ item, index }) => {
-    if(multimediaSaved){
-      try{
+    console.log(item)
+    if(multimediaSaved.length != 0){
+      if(isVideo(item)){
         return (
-          <MultimediaVideo key={index} item={item} />
-        )
-      }catch{
-        return (
-          <MultimediaImage item={item} key={index} />
+          <MultimediaVideo  item={item} />
         )
       }
+      else{
+        return (
+          <MultimediaImage item={item}  />
+        )
+      }  
     }else{
       if (item.typeContent.includes("image")) {
         return (
-          <MultimediaImage item={item} key={index} />
+          <MultimediaImage item={item}  />
         )
       }
       else {
         return (
-          <MultimediaVideo key={index} item={item} />
+          <MultimediaVideo  item={item} />
         )
     }
 
   }}
-
+  const isVideo = (multimedia)=>{
+    const multimediaParsed = multimedia.split(".")
+    if(multimediaParsed[3]=="mp4"){
+      return true
+    }
+    else{
+      false
+    }
+  }
   const fetchmultimediaInstruction = (idInstruction) => {
-    if(!multimedia){
+    if(multimediaSaved.length==0){
       const resp = axios.get(`https://tasty-hub.herokuapp.com/api/multimedia/instruction/${idInstruction}`);
       resp.then((multimediaData) => {
         setMultimedia(multimediaData.data)
@@ -100,7 +109,7 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
   return (
     <ScrollView nestedScrollEnabled={true} style={{ width: '100%', maxHeight: 220 }}>
       {multimedia.map((elem, index) => {
-        if (index < multimedia.length) {
+        console.log(elem)
           return (
             <RenderMultimediaItem
               key={index}
@@ -108,8 +117,8 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
             />
           )
         }
-        return null
-      }
+       
+      
       )
       }
     </ScrollView>
@@ -117,24 +126,5 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    alignContent: "center",
-    backgroundColor: '#000',
-  },
-  text: {
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
-    alignContent: "flex-start",
-    fontSize: 20,
-  },
-  itemContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    alignContent: "center",
-  }
-})
+
 export default CarrouselMultimedia

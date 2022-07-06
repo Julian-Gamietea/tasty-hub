@@ -6,14 +6,15 @@ import CarrouselMultimedia from "./CarrouselMultimedia";
 export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
   const [instructions, setInstructions] = useState({});
   const flatRef = useRef(null);
-  const Item = ({ instruction,index }) => {
-    
+console.log(" ")
+    const Item = ({ instruction,index }) => {
+    const multimediaByIndex = getMultimediaByIndex(index)
     return (
       <View style={{justifyContent: 'center', position: 'relative', width: Dimensions.get("screen").width-10, marginVertical: 15 }}>
         <Text style={{ color: "#553900", fontSize: 29, fontWeight: "900", marginHorizontal: 10 ,alignContent: "flex-start", marginBottom: 20 }}>Paso {instruction.numberOfStep}</Text>
         <Text style={{ color: "#df9c16", fontSize: 29, fontWeight: '700', marginHorizontal: 10 , marginBottom: 20 }}>{instruction.title}</Text>
         <Text style={{ textAlign:'left', fontSize: 22, marginHorizontal: 10 }}>{instruction.description}</Text>
-        <CarrouselMultimedia id={instruction.id} multimediaSaved={getMultimediaByIndex(index)} />
+        <CarrouselMultimedia id={instruction.id} multimediaSaved={multimediaByIndex} />
       </View>
     );
   }
@@ -23,10 +24,11 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
   )
 
   const fetchInstructions = async (idRecipe) => {
-    if(!instructionsSaved){
+    if(instructionsSaved.length == 0){
       const resp = await fetch(`https://tasty-hub.herokuapp.com/api/instruction/recipe/${idRecipe}`);
       const data = await resp.json();
       setInstructions(data);
+      console.log("entre")
     }else{
       setInstructions(instructionsSaved)
     }
@@ -49,7 +51,7 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
     )
     return auxArray
   }
-
+  console.log(instructions)
   return (
     <View style={styles.container}>
       <FlatList
