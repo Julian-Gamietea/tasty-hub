@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 30,
         marginTop: 5,
-        alignSelf: 'center'
+        marginLeft: 30
     },
     username: {
         fontFamily: "InterSemiBold"
