@@ -6,7 +6,7 @@ import CarrouselMultimedia from "./CarrouselMultimedia";
 export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
   const [instructions, setInstructions] = useState({});
   const flatRef = useRef(null);
-console.log(" ")
+
     const Item = ({ instruction,index }) => {
     const multimediaByIndex = getMultimediaByIndex(index)
     return (
@@ -37,7 +37,7 @@ console.log(" ")
 
   useEffect(() => {
     fetchInstructions(id);
-  }, []);
+  }, );
 
   const getMultimediaByIndex= (index) =>{
     const auxArray = new Array()
