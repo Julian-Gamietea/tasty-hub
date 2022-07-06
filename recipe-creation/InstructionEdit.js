@@ -421,14 +421,7 @@ export const InstructionEdit = ({ navigation, route }) => {
 
     const overwriteOldRecipe = async (id) => {
         const url = 'https://tasty-hub.herokuapp.com/api'
-        //BORRAR FOTOS
-        // await axios.delete(`${url}/recipePhotos/deleteall/${id}`);
-        //BORRAR MULTIMEDIA
-        // await axios.delete(`${url}/multimedia/deleteall/${id}`);
-        //BORRAR INGQ
         await axios.delete(`${url}/ingredientQuantity?recipeId=${id}`);
-        //BORRAR INSTRUCCIONES
-        // await axios.delete(`${url}/instruction?recipeId=${id}`);
     }
 
     const [loaded] = useFonts({
