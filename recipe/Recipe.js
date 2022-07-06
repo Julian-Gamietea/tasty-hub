@@ -27,7 +27,7 @@ export const Recipe = ({route, navigation}) => {
     React.useEffect(() => {
         const getStoragedIngredients = async () => {
             try{
-                const jsonValue = await AsyncStorage.getItem(`Receta_${id}`)
+                const jsonValue = await AsyncStorage.getItem(`Receta_${id}_${userId}`)
                 return JSON.parse(jsonValue).ingredientes;
             } catch(e) {
                 console.log(e)
@@ -40,7 +40,7 @@ export const Recipe = ({route, navigation}) => {
             try {
                 keys = await AsyncStorage.getAllKeys()
                 for (const key of keys){
-                    if(key ===`Receta_${id}` && recalculated){
+                    if(key ===`Receta_${id}_${userId}` && recalculated){
                         setOverwrite(true)
                         const ingStoraged = await getStoragedIngredients()
                         for (let index = 0; index < ingStoraged.length; index++) {
@@ -332,7 +332,7 @@ export const Recipe = ({route, navigation}) => {
 
     const save = async () => {
 
-        const filename = `Receta_${datos.id}`
+        const filename = `Receta_${datos.id}_${userId}`
         const directory = FileSystem.documentDirectory+filename;
 
         if (!saved){
@@ -347,8 +347,6 @@ export const Recipe = ({route, navigation}) => {
             if(keys.length >= 5){
                 showNotification('Guardadas')
             }else{
-                setSaved(true)
-                showNotification('Recordat')
                 
                 if(!overwrite){
                     FileSystem.makeDirectoryAsync(directory)
@@ -443,7 +441,11 @@ export const Recipe = ({route, navigation}) => {
 
                     
                     AsyncStorage.setItem(filename, JSON.stringify(object))
-                    .then(()=>console.log("Agregado"))
+                    .then(()=>{
+                        console.log("Agregado")
+                        setSaved(true)
+                        showNotification('Recordat')
+                    })
                     .catch((error) => console.log(error))
                     
                 }
@@ -497,11 +499,11 @@ export const Recipe = ({route, navigation}) => {
                 <View style={styles.infoItem1}>
                     <View style={{flexDirection:'row', marginBottom: 5}}>
                         <MaterialIcons name="group" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {factor ? Math.ceil(datos.peopleAmount*factor) : datos.peopleAmount } personas </Text>
+                        <Text style={styles.infoText}> {factor ? Math.ceil(datos.peopleAmount*factor) : Math.ceil(datos.peopleAmount) } personas </Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                         <Feather name="pie-chart" size={24} color="#5D420C" />
-                        <Text style={styles.infoText}> {factor ? Math.ceil(datos.portions*factor) : datos.portions} porciones </Text>
+                        <Text style={styles.infoText}> {factor ? Math.ceil(datos.portions*factor) : Math.ceil(datos.portions)} porciones </Text>
                     </View>  
                 </View>
                 <View style={styles.infoItem2}>
@@ -555,7 +557,7 @@ export const Recipe = ({route, navigation}) => {
                 <View style={{flexDirection:'column'}}>
                     {ingredientes.map((element, index) => {
                         return( 
-                        <Text key={index} style={styles.ingredientItemText}> - {element.quantity.toFixed(2)} {element.unitName} de {element.ingredientName} </Text>);  
+                        <Text key={index} style={styles.ingredientItemText}> - {parseFloat(element.quantity).toFixed(2)} {element.unitName} de {element.ingredientName} </Text>);  
                     })
                     }
                     
