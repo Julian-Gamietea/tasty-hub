@@ -5,7 +5,7 @@ import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system'
 
-export const  SavedRecipeCard = ({ navigation,rating, id, directory, image, duration, ownerUserName, title, userPhoto}) => {
+export const  SavedRecipeCard = ({userId, navigation,rating, id, directory, image, duration, ownerUserName, title, userPhoto}) => {
     const [loaded] = useFonts({
         InterBold: require ('../assets/fonts/Inter-Bold.ttf'),
         InterRegular: require ('../assets/fonts/Inter-Regular.ttf'),
@@ -17,17 +17,20 @@ export const  SavedRecipeCard = ({ navigation,rating, id, directory, image, dura
     }
 
     const handlePressVer = () => {
-        navigation.navigate("Recipe", {filename: `Receta_${id}`})
+        navigation.navigate("Recipe", {filename: `Receta_${id}_${userId}`})
     }
 
     const handlePressEliminar = () => {
-        AsyncStorage.removeItem(`Receta_${id}`)
+        AsyncStorage.removeItem(`Receta_${id}_${userId}`)
         .then((response) => console.log("Eliminado"))
         .catch((error) => console.log(error))
 
         FileSystem.deleteAsync(directory)
-        .then(()=> console.log("directorio eliminado"))
+        .then(()=> {
+            console.log("directorio eliminado")})
         .catch((error)=>console.log(error))  
+
+
     }
 
     return(
