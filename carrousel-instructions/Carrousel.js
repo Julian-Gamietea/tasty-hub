@@ -2,31 +2,28 @@ import { useEffect, useState, useRef } from "react";
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { View } from "react-native";
 import CarrouselMultimedia from "./CarrouselMultimedia";
-import { MaterialIcons } from '@expo/vector-icons';
 
 export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
   const [instructions, setInstructions] = useState({});
-  const [currentIndex, setCurrentIndex] = useState(0);
   const flatRef = useRef(null);
-
-  const Item = ({ instruction, multimedia }) => {
+  const Item = ({ instruction,index }) => {
+    
     return (
-
       <View style={{justifyContent: 'center', position: 'relative', width: Dimensions.get("screen").width-10, marginVertical: 15 }}>
         <Text style={{ color: "#553900", fontSize: 29, fontWeight: "900", marginHorizontal: 10 ,alignContent: "flex-start", marginBottom: 20 }}>Paso {instruction.numberOfStep}</Text>
         <Text style={{ color: "#df9c16", fontSize: 29, fontWeight: '700', marginHorizontal: 10 , marginBottom: 20 }}>{instruction.title}</Text>
         <Text style={{ textAlign:'left', fontSize: 22, marginHorizontal: 10 }}>{instruction.description}</Text>
-        <CarrouselMultimedia id={instruction.id} multimediaSaved={multimedia} />
+        <CarrouselMultimedia id={instruction.id} multimediaSaved={getMultimediaByIndex(index)} />
       </View>
     );
   }
 
-  const renderItem = ({ item, multimediaSaved }) => (
-    <Item instruction={item} multimedia={multimediaSaved} />
-  );
+  const renderItem = ({ item,index }) => (
+    <Item instruction={item} index={index} />
+  )
 
   const fetchInstructions = async (idRecipe) => {
-    if(!multimediaSaved && !instructionsSaved){
+    if(!instructionsSaved){
       const resp = await fetch(`https://tasty-hub.herokuapp.com/api/instruction/recipe/${idRecipe}`);
       const data = await resp.json();
       setInstructions(data);
@@ -40,6 +37,18 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
     fetchInstructions(id);
   }, []);
 
+  const getMultimediaByIndex= (index) =>{
+    const auxArray = new Array()
+    multimediaSaved.map((elem) =>{ elem.map((multimedia)  =>  {
+          const multimediaSplit=multimedia.split("/")
+          if(multimediaSplit[11].charAt(multimediaSplit[11].length-1)==index){
+            auxArray.push(multimedia)
+          }
+        })
+      }
+    )
+    return auxArray
+  }
 
   return (
     <View style={styles.container}>
@@ -50,7 +59,7 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
         horizontal
         pagingEnabled
         ref={(node) => (flatRef.current = node)}
-        renderItem={(item, index)=>renderItem(item, multimediaSaved[index])}
+        renderItem={(item,index)=>renderItem(item,index)}
       />
 
     </View>

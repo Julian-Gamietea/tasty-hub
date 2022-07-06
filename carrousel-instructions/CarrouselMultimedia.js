@@ -1,53 +1,86 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Text, Image, ScrollView, StyleSheet } from "react-native";
+import { Text, Image, ScrollView, StyleSheet, View } from "react-native";
 import { Video } from 'expo-av';
 
-
-
-
-
 export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
+
   const [multimedia, setMultimedia] = useState([]);
-
   const video = React.useRef(null);
-
   const MultimediaVideo = ({ item }) => {
-    return (
-      <Video
-        source={{ uri: item.urlContent }}
-        ref={video}
-        useNativeControls
-        resizeMode="contain"
-        isLooping
-        style={{ width: 340, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
-      />
 
-    )
+    if(multimediaSaved){
+      return (
+        <Video
+          source={{ uri: item}}
+          ref={video}
+          useNativeControls
+          resizeMode="contain"
+          isLooping
+          style={{ width: 340, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
+        />
+
+      )
+    }else{
+      return (
+        <Video
+          source={{ uri: item.urlContent }}
+          ref={video}
+          useNativeControls
+          resizeMode="contain"
+          isLooping
+          style={{ width: 340, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
+        />
+  
+      )
+    }
+
 
   };
 
   const MultimediaImage = ({ item, index }) => {
-    return (
+    if(multimediaSaved){
       <Image
         key={index}
-        source={{ uri: item.urlContent }}
+        source={{ uri: item}}
         style={{ width: 300, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
       />
-    )
+    }
+    else{
+      return (
+        <Image
+          key={index}
+          source={{ uri: item.urlContent }}
+          style={{ width: 300, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
+        />
+      )
+  }
   };
+
   const RenderMultimediaItem = ({ item, index }) => {
-    if (item.typeContent.includes("image")) {
-      return (
-        <MultimediaImage item={item} key={index} />
-      )
+    if(multimediaSaved){
+      try{
+        return (
+          <MultimediaVideo key={index} item={item} />
+        )
+      }catch{
+        return (
+          <MultimediaImage item={item} key={index} />
+        )
+      }
+    }else{
+      if (item.typeContent.includes("image")) {
+        return (
+          <MultimediaImage item={item} key={index} />
+        )
+      }
+      else {
+        return (
+          <MultimediaVideo key={index} item={item} />
+        )
     }
-    else {
-      return (
-        <MultimediaVideo key={index} item={item} />
-      )
-    }
-  };
+
+  }}
 
   const fetchmultimediaInstruction = (idInstruction) => {
     if(!multimedia){
@@ -65,9 +98,7 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
   }, []);
 
   return (
-
     <ScrollView nestedScrollEnabled={true} style={{ width: '100%', maxHeight: 220 }}>
-
       {multimedia.map((elem, index) => {
         if (index < multimedia.length) {
           return (
@@ -81,8 +112,6 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
       }
       )
       }
-
-
     </ScrollView>
 
   );
