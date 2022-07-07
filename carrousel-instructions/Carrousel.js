@@ -10,11 +10,13 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
     const Item = ({ instruction,index }) => {
     const multimediaByIndex = getMultimediaByIndex(index)
     return (
-      <View style={{justifyContent: 'center', position: 'relative', width: Dimensions.get("screen").width-10, marginVertical: 15 }}>
-        <Text style={{ color: "#553900", fontSize: 29, fontWeight: "900", marginHorizontal: 10 ,alignContent: "flex-start", marginBottom: 20 }}>Paso {instruction.numberOfStep}</Text>
-        <Text style={{ color: "#df9c16", fontSize: 29, fontWeight: '700', marginHorizontal: 10 , marginBottom: 20 }}>{instruction.title}</Text>
-        <Text style={{ textAlign:'left', fontSize: 22, marginHorizontal: 10 }}>{instruction.description}</Text>
-        <CarrouselMultimedia id={instruction.id} multimediaSaved={multimediaByIndex} />
+      <View style={styles.carrouselContainer}>
+        <Text style={styles.step}>Paso {instruction.numberOfStep}</Text>
+        <Text style={styles.title}>{instruction.title}</Text>
+        <Text style={styles.description}>{instruction.description}</Text>
+        <View style={styles.multimedia}>
+          <CarrouselMultimedia id={instruction.id} multimediaSaved={multimediaByIndex} />
+        </View>
       </View>
     );
   }
@@ -69,10 +71,8 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
 }
 
 const styles = StyleSheet.create({
-  flatListStyle: {
-    alignContent: "center"
-  }
-  , container: {
+
+  container: {
     flexWrap:"wrap",
     alignItems: "center",
     justifyContent: "center",
@@ -82,17 +82,32 @@ const styles = StyleSheet.create({
     borderRadius:10,
     marginHorizontal:5
   },
-  text: {
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
-    alignContent: "flex-start",
-    fontSize: 20,
-  
+  carrouselContainer:{
+    height: '90%',
+    width:Dimensions.get('screen').width-10
   },
-  itemContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    alignContent: "center",
+  step:{
+    flex:1,
+    color: "#553900", 
+    fontSize: 29, 
+    fontWeight: "900",
+    marginLeft: 15
+  },
+  title:{
+    flex:1,
+    color: "#df9c16", 
+    fontSize: 29, 
+    fontWeight: '700',
+    marginLeft: 15
+  },
+  description:{
+    textAlign:'left', 
+    fontSize: 22,
+    marginLeft: 15,
+    height: 100
+  },
+  multimedia: {
+    flex: 4
   }
 })
 export default Carrousel
