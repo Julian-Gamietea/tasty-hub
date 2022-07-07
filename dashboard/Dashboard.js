@@ -74,12 +74,16 @@ export const Dashboard = ({ route, navigation }) => {
         }
     }, [user, focus, netInfo])
 
-    React.useEffect(() => {
-        if (!netInfo.isConnected && ignoredFirst) {
-            navigation.navigate('NoInternet');
-        }
-        setIgnoredFirst(true);
-    }, [netInfo])
+    // React.useEffect(() => {
+    //     if (netInfo.type === 'none' && ignoredFirst) {
+    //         setTimeout(() => {
+    //             if (netInfo.type === 'none') {
+    //                 navigation.navigate('NoInternet');
+    //             }
+    //         }, 5000);
+    //     }
+    //     setIgnoredFirst(true);
+    // }, [netInfo])
 
     const onRefresh = () => {
         setIsFetching(true);

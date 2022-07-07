@@ -47,9 +47,7 @@ export const CreateRecipeName = ({ navigation, route }) => {
 			} });
 		} else {
 			if (recipeName) {
-				if (cellular) {
-					navigation.navigate('RecipeForm', {recipeTitle: recipeName, cellular: true});
-				} else {
+
 					try {
 						const res = await axios.get(`https://tasty-hub.herokuapp.com/api/recipes?ownerId=${user.id}`);
 						if (res.data.length > 0) {
@@ -57,15 +55,15 @@ export const CreateRecipeName = ({ navigation, route }) => {
 							if (aux.length > 0) {
 								navigation.navigate('RecipeNameExists', { recipeName: recipeName, recipe: aux[0]});
 							} else {
-								navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: false });
+								navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: cellular ? true : false });
 							}
 						} else {
-							navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: false });
+							navigation.navigate('RecipeForm', { recipeTitle: recipeName, cellular: cellular ? true : false });
 						}
 					} catch (e) {
 						console.log(e);
 					}
-				}
+
 			} else {
 				setIsValid(false);
 			}
@@ -134,8 +132,10 @@ const styles = StyleSheet.create({
 	input: {
 		borderWidth: 1,
 		borderRadius: 30,
-		paddingHorizontal: 140,
-		paddingVertical: 10
+		paddingVertical: 10,
+		maxWidth: 320,
+		minWidth: 320,
+		textAlign: 'center'
 	},
 	nextArrow: {
 		width: 120,

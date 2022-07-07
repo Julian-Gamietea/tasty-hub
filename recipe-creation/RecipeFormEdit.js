@@ -204,6 +204,33 @@ export const RecipeFormEdit = ({ navigation, route }) => {
 			<Modal
 				animationType="slide"
 				transparent={true}
+				visible={modalVisible}
+				onRequestClose={() => {
+					Alert.alert("Modal has been closed.");
+					setModalVisible(!modalVisible);
+				}}
+			>
+				<View style={styles.centeredView}>
+					<View style={styles.modalView}>
+						<Text style={styles.modalText}>No puede avanzar debido a los siguientes problemas:</Text>
+						{errors.map((errormsg, index) => (
+							<Text style={{textAlign: 'center', marginBottom: 15}}>{index + 1}. {errormsg}</Text>
+						))}
+						<Pressable
+							style={[styles.button, styles.buttonClose]}
+							onPress={() => {
+								setModalVisible(!modalVisible);
+								setErrors([]);
+							}}
+						>
+							<Text style={styles.textStyle}>Entendido</Text>
+						</Pressable>
+					</View>
+				</View>
+			</Modal>
+			<Modal
+				animationType="slide"
+				transparent={true}
 				visible={networkModalVisible}
 				onRequestClose={() => {
 					Alert.alert("Modal has been closed.");
@@ -413,10 +440,10 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		color: '#553900'
 	},
-	button: {
-		marginTop: 50,
-		width: 300
-	},
+	// button: {
+	// 	marginTop: 50,
+	// 	width: 300
+	// },
 	menu: {
 		alignSelf: 'flex-start',
 		marginLeft: 19
@@ -459,5 +486,47 @@ const styles = StyleSheet.create({
 		color: 'white',
 		marginTop: 2,
 		marginRight: 2
+	},
+	centeredView: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		marginTop: 22
+	},
+	modalView: {
+		margin: 20,
+		backgroundColor: "white",
+		borderRadius: 20,
+		padding: 35,
+		alignItems: "center",
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+		elevation: 5
+	},
+	button: {
+		borderRadius: 5,
+		padding: 10,
+		paddingHorizontal: 20
+	},
+	buttonOpen: {
+		backgroundColor: "#F194FF",
+	},
+	buttonClose: {
+		backgroundColor: "#F3A200",
+	},
+	textStyle: {
+		color: "white",
+		fontWeight: "bold",
+		textAlign: "center"
+	},
+	modalText: {
+		marginBottom: 15,
+		textAlign: "center",
+		fontFamily: 'InterSemiBold'
 	}
 });

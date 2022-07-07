@@ -531,7 +531,7 @@ export const InstructionEdit = ({ navigation, route }) => {
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Se detectó que ya no se encuentra en una red sin cargo.Continuar con esta red puede generar costos adicionales.{'\n'}¿Desea continuar?</Text>
+                        <Text style={styles.modalText}>Se detectó que ya no se encuentra en una red sin cargo. Continuar con esta red puede generar costos adicionales.{'\n'}¿Desea continuar?</Text>
                         <Text style={{textAlign: 'center', marginBottom: 15}}>(La receta no se subirá hasta que se disponga de una red sin cargo)</Text>
                         <View style={{
                             flexDirection: 'row',
@@ -785,7 +785,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
         elevation: 2,
-        width: 70,
+        // width: 70,
 
     },
     buttonOpen: {

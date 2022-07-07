@@ -723,7 +723,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
         elevation: 2,
-        width: 70,
+        // width: 70,
 
     },
     buttonOpen: {
