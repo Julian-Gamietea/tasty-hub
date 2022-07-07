@@ -19,6 +19,7 @@ export const IngredientScreen = ({navigation, recipeId, userId}) => {
 		const getData = () => {
 			axios.get('https://tasty-hub.herokuapp.com/api/unit')
 			.then((response) => {
+				console.log(response.data)
 				setUnit(response.data)
 			})
 			.catch((error) => console.log(error))
