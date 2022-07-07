@@ -97,6 +97,13 @@ function ProfileTabStack() {
       <Stack.Screen name="EditProfile" component={EditProfile}/>
       <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
       <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+
+      <Stack.Screen
+          name="RecipeTabStack"
+          component={RecipeTabStack}
+          options={{ headerShown: false }}
+        />
+
         {/*<Stack.Screen name="NoInternet" component={NoInternet}/>*/}
 
     </Stack.Navigator>
@@ -136,6 +143,13 @@ function SavedTabStack() {
       <Stack.Screen name="EditProfile" component={EditProfile}/>
       <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
       <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+
+      <Stack.Screen
+          name="RecipeTabStack"
+          component={RecipeTabStack}
+          options={{ headerShown: false }}
+        />
+
         {/*<Stack.Screen name="NoInternet" component={NoInternet}/>*/}
 
 
