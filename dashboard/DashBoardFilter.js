@@ -263,6 +263,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
             </Picker>
         
             <TextInput
+              keyboardType="numeric"
               style={styles.durationInput}
               onChangeText={onChangeText}
               value={duration}
