@@ -74,7 +74,6 @@ export const Recipe = ({route, navigation}) => {
     
                 axios(config)
                 .then(function (response) {
-                    setLoading(true)
                     // SETTING THE RECIPE INFORMATION 
                     setDatos(response.data)
                     array.push(response.data.mainPhoto)
@@ -107,7 +106,6 @@ export const Recipe = ({route, navigation}) => {
                         })
                     }else{
                         setIngredientes(recalculated)
-                        setLoading(false)
                     }
                     
     
@@ -170,7 +168,6 @@ export const Recipe = ({route, navigation}) => {
                     response.data.forEach(element => {
                         array.push(element.photoUrl)
                     });
-                    setLoading(false)
                 })
                 .catch((error)=>
                 
