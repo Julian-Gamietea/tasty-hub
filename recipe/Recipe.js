@@ -559,6 +559,7 @@ export const Recipe = ({route, navigation}) => {
                     {recalculated && <TouchableOpacity 
                         onPress={()=> save()}  
                         style={styles.profileButton}
+                        disabled={saved}
                     >
                         {saved
                             ? <Ionicons name="download" size={24} color="white" /> 
