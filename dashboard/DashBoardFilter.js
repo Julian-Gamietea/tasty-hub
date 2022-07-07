@@ -15,13 +15,15 @@ export const DashBoardFilter = ({ route, navigation }) => {
   const [includedIngredientElems, setIncludedIngredientElems] = useState(new Set())
   const [excludedIngredientElems, setExcludedIngredientElems] = useState(new Set())
   const [selectedValue, setSelectedValue] = React.useState('Duracion');
-  const [duration, setDuration] = useState(null)
+  const [duration, setDuration] = useState()
   const [filteredRecipes,setFilterRecipes] = useState([])
+  const [typed,setTyped]=useState("")
+  
   const onChangeText = (text) => {
     setDuration(text)
-    if(duration!=null && duration.length==0){
-      setDuration(null)
-    }
+    if(!typed){
+      setTyped(true)
+    }    
   }
   
   const handleOnPressIncludeIngredient = (ingredient) => {
@@ -160,8 +162,9 @@ export const DashBoardFilter = ({ route, navigation }) => {
     fetchIngredients();
   }, []);
 
-  const submit = async () => {
-    if(selectedValue=='Duracion' && duration!=null  ){
+  const submit = async () => { 
+    
+    if(selectedValue=='Duracion' && duration.length>0){
       Alert.alert("Error!", "Estas ingresando una cantidad de tiempo pero no seleccionando como buscar", [
         {
           text: "Cancel",
@@ -180,6 +183,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
     )
     navigation.navigate("SearchResults",{navigation:navigation,recipeList:filteredRecipes})
     setFilterRecipes([])
+    setStarCount(0)
     
   }
   const filterRecipe =  async (recipe) =>{
@@ -187,13 +191,13 @@ export const DashBoardFilter = ({ route, navigation }) => {
     if(starCount == 0 && isValidDuration(recipe)){
       filteredRecipes.push(recipe)
     }
-    else if(duration==null && average==starCount){
+    else if(duration.length==0  && average==starCount){
       filteredRecipes.push(recipe)
     }
     else if(isValidDuration(recipe) && average==starCount){
       filteredRecipes.push(recipe)
     }
-    else if( duration==null   && starCount == 0){
+    else if( duration.length==0    && starCount == 0){
       filteredRecipes.push(recipe)
     }
 
@@ -201,13 +205,13 @@ export const DashBoardFilter = ({ route, navigation }) => {
 
   const isValidDuration = (recipe) =>{
     if(selectedValue == '='){
-      return recipe.duration==duration
+      return recipe.duration==parseInt(duration)
     }
     else if(selectedValue == '<'){
-      return recipe.duration<duration
+      return recipe.duration< parseInt(duration)
     }
     else if(selectedValue == '>'){
-      return recipe.duration>duration
+      return recipe.duration>parseInt(duration)
     }
     else{
       return false;
@@ -280,7 +284,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
             maxStars={5}
             rating={starCount}
             selectedStar={(rating) => setStarCount(rating)}
-            fullStarColor={'#fff'}
+            fullStarColor={'#553900'}
             emptyStarColor={'#EFD87B'}
             starSize={52}
           />
