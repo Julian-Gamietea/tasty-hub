@@ -84,27 +84,28 @@ const styles = StyleSheet.create({
   },
   carrouselContainer:{
     height: '90%',
-    width:Dimensions.get('screen').width-10
+    width:Dimensions.get('screen').width-25
   },
   step:{
     flex:1,
     color: "#553900", 
     fontSize: 29, 
     fontWeight: "900",
-    marginLeft: 15
+    marginHorizontal: 15,
   },
   title:{
     flex:1,
     color: "#df9c16", 
     fontSize: 29, 
     fontWeight: '700',
-    marginLeft: 15
+    marginHorizontal: 15,
+    
   },
   description:{
     textAlign:'left', 
     fontSize: 22,
-    marginLeft: 15,
-    height: 100
+    marginHorizontal: 15,
+    height: 105
   },
   multimedia: {
     flex: 4
