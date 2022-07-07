@@ -323,7 +323,7 @@ export const RecipeForm = ({navigation, route}) => {
                         <TouchableOpacity onPress={() => navigation.navigate('DefineType', {
                             state: recipeState,
                             origin: 'RecipeForm'
-                        })} style={[styles.addButton, {minWidth: 110, maxWidth: 140}]}>
+                        })} style={[styles.addButton,typeId ? {minWidth: 110, maxWidth: 140} : {width: 110}]}>
                             <MaterialIcons name={typeId ? "edit" : "add-circle-outline"} size={24} style={styles.iconButton}/>
                             <Text style={styles.textButton}>{typeId ? 'Modificar' : 'Añadir'}</Text>
                         </TouchableOpacity>
@@ -349,7 +349,7 @@ export const RecipeForm = ({navigation, route}) => {
                         <TouchableOpacity onPress={() => navigation.navigate('DefineIngridient', {
                             state: recipeState,
                             origin: 'RecipeForm'
-                        })} style={styles.addButton}>
+                        })} style={[styles.addButton, {width: 110}]}>
                             <MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton}/>
                             <Text style={styles.textButton}>Añadir</Text>
                         </TouchableOpacity>
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#F3A200",
         flexDirection: 'row',
         justifyContent: 'space-around',
-        width: 110,
+        // width: 110,
         borderRadius: 25,
         paddingVertical: 5,
         paddingHorizontal: 10

@@ -329,9 +329,9 @@ export const RecipeFormEdit = ({ navigation, route }) => {
 
 					<View style={styles.margin}>
 						<Text style={styles.description}>Tipo de plato</Text>
-						<TouchableOpacity onPress={() => navigation.navigate('DefineType', { state: recipeState, origin: 'RecipeFormEdit' })} style={styles.addButton}>
-							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
-							<Text style={styles.textButton}>Añadir</Text>
+						<TouchableOpacity onPress={() => navigation.navigate('DefineType', { state: recipeState, origin: 'RecipeFormEdit' })} style={[styles.addButton,typeId ? {minWidth: 110, maxWidth: 140} : {width: 110}]}>
+							<MaterialIcons name={typeId ? "edit" : "add-circle-outline"} size={24} style={styles.iconButton}/>
+							<Text style={styles.textButton}>{typeId ? 'Modificar' : 'Añadir'}</Text>
 						</TouchableOpacity>
 						{typeId &&
 							<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
@@ -347,7 +347,7 @@ export const RecipeFormEdit = ({ navigation, route }) => {
 					</View>
 					<View style={styles.margin}>
 						<Text style={styles.description}>Ingredientes</Text>
-						<TouchableOpacity onPress={() => navigation.navigate('DefineIngridient', { state: recipeState, origin: 'RecipeFormEdit' })} style={styles.addButton}>
+						<TouchableOpacity onPress={() => navigation.navigate('DefineIngridient', { state: recipeState, origin: 'RecipeFormEdit' })} style={[styles.addButton, {width: 110}]}>
 							<MaterialIcons name="add-circle-outline" size={24} style={styles.iconButton} />
 							<Text style={styles.textButton}>Añadir</Text>
 						</TouchableOpacity>
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#F3A200",
 		flexDirection: 'row',
 		justifyContent: 'space-around',
-		width: 110,
+		// width: 110,
 		borderRadius: 25,
 		paddingVertical: 5,
 		paddingHorizontal: 10
