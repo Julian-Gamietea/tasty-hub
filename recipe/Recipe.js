@@ -123,7 +123,7 @@ export const Recipe = ({route, navigation}) => {
                             // SETTING THE RECIPE RATING
     
                             if(!isNaN(response.data)){
-                                setStarCount2(response.data)
+                                setStarCount2(Math.floor(response.data))
                             }
                         
                         })
@@ -275,7 +275,8 @@ export const Recipe = ({route, navigation}) => {
             .then(function () {
                 setModalVisible(!modalVisible)
                 setComments("");
-                setStarCount(0)       
+                setStarCount(0)
+                setHasRating(true)       
             })
             .catch(function (error) {
                 console.log("ERROR 7 post " + error);
@@ -875,7 +876,9 @@ const styles = StyleSheet.create({
         marginTop: 10,
         backgroundColor: '#E8E8E8',
         borderRadius: 20,
-        // height: 550,
+        height: 450,
+        marginLeft:8,
+        marginRight: 8
     },
 
     calificationText:{

@@ -15,7 +15,7 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
           useNativeControls
           resizeMode="contain"
           isLooping
-          style={{ width: 340, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
+          style={{ width: 340, height: 200, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
         />
 
       )
@@ -27,7 +27,7 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
           useNativeControls
           resizeMode="contain"
           isLooping
-          style={{ width: 340, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
+          style={{ width: 340, height: 200, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
         />
   
       )
@@ -42,7 +42,7 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
       <Image
         key={index}
         source={{ uri: item}}
-        style={{ width: 300, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
+        style={{ width: 300, height: 200, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
       />)
     }
     else{
@@ -50,7 +50,7 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
         <Image
           key={index}
           source={{ uri: item.urlContent }}
-          style={{ width: 300, height: 200, marginLeft: 10, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
+          style={{ width: 300, height: 200, marginTop: 8, borderRadius: 10, alignSelf: 'center' }}
         />
       )
   }
