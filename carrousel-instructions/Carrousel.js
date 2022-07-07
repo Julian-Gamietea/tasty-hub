@@ -39,7 +39,7 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
 
   useEffect(() => {
     fetchInstructions(id);
-  }, );
+  },[]);
 
   const getMultimediaByIndex= (index) =>{
     const auxArray = new Array()
@@ -108,7 +108,8 @@ const styles = StyleSheet.create({
     height: 105
   },
   multimedia: {
-    flex: 4
+    flex: 4,
+    marginRight: 5
   }
 })
 export default Carrousel
