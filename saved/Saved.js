@@ -62,7 +62,7 @@ export const Saved = ({navigation}) => {
                     {
                         recipes.map((element,index) => {
                             return(
-                                <View key={index} style={{height: 670, width: '100%'}}>
+                                <View key={index} style={{height: 614, width: '100%'}}>
                                     <SavedRecipeCard 
                                         userId={idUser}
                                         navigation={navigation}

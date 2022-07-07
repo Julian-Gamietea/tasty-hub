@@ -409,8 +409,8 @@ export const Recipe = ({route, navigation}) => {
                                 
                                 for (const multi of data){
                                     try{
-                                        await FileSystem.downloadAsync(multi.urlContent, instructionDir+'multimedia_'+index+'.'+multi.extension)
-                                        subMultimedia.push(instructionDir+'multimedia_'+index+'.'+multi.extension)
+                                        await FileSystem.downloadAsync(multi.urlContent, instructionDir+'multimedia'+multi.id+'_'+index+'.'+multi.extension)
+                                        subMultimedia.push(instructionDir+'multimedia'+multi.id+'_'+index+'.'+multi.extension)
                                         //console.log(instructionDir+'multimedia_'+index+'.'+multi.extension)
                                     }catch(e){
                                         console.log(e)
