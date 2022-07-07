@@ -146,6 +146,8 @@ export const Overwrite = async (userId) => {
 
             //BORRAR FOTOS
             await axios.delete(`${url}/recipePhotos/deleteall/${auxRecipe.id}`);
+            //BORRAR FOTOS PRINCIPALES
+            await axios.delete(`${url}/recipes/mainphoto/${auxRecipe.id}`);
             //BORRAR MULTIMEDIA
             await axios.delete(`${url}/multimedia/deleteall/${auxRecipe.id}`);
             //BORRAR INGQ

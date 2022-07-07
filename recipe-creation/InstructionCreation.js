@@ -412,6 +412,8 @@ export const InstructionCreation = ({ navigation, route }) => {
         const url = 'https://tasty-hub.herokuapp.com/api'
 		//BORRAR FOTOS
 		await axios.delete(`${url}/recipePhotos/deleteall/${id}`);
+        //BORRAR FOTO PRINCIPAL
+        await axios.delete(`${url}/recipes/mainphoto/${id}`);
 		//BORRAR MULTIMEDIA
         await axios.delete(`${url}/multimedia/deleteall/${id}`);
 		//BORRAR INGQ
