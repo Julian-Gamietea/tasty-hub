@@ -4,6 +4,7 @@ import { Alert, Dimensions, FlatList,  ScrollView,  StyleSheet, Text, TextInput,
 import StarRating from "react-native-star-rating";
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
+import { registerAsset } from "react-native-web/dist/cjs/modules/AssetRegistry";
 export const DashBoardFilter = ({ route, navigation }) => {
   const [ingredients, setIngredients] = useState([]);
   const [types, setTypes] = useState([]);
@@ -169,12 +170,13 @@ export const DashBoardFilter = ({ route, navigation }) => {
   }, []);
 
   const submit = async () => { 
+   
     /*if(typed){
       if(selectedValue=='Duracion' && duration.length>0){
         Alert.alert("Error!", "Estas ingresando una cantidad de tiempo pero no seleccionando como buscar", [
           {
             text: "Cancel",
-            onPress: () => null,
+            onPress: () => restart(),
             style: "cancel"
           },
          
@@ -182,7 +184,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
       };
   
     }else{*/
-      const recipes = await fetchRecipes()
+    const recipes = await fetchRecipes()
       recipes.map((recipe)=>
         filterRecipe(recipe
         )
@@ -193,10 +195,10 @@ export const DashBoardFilter = ({ route, navigation }) => {
       setDuration(null)
       setSelectedValue('Duracion')
 
-  }
+  
+}
   const filterRecipe =  async (recipe) =>{
     const average = await getAverageOfRating(recipe.id)
-    console.log(duration.length == 0)
       if(starCount == 0 && isValidDuration(recipe)){
         filteredRecipes.push(recipe)
       }
