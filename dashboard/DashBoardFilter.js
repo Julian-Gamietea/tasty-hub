@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Alert, FlatList,  ScrollView,  StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, Dimensions, FlatList,  ScrollView,  StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import StarRating from "react-native-star-rating";
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -124,14 +124,14 @@ export const DashBoardFilter = ({ route, navigation }) => {
     if (item.item.name) {
       return (
         <TouchableOpacity {...touchProps} onPress={() => handleIngredientPress(isPress,included,item.item)} underlayColor="#DDDDDD" >
-          <Text style= {styles.buttonText}>{item.item.name}</Text>
+          <Text style= {!isPress ? styles.buttonText:styles.pressedButtonText}>{item.item.name}</Text>
         </TouchableOpacity>
       )
     }
     else {
       return (
         <TouchableOpacity {...touchProps} onPress={() => handleTypePress(isPress,item.item)} underlayColor="#DDDDDD" >
-          <Text style={styles.buttonText}>{item.item.description}</Text>
+          <Text style= {!isPress ? styles.buttonText:styles.pressedButtonText}>{item.item.description}</Text>
         </TouchableOpacity>
       )
     }
@@ -254,13 +254,14 @@ export const DashBoardFilter = ({ route, navigation }) => {
       <View style={styles.dropdownContainer}>
         <Text style={styles.listTitle}>Tiempo</Text>
         <View style={styles.pickerContainer}>
-      
-            <Picker style={styles.picker} selectedValue={selectedValue} onValueChange={(value) => setSelectedValue(value)}>
-              <Picker.Item style={styles.pickerItem} label='Seleccione' value=''/>
-              <Picker.Item style={styles.pickerItem} label='Igual a' value='=' />
-              <Picker.Item style={styles.pickerItem} label='Menor a' value='<' />
-              <Picker.Item style={styles.pickerItem} label='Mayor a' value='>' />
+          <View style={styles.pickerRoundedContainer}>
+            <Picker style={styles.picker}   label='Seleccione' selectedValue={selectedValue} onValueChange={(value) => setSelectedValue(value)}>
+              <Picker.Item style={styles.pickerItem}  label='Seleccione' value=''/>
+              <Picker.Item style={styles.pickerItem}  label='Igual a' value='=' />
+              <Picker.Item style={styles.pickerItem}  label='Menor a' value='<' />
+              <Picker.Item style={styles.pickerItem}  label='Mayor a' value='>' />
             </Picker>
+          </View>
         
             <TextInput
               keyboardType="numeric"
@@ -268,14 +269,17 @@ export const DashBoardFilter = ({ route, navigation }) => {
               onChangeText={onChangeText}
               value={duration}
               maxLength={3}
+              textAlign="center"
             />
             <Text style={styles.inputText}>Min</Text>
         </View>
 
       </View>
       <View style={styles.ratingContainer}>
+        <View style={{marginLeft:"5%"}}>
         <Text style={styles.listTitle}>Calificacion</Text>
-        <View style={{marginLeft:"12%"}}>
+        </View>
+         <View style={{width:Dimensions.get("screen").width,justifyContent:"center",alignItems:"center"}}>
           <StarRating
             disabled={false}
             emptyStar={'star-fill'}
@@ -288,13 +292,14 @@ export const DashBoardFilter = ({ route, navigation }) => {
             fullStarColor={'#553900'}
             emptyStarColor={'#EFD87B'}
             starSize={52}
+            starStyle={{marginHorizontal:"1%"}}
           />
-        </View>
+      </View> 
        
       </View>
       <View >
-        <TouchableOpacity onPress={() => submit()} style={{alignSelf:"center",marginTop:"3%"}}>
-          <MaterialIcons name="done" size={50} color="white" />
+        <TouchableOpacity onPress={() => submit()} style={{alignSelf:"center",justifyContent:"center",marginTop:"1%"}}>
+          <MaterialIcons name="done" size={50} color="white"  />
           <Text style={styles.acceptanceText}>Aceptar</Text>
         </TouchableOpacity>
       </View>
@@ -310,6 +315,7 @@ const styles = StyleSheet.create({
 
   },
   title: {
+    fontFamily:"InterSemiBold",
     color: "#FFFFFF",
     fontWeight: "600",
     fontSize: 36,
@@ -317,27 +323,31 @@ const styles = StyleSheet.create({
     alignSelf:"center"
   },
   listTitle: {
+    fontFamily:"InterSemiBold",
     alignSelf: "flex-start",
     fontWeight: "600",
     color: "#ffffff",
     fontSize: 28,
     alignSelf: "flex-start",
-    marginBottom: "2%"
+    marginBottom: "2%",
 
   },
   inputText:{
+    fontFamily:"InterSemiBold",
     alignSelf: "center",
     fontWeight: "600",
     color: "#ffffff",
-    fontSize: 16,
+    fontSize: 18,
     marginLeft:"2%"
 
   },
   acceptanceText:{
+    fontFamily:"InterSemiBold",
     alignSelf: "center",
     fontWeight: "600",
     color: "#ffffff",
     fontSize: 16,
+    marginRight:"2%"
   },
   dropdownContainer: {
     justifyContent: "flex-start",
@@ -350,19 +360,26 @@ const styles = StyleSheet.create({
     marginVertical:"1%"
   },
   ratingContainer: {
- 
-    justifyContent: "flex-start",
-    alignSelf: "flex-start",
-    marginLeft: "3%",
-    marginTop:"6%",
+    width:"75%",
+    marginTop:"4%",
     
   },
+  pressedButtonText:{
+    alignSelf:"center",
+    fontFamily:"InterSemiBold",
+    color:"white",
+    fontSize:16,
+    fontWeight:"300"
+  },
   buttonText: {
-    alignSelf: "center"
+    fontFamily:"InterSemiBold",
+    alignSelf: "center",
+    fontSize:16,
+    fontWeight:"300"
   },
   btnNormal: {
     padding:10,
-    backgroundColor: "#f7eab5",
+    backgroundColor: "#F7EAB5",
     marginHorizontal: 3,
     borderRadius: 8,
     minWidth:80
@@ -375,24 +392,33 @@ const styles = StyleSheet.create({
     minWidth:80
   },
   pickerItem: {
-    borderRadius: 100,
+    fontFamily:"InterSemiBold",
   },
   picker: {
-    width:"50%",
-    marginHorizontal: "2%",
+    fontFamily:"InterBold",
+    width:"70%",
+    marginLeft:"12%",
+    
     color: '#11110D',
     backgroundColor: "#F7EAB5",
+    
   },
   pickerContainer: {
     flexDirection: "row",
-  
     borderRadius: 8,
-    marginRight: "2%"
+  },
+  pickerRoundedContainer: {
+    justifyContent:"center",
+    borderRadius: 20,
+    flexDirection: "row",
+    backgroundColor: "#F7EAB5",
+    width:200
+    
   },
   durationInput: {
     height: "100%",
     width: 89,
-    borderRadius: 8,
+    borderRadius: 20,
     backgroundColor: "#F7EAB5",
     alignSelf:"center",
     marginLeft:"2%"
