@@ -174,8 +174,6 @@ export const Recipe = ({route, navigation}) => {
                 
                  console.log("ERROR 6" + error)
                  )
-    
-                
                 setRecipeImages(array)
                 
     
