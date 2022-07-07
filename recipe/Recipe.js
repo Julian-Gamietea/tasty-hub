@@ -107,6 +107,7 @@ export const Recipe = ({route, navigation}) => {
                         })
                     }else{
                         setIngredientes(recalculated)
+                        setLoading(false)
                     }
                     
     
@@ -152,11 +153,12 @@ export const Recipe = ({route, navigation}) => {
     
                 axios.get(`https://tasty-hub.herokuapp.com/api/rating/user?recipeId=${id}&userId=${userId}`)
                 .then((response)=>{
+                    setHasRating(true)
                     setStarCount(response.data.rating)
                     setComments(response.data.comments)
-                
                 })
                 .catch(()=>{
+                    setHasRating(false)
                     // Dont send any error because its ok if the user hasnt got a recipe rating in this recipe
                 })
                 
@@ -174,8 +176,6 @@ export const Recipe = ({route, navigation}) => {
                 
                  console.log("ERROR 6" + error)
                  )
-    
-                
                 setRecipeImages(array)
                 
     
@@ -208,6 +208,7 @@ export const Recipe = ({route, navigation}) => {
         
     },[focus, recalculated]);
 
+    const [hasRating, setHasRating] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
     const focus = useIsFocused();
     const [overwrite, setOverwrite] = React.useState(false)
@@ -220,7 +221,7 @@ export const Recipe = ({route, navigation}) => {
     const [ingredientes, setIngredientes] = React.useState([])
     const [comments, setComments] = React.useState("")
     const [modalVisible, setModalVisible] = React.useState(false);
-    const [starCount, setStarCount] = React.useState(0);
+    const [starCount, setStarCount] = React.useState(null);
     const [starCount2, setStarCount2] = React.useState(0);
     const [addedFavorites, setAddedFavorites] = React.useState(false)
     const [notificationText, setNotificationText] = React.useState("")
@@ -252,7 +253,6 @@ export const Recipe = ({route, navigation}) => {
     
 
     const closeModalSend = () => {
-        
         var axios = require('axios');
         var data = JSON.stringify({
         "comments": comments,
@@ -260,25 +260,47 @@ export const Recipe = ({route, navigation}) => {
         "recipeId": id,
         "userId": userId
         });
+        
+        if(!hasRating){
+            var configNull = {
+            method: 'post',
+            url: 'https://tasty-hub.herokuapp.com/api/rating',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            data : data
+            };
 
-        var config = {
-        method: 'put',
-        url: 'https://tasty-hub.herokuapp.com/api/rating',
-        headers: { 
-            'Content-Type': 'application/json'
-        },
-        data : data
-        };
-
-        axios(config)
-        .then(function () {
-            setModalVisible(!modalVisible)
-            setComments("");
-            setStarCount(0)       
-        })
-        .catch(function (error) {
-            console.log("ERROR 7" + error);
-        });
+            axios(configNull)
+            .then(function () {
+                setModalVisible(!modalVisible)
+                setComments("");
+                setStarCount(0)       
+            })
+            .catch(function (error) {
+                console.log("ERROR 7 post " + error);
+            });
+        }else{
+            var configNotNull = {
+            method: 'put',
+            url: 'https://tasty-hub.herokuapp.com/api/rating',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            data : data
+            };
+    
+            axios(configNotNull)
+            .then(function () {
+                setModalVisible(!modalVisible)
+                setComments("");
+                setStarCount(0)       
+            })
+            .catch(function (error) {
+                console.log("ERROR 7 put " + error);
+            });
+        }
+        
 
         
     }
@@ -445,7 +467,7 @@ export const Recipe = ({route, navigation}) => {
                     
                     AsyncStorage.setItem(filename, JSON.stringify(object))
                     .then(()=>{
-                        console.log("Agregado")
+                        console.log("Agregado al AsyncStorage")
                         setSaved(true)
                         showNotification('Recordat')
                     })
@@ -460,11 +482,11 @@ export const Recipe = ({route, navigation}) => {
             setSaved(false)
             
             AsyncStorage.removeItem(filename)
-            .then((response) => console.log("Eliminado"))
+            .then((response) => console.log("Eliminado del AsyncStorage"))
             .catch((error) => console.log(error))
 
             FileSystem.deleteAsync(directory)
-            .then(()=> console.log("directorio eliminado"))
+            .then(()=> console.log("Directorio eliminado"))
             .catch((error)=>console.log(error))  
         }
     }

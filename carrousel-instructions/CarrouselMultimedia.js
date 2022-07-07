@@ -57,7 +57,7 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
   };
 
   const RenderMultimediaItem = ({ item, index }) => {
-    console.log(item)
+    //console.log(item)
     if(multimediaSaved.length != 0){
       if(isVideo(item)){
         return (
@@ -109,7 +109,7 @@ export const CarrouselMultimedia = ({ id, multimediaSaved }) => {
   return (
     <ScrollView nestedScrollEnabled={true} style={{ width: '100%', maxHeight: 220 }}>
       {multimedia.map((elem, index) => {
-        console.log(elem)
+        //console.log(elem)
           return (
             <RenderMultimediaItem
               key={index}
