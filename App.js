@@ -67,7 +67,7 @@ function DashboardTabStack() {
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="DashBoardFilter" component={DashBoardFilter} />
-        <Stack.Screen name="NoInternet" component={NoInternet}/>
+        {/*<Stack.Screen name="NoInternet" component={NoInternet}/>*/}
 
     </Stack.Navigator>
   );
@@ -81,7 +81,7 @@ function FavouritesTabStack() {
       <Stack.Screen name="Favourites" component={Favourites} />
       <Stack.Screen name="UserProfile" component={UserProfile}/>
       <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
-        <Stack.Screen name="NoInternet" component={NoInternet}/>
+        {/*<Stack.Screen name="NoInternet" component={NoInternet}/>*/}
 
     </Stack.Navigator>
   )
@@ -97,7 +97,7 @@ function ProfileTabStack() {
       <Stack.Screen name="EditProfile" component={EditProfile}/>
       <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
       <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
-        <Stack.Screen name="NoInternet" component={NoInternet}/>
+        {/*<Stack.Screen name="NoInternet" component={NoInternet}/>*/}
 
     </Stack.Navigator>
   )
@@ -120,7 +120,7 @@ function RecipeTabStack() {
       <Stack.Screen name="InstructionEdit" component={InstructionEdit} />
       <Stack.Screen name="RecipeEditSuccess" component={RecipeEditSuccess}/>
       <Stack.Screen name="StoredRecipeSuccess" component={StoredRecipeSuccess}/>
-      <Stack.Screen name="NoInternet" component={NoInternet}/>
+      {/*<Stack.Screen name="NoInternet" component={NoInternet}/>*/}
     </Stack.Navigator>
     )
 }
@@ -136,7 +136,7 @@ function SavedTabStack() {
       <Stack.Screen name="EditProfile" component={EditProfile}/>
       <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
       <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
-        <Stack.Screen name="NoInternet" component={NoInternet}/>
+        {/*<Stack.Screen name="NoInternet" component={NoInternet}/>*/}
 
 
     </Stack.Navigator>
@@ -251,6 +251,7 @@ export default function App() {
         <Stack.Screen name="EmailNotConfirmed" component={EmailNotConfirmed} />
         <Stack.Screen name="SavedRecipeCard" component={SavedRecipeCard}/>
         <Stack.Screen name="CarrouselImages" component={CarrouselImages} />
+          <Stack.Screen name="NoInternet" component={NoInternet}/>
 
         <Stack.Screen name="UserStudentConflict" component={UserStudentConflict} />
         <Stack.Screen name="SuccessFullPasswordRecovery" component={SuccessFullPasswordRecovery} />

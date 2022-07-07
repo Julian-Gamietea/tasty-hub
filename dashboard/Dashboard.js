@@ -37,6 +37,7 @@ export const Dashboard = ({ route, navigation }) => {
 
     const focus = useIsFocused();
     const netInfo = useNetInfo();
+    const [ignoredFirst, setIgnoredFirst] = React.useState(false);
     const [user, setUser] = React.useState(null);
     const [recipeList, setRecipeList] = React.useState([]);
     const [dataLoaded, setDataLoaded] = React.useState(false);
@@ -74,9 +75,10 @@ export const Dashboard = ({ route, navigation }) => {
     }, [user, focus, netInfo])
 
     React.useEffect(() => {
-        if (!netInfo.isConnected) {
+        if (!netInfo.isConnected && ignoredFirst) {
             navigation.navigate('NoInternet');
         }
+        setIgnoredFirst(true);
     }, [netInfo])
 
     const onRefresh = () => {
