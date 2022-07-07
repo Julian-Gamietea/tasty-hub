@@ -15,9 +15,9 @@ export const DashBoardFilter = ({ route, navigation }) => {
   const [includedIngredientElems, setIncludedIngredientElems] = useState(new Set())
   const [excludedIngredientElems, setExcludedIngredientElems] = useState(new Set())
   const [selectedValue, setSelectedValue] = React.useState('Duracion');
-  const [duration, setDuration] = useState()
+  const [duration, setDuration] = useState(null)
   const [filteredRecipes,setFilterRecipes] = useState([])
-  const [typed,setTyped]=useState("")
+  const [typed,setTyped]=useState(false)
   
   const onChangeText = (text) => {
     setDuration(text)
@@ -31,6 +31,9 @@ export const DashBoardFilter = ({ route, navigation }) => {
     selectedIngridients.push(ingredient.id)
     auxSet.add(ingredient)
     setIncludedIngredientElems(auxSet)
+    if(excludedIngredients.indexOf(ingredient.id)!=-1){
+      handleOnPressOutExcludeIngredient(ingredient)      
+    }
   }
   const handleOnPressOutIncludeIngredient = (ingredient) => {
     const auxSet = new Set(includedIngredientElems.values())
@@ -49,6 +52,9 @@ export const DashBoardFilter = ({ route, navigation }) => {
     excludedIngredients.push(ingredient.id)
     auxSet.add(ingredient)
     setExcludedIngredientElems(auxSet)
+    if(selectedIngridients.indexOf(ingredient.id)!=-1){
+      handleOnPressOutIncludeIngredient(ingredient)      
+    }
   }
   const handleOnPressOutExcludeIngredient = (ingredient) => {
     const auxSet = new Set(excludedIngredientElems.values())
@@ -163,55 +169,60 @@ export const DashBoardFilter = ({ route, navigation }) => {
   }, []);
 
   const submit = async () => { 
-    
-    if(selectedValue=='Duracion' && duration.length>0){
-      Alert.alert("Error!", "Estas ingresando una cantidad de tiempo pero no seleccionando como buscar", [
-        {
-          text: "Cancel",
-          onPress: () => null,
-          style: "cancel"
-        },
-       
-      ]);
-      return true
-    };
-
-    const recipes = await fetchRecipes()
-    recipes.map((recipe)=>
-      filterRecipe(recipe
+    /*if(typed){
+      if(selectedValue=='Duracion' && duration.length>0){
+        Alert.alert("Error!", "Estas ingresando una cantidad de tiempo pero no seleccionando como buscar", [
+          {
+            text: "Cancel",
+            onPress: () => null,
+            style: "cancel"
+          },
+         
+        ]);
+      };
+  
+    }else{*/
+      const recipes = await fetchRecipes()
+      console.log(recipes)
+      recipes.map((recipe)=>
+        filterRecipe(recipe
+        )
       )
-    )
-    navigation.navigate("SearchResults",{navigation:navigation,recipeList:filteredRecipes})
-    setFilterRecipes([])
-    setStarCount(0)
-    
+      navigation.navigate("SearchResults",{navigation:navigation,recipeList:filteredRecipes})
+      setFilterRecipes([])
+      setStarCount(0)
+      setDuration(null)
+      setSelectedValue('Duracion')
+
   }
   const filterRecipe =  async (recipe) =>{
     const average = await getAverageOfRating(recipe.id)
-    if(starCount == 0 && isValidDuration(recipe)){
-      filteredRecipes.push(recipe)
-    }
-    else if(duration.length==0  && average==starCount){
-      filteredRecipes.push(recipe)
-    }
-    else if(isValidDuration(recipe) && average==starCount){
-      filteredRecipes.push(recipe)
-    }
-    else if( duration.length==0    && starCount == 0){
-      filteredRecipes.push(recipe)
-    }
+      if(starCount == 0 && isValidDuration(recipe)){
+        filteredRecipes.push(recipe)
+      }
+      else if(duration == null  && average==starCount){
+        filteredRecipes.push(recipe)
+      }
+      else if(isValidDuration(recipe) && average==starCount){
+        filteredRecipes.push(recipe)
+      }
+      else if( duration==null  && starCount == 0){
+        filteredRecipes.push(recipe)
+      }
+
+    
 
   }
 
   const isValidDuration = (recipe) =>{
     if(selectedValue == '='){
-      return recipe.duration==parseInt(duration)
+      return recipe.duration==duration
     }
     else if(selectedValue == '<'){
-      return recipe.duration< parseInt(duration)
+      return recipe.duration< duration
     }
     else if(selectedValue == '>'){
-      return recipe.duration>parseInt(duration)
+      return recipe.duration>duration
     }
     else{
       return false;
@@ -395,7 +406,6 @@ const styles = StyleSheet.create({
     fontFamily:"InterSemiBold",
   },
   picker: {
-    fontFamily:"InterBold",
     width:"70%",
     marginLeft:"12%",
     
