@@ -29,6 +29,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {useIsFocused} from "@react-navigation/native";
 import * as UploadFromLocal from "../recipe-creation/UploadFromLocal";
 import {useNetInfo} from "@react-native-community/netinfo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
@@ -43,7 +44,7 @@ export const Dashboard = ({ route, navigation }) => {
     const [inputValue, setInputValue] = React.useState("");
     const [isFetching, setIsFetching] = React.useState(false);
     const [recipesModalVisible, setRecipesModalVisible] = React.useState(false);
-    const [pendingRecipes, setPendingRecipes] = React.useState(null);
+    const [pendingRecipes, setPendingRecipes] = React.useState(false);
     const [isUploading, setIsUploading] = React.useState(false);
     const [isModalVisible,setIsModalVisible]=React.useState(false);
     const [checked, setChecked] = React.useState();
@@ -57,10 +58,26 @@ export const Dashboard = ({ route, navigation }) => {
     }, [])
 
     React.useEffect(() => {
-        if (user && UploadFromLocal.hasQueues(user.id) && netInfo.type === 'wifi') {
-            setPendingRecipes(true);
+
+        if (user && focus && netInfo.type === 'wifi') {
+            UploadFromLocal.hasQueues(user.id)
+                .then((res) => {
+                    console.log(res);
+                    if (res) {
+                        setPendingRecipes(true);
+                    }
+                })
         }
-    }, [user, focus])
+        if (netInfo.type === 'cellular') {
+            setPendingRecipes(false);
+        }
+    }, [user, focus, netInfo])
+
+    React.useEffect(() => {
+        if (!netInfo.isConnected) {
+            navigation.navigate('NoInternet');
+        }
+    }, [netInfo])
 
     const onRefresh = () => {
         setIsFetching(true);
@@ -93,8 +110,8 @@ export const Dashboard = ({ route, navigation }) => {
         await UploadFromLocal.UploadNormal(user.id);
         await UploadFromLocal.Overwrite(user.id);
         await UploadFromLocal.UploadEdit(user.id);
-        setIsUploading(false);
         setPendingRecipes(false);
+        setIsUploading(false);
         setRecipesModalVisible(false);
     }
 
@@ -351,10 +368,6 @@ const styles = StyleSheet.create({
         fontFamily: "InterRegular",
         fontSize: 18,
 
-        alignSelf: 'center',
-        marginBottom: 30,
-        marginTop: 5,
-        marginLeft: 30
     },
     username: {
         fontFamily: "InterSemiBold"

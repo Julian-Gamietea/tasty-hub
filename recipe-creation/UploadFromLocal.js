@@ -8,7 +8,7 @@ const getQueue = async (queueType, userId) => {
     if (data === null) {
         return null
     } else {
-        return JSON.parse(data).queue;
+        return Array.from(JSON.parse(data).queue);
     }
 }
 
@@ -17,111 +17,119 @@ export const hasQueues = async (userId) => {
     const ow = await AsyncStorage.getItem(`user_${userId}_overwrite_queue`);
     const ed = await AsyncStorage.getItem(`user_${userId}_edit_queue`);
 
-    return up || ow || ed;
+    return (up !== null) || (ow !== null) || (ed !== null);
 }
 
 export const UploadNormal = async (userId) => {
-    const queue = getQueue('upload', userId);
+    const queue = await getQueue('upload', userId);
     if (queue !== null) {
-        for (let recipeData of queue) {
-            const auxRecipe = {
-                description: recipeData.description,
-                duration: recipeData.duration,
-                enabled: false,
-                name: recipeData.name,
-                ownerId: recipeData.ownerId,
-                peopleAmount: recipeData.peopleAmount,
-                portions: recipeData.portions,
-                typeId: recipeData.typeId,
-            }
+        try {
 
-            //SUBO LA RECETA
-            const recipeRes = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
+            for (let recipeData of queue) {
+                const auxRecipe = {
+                    description: recipeData.description,
+                    duration: recipeData.duration,
+                    enabled: false,
+                    name: recipeData.name,
+                    ownerId: recipeData.ownerId,
+                    peopleAmount: recipeData.peopleAmount,
+                    portions: recipeData.portions,
+                    typeId: recipeData.typeId,
+                }
 
-            //SUBO LAS FOTOS
-            const fdi = new FormData();
-            for (let image of recipeData.images) {
-                fdi.append('images', image);
-            }
 
-            try {
-                await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipeRes.data.id}`, fdi,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    }
-                );
-            } catch (e) {
-                console.log(e);
-            }
+                const recipeRes = await axios.post(`https://tasty-hub.herokuapp.com/api/recipes`, auxRecipe);
 
-            //SUBO LOS INGREDIENTES
-            let qtyAux = {};
-            for (let qty of recipeData.ingredientQty) {
+                //SUBO LA RECETA
 
-                qtyAux = {
-                    recipeId: recipeRes.data.id,
-                    ingredientId: qty.ingredientId,
-                    unitId: qty.unitId,
-                    quantity: qty.quantity,
-                    observations: "",
+                //SUBO LAS FOTOS
+                const fdi = new FormData();
+                for (let image of recipeData.images) {
+                    fdi.append('images', image);
                 }
 
                 try {
-                    const iq = await axios.post(`https://tasty-hub.herokuapp.com/api/ingredientQuantity`, qtyAux);
-                } catch (e) {
-                    console.log(e);
-                }
-            }
-
-            //SUBO LAS INSTRUCCIONES
-            for (let step of recipeData.steps) {
-                try {
-
-                    const res = await axios.post(`https://tasty-hub.herokuapp.com/api/instruction`,
+                    await axios.post(`https://tasty-hub.herokuapp.com/api/recipePhotos?recipeId=${recipeRes.data.id}`, fdi,
                         {
-                            description: step.description,
-                            numberOfStep: step.numberOfStep,
-                            recipeId: recipeRes.data.id,
-                            title: step.title,
-                        });
-
-                    const instructionId = res.data.id;
-
-
-                    const fd = new FormData();
-                    for (let multim of step.multimedia) {
-                        const aux = {
-                            uri: multim.uri,
-                            type: multim.type,
-                            name: multim.name
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
                         }
-                        fd.append('multimedia', aux);
-                    }
-
-                    const config = {
-                        method: 'post',
-                        url: `https://tasty-hub.herokuapp.com/api/multimedia?instructionId=${instructionId}`,
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        },
-                        data: fd
-                    };
-
-                    await axios(config);
-
-
+                    );
                 } catch (e) {
                     console.log(e);
                 }
+
+                //SUBO LOS INGREDIENTES
+                let qtyAux = {};
+                for (let qty of recipeData.ingredientQty) {
+
+                    qtyAux = {
+                        recipeId: recipeRes.data.id,
+                        ingredientId: qty.ingredientId,
+                        unitId: qty.unitId,
+                        quantity: qty.quantity,
+                        observations: "",
+                    }
+
+                    try {
+                        const iq = await axios.post(`https://tasty-hub.herokuapp.com/api/ingredientQuantity`, qtyAux);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+
+                //SUBO LAS INSTRUCCIONES
+                for (let step of recipeData.steps) {
+                    try {
+
+                        const res = await axios.post(`https://tasty-hub.herokuapp.com/api/instruction`,
+                            {
+                                description: step.description,
+                                numberOfStep: step.numberOfStep,
+                                recipeId: recipeRes.data.id,
+                                title: step.title,
+                            });
+
+                        const instructionId = res.data.id;
+
+
+                        const fd = new FormData();
+                        for (let multim of step.multimedia) {
+                            const aux = {
+                                uri: multim.uri,
+                                type: multim.type,
+                                name: multim.name
+                            }
+                            fd.append('multimedia', aux);
+                        }
+
+                        const config = {
+                            method: 'post',
+                            url: `https://tasty-hub.herokuapp.com/api/multimedia?instructionId=${instructionId}`,
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            },
+                            data: fd
+                        };
+
+                        await axios(config);
+
+
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
             }
+        await AsyncStorage.removeItem(`user_${userId}_upload_queue`);
+        } catch (e) {
+            console.log(e);
         }
     }
 }
 
 export const Overwrite = async (userId) => {
-    const queue = getQueue('overwrite', userId);
+    const queue = await getQueue('overwrite', userId);
     if (queue !== null) {
         for (let recipeData of queue) {
             const auxRecipe = {
@@ -227,11 +235,13 @@ export const Overwrite = async (userId) => {
                 }
             }
         }
+        await AsyncStorage.removeItem(`user_${userId}_overwrite_queue`);
+
     }
 }
 
 export const UploadEdit = async (userId) => {
-    const queue = getQueue('edit', userId);
+    const queue = await getQueue('edit', userId);
     if (queue !== null) {
         for (let recipeData of queue) {
             const auxRecipe = {
@@ -428,5 +438,7 @@ export const UploadEdit = async (userId) => {
                 }
             }
         }
+        await AsyncStorage.removeItem(`user_${userId}_edit_queue`);
+
     }
 }

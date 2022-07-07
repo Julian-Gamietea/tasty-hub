@@ -49,6 +49,9 @@ import { RecipeSuccessNormal } from './recipe-creation/RecipeSuccessNormal';
 import { RecipeFormEdit } from './recipe-creation/RecipeFormEdit';
 import { InstructionEdit } from './recipe-creation/InstructionEdit';
 import { DashBoardFilter } from './dashboard/DashBoardFilter';
+import {RecipeEditSuccess} from "./recipe-creation/RecipeEditSuccess";
+import {StoredRecipeSuccess} from "./recipe-creation/StoredRecipeSuccess";
+import {NoInternet} from "./recipe-creation/NoInternet";
 
 
 
@@ -64,6 +67,8 @@ function DashboardTabStack() {
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="DashBoardFilter" component={DashBoardFilter} />
+        <Stack.Screen name="NoInternet" component={NoInternet}/>
+
     </Stack.Navigator>
   );
 }
@@ -76,6 +81,8 @@ function FavouritesTabStack() {
       <Stack.Screen name="Favourites" component={Favourites} />
       <Stack.Screen name="UserProfile" component={UserProfile}/>
       <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+        <Stack.Screen name="NoInternet" component={NoInternet}/>
+
     </Stack.Navigator>
   )
 }
@@ -90,6 +97,8 @@ function ProfileTabStack() {
       <Stack.Screen name="EditProfile" component={EditProfile}/>
       <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
       <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+        <Stack.Screen name="NoInternet" component={NoInternet}/>
+
     </Stack.Navigator>
   )
 }
@@ -109,6 +118,9 @@ function RecipeTabStack() {
       <Stack.Screen name="SuccessNormal" component={RecipeSuccessNormal}/>
       <Stack.Screen name="RecipeFormEdit" component={RecipeFormEdit}/>
       <Stack.Screen name="InstructionEdit" component={InstructionEdit} />
+      <Stack.Screen name="RecipeEditSuccess" component={RecipeEditSuccess}/>
+      <Stack.Screen name="StoredRecipeSuccess" component={StoredRecipeSuccess}/>
+      <Stack.Screen name="NoInternet" component={NoInternet}/>
     </Stack.Navigator>
     )
 }
@@ -124,6 +136,8 @@ function SavedTabStack() {
       <Stack.Screen name="EditProfile" component={EditProfile}/>
       <Stack.Screen name="ProfileUpdate" component={ProfileUpdated}/>
       <Stack.Screen name="RecalculateRecipe" component={RecalculateRecipe}/>
+        <Stack.Screen name="NoInternet" component={NoInternet}/>
+
 
     </Stack.Navigator>
   )

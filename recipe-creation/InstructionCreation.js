@@ -333,7 +333,7 @@ export const InstructionCreation = ({ navigation, route }) => {
         }
         else if (!hasErrors() && networkType === 'cellular') {
 
-            if (recipe.id === null) {
+            if (recipe.id === 0) {
 
                 const auxRecipe = {
                     description: recipe.description,
@@ -401,7 +401,7 @@ export const InstructionCreation = ({ navigation, route }) => {
             }
 
             setIsUploading(false);
-
+            navigation.navigate("StoredRecipeSuccess");
         }
         else {
             setIsUploading(false);

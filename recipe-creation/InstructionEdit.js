@@ -234,8 +234,7 @@ export const InstructionEdit = ({ navigation, route }) => {
 
     const upload = async () => {
         setIsUploading(true);
-        if (!hasErrors && networkType !== 'cellular') {
-
+        if (!hasErrors() && networkType !== 'cellular') {
             const auxRecipe = {
                 id: recipe.id,
                 description: recipe.description,
@@ -248,6 +247,8 @@ export const InstructionEdit = ({ navigation, route }) => {
                 typeId: recipe.typeId,
                 mainPhoto: recipe.mainPhoto.uri
             }
+            console.log(auxRecipe);
+
             //BORRO IQ VIEJAS
             await overwriteOldRecipe(recipe.id);
             //ACTUALIZO LA RECETA
@@ -429,7 +430,7 @@ export const InstructionEdit = ({ navigation, route }) => {
                 }
             }
             setIsUploading(false);
-            navigation.navigate('SuccessNormal');
+            navigation.navigate('RecipeEditSuccess');
         }
         else if (!hasErrors() && networkType === 'cellular') {
             const auxRecipe = {
@@ -468,7 +469,8 @@ export const InstructionEdit = ({ navigation, route }) => {
                 console.log(e);
             }
 
-
+            setIsUploading(false);
+            navigation.navigate("StoredRecipeSuccess")
         }
         else {
             setIsUploading(false);
