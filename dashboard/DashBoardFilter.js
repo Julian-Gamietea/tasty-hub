@@ -183,7 +183,6 @@ export const DashBoardFilter = ({ route, navigation }) => {
   
     }else{*/
       const recipes = await fetchRecipes()
-      console.log(recipes)
       recipes.map((recipe)=>
         filterRecipe(recipe
         )
@@ -197,6 +196,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
   }
   const filterRecipe =  async (recipe) =>{
     const average = await getAverageOfRating(recipe.id)
+    console.log(duration.length == 0)
       if(starCount == 0 && isValidDuration(recipe)){
         filteredRecipes.push(recipe)
       }
@@ -207,6 +207,12 @@ export const DashBoardFilter = ({ route, navigation }) => {
         filteredRecipes.push(recipe)
       }
       else if( duration==null  && starCount == 0){
+        filteredRecipes.push(recipe)
+      }
+      else if(duration.length==0 && average == starCount){
+        filteredRecipes.push(recipe)
+      }
+      else if(duration.length == 0 && starCount==0){
         filteredRecipes.push(recipe)
       }
 
@@ -308,9 +314,9 @@ export const DashBoardFilter = ({ route, navigation }) => {
       </View> 
        
       </View>
-      <View >
-        <TouchableOpacity onPress={() => submit()} style={{alignSelf:"center",justifyContent:"center",marginTop:"1%"}}>
-          <MaterialIcons name="done" size={50} color="white"  />
+      <View style={{width:Dimensions.get("screen").width,justifyContent:"center",alignItems:"center"}}>
+        <TouchableOpacity onPress={() => submit()} style={{marginTop:"1%"}}>
+          <MaterialIcons name="done" size={50} color="white" style={{marginLeft:"1%"}}  />
           <Text style={styles.acceptanceText}>Aceptar</Text>
         </TouchableOpacity>
       </View>
@@ -358,7 +364,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#ffffff",
     fontSize: 16,
-    marginRight:"2%"
+ 
   },
   dropdownContainer: {
     justifyContent: "flex-start",
