@@ -28,7 +28,7 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
       const resp = await fetch(`https://tasty-hub.herokuapp.com/api/instruction/recipe/${idRecipe}`);
       const data = await resp.json();
       setInstructions(data);
-      console.log("entre")
+      //console.log("entre")
     }else{
       setInstructions(instructionsSaved)
     }
@@ -51,7 +51,7 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
     )
     return auxArray
   }
-  console.log(instructions)
+  //console.log(instructions)
   return (
     <View style={styles.container}>
       <FlatList
