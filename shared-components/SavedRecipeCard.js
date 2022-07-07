@@ -135,8 +135,8 @@ const styles = StyleSheet.create({
         marginLeft: '4%'
     },
     profileImage:{
-        height: '75%',
-        width: '15%',
+        height: 60,
+        width: 60,
         borderRadius: 100
     },
     rating:{

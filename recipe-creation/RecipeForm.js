@@ -46,7 +46,10 @@ export const RecipeForm = ({navigation, route}) => {
     let recipeTitle = "";
     if (route.params.recipeTitle) {
         recipeTitle = route.params.recipeTitle;
-    } else {
+    } else if (route.params.rdata) {
+        recipeTitle = route.params.rdata.recipeName;
+    }
+    else {
         recipeTitle = route.params.data;
     }
 
