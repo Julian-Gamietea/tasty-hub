@@ -2,7 +2,7 @@ import { View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { MaterialIcons } from '@expo/vector-icons';
 
-export const DashboardInput = ({ placeholder, onChange, value, onClick }) => {
+export const DashboardInput = ({ placeholder, onChange, value, onClick, icon }) => {
     
     const styles = StyleSheet.create(
         {
@@ -51,7 +51,7 @@ export const DashboardInput = ({ placeholder, onChange, value, onClick }) => {
                 placeholder={placeholder}
             />
             <TouchableOpacity style={styles.searchButton} onPress={onClick}>
-                <MaterialIcons name="search" size={32} color="#553900" />
+                <MaterialIcons name={icon ? icon : 'search'} size={32} color="#553900" />
             </TouchableOpacity>
         </View>
 

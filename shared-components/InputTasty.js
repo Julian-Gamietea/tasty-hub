@@ -47,8 +47,3 @@ export const InputTasty = ({placeholder, onChange, value, passwrd, isValid, erro
 
         );
 }
-
-
-
-
-

@@ -41,6 +41,7 @@ export const Carrousel = ({id, multimediaSaved, instructionsSaved}) => {
     fetchInstructions(id);
   },[]);
 
+
   const getMultimediaByIndex= (index) =>{
     const auxArray = new Array()
     multimediaSaved.map((elem) =>{ elem.map((multimedia)  =>  {

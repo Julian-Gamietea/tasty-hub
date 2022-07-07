@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Text, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import image from '../assets/login/login-image.png';
@@ -16,6 +16,7 @@ export const LogIn = ({ navigation }) => {
 
     const [loginState, loginDispatch] = React.useReducer(loginReducer, initialState);
     const { alias, password, isAliasValid, isPasswordValid, userErrorMessage, passwordErrorMessage } = loginState;
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const areInputsValid = () => {
         if (alias === "")
@@ -31,31 +32,39 @@ export const LogIn = ({ navigation }) => {
 
     const login = () => {
         if (areInputsValid()) {
+            setIsLoading(true);
             axios.get(`https://tasty-hub.herokuapp.com/api/user/username/${alias}`)
                 .then((res) => {
                     axios.get(`https://tasty-hub.herokuapp.com/api/user/check/registration/completion?email=${res.data.email}`)
                         .then((res) => {
                             axios.get(`https://tasty-hub.herokuapp.com/api/auth/login?alias=${alias}&password=${password}`)
                                 .then((res) => {
+                                    setIsLoading(false);
                                     loginDispatch({ type: "reset" });
                                     SecureStore.setItemAsync("user", JSON.stringify(res.data))
                                     .then(() => {
                                         navigation.navigate('Dashboard');
                                     })
-                                    .catch(e => {console.log(e)});
+                                    .catch(e => {
+                                        console.log(e);
+                                        setIsLoading(false);
+                                    });
                                 })
                                 .catch(e => {
+                                    setIsLoading(false);
                                     loginDispatch({ type: "aliasError", error: "Usuario Incorrecto" });
                                     loginDispatch({ type: "passwordError", error: "Contraseña Incorrecta" });
                                 })
                         })
                         .catch(e => {
+                            setIsLoading(false);
                             loginDispatch({ type: "reset" })
                             navigation.navigate('IncompleteRegistry');
                         });
                 }
                 )
                 .catch(e => {
+                    setIsLoading(false);
                     loginDispatch({ type: "aliasError", error: "Usuario Incorrecto" });
                     loginDispatch({ type: "passwordError", error: "Contraseña Incorrecta" });
                 });
@@ -111,7 +120,11 @@ export const LogIn = ({ navigation }) => {
                 <Link to={{ screen: 'RestorePassword' }} style={styles.link} >¿Olvidaste tu contraseña?</Link>
 
                 <View style={styles.formContainerItem2}>
-                    <ButtonCustom callback={login} text='Iniciar Sesión' />
+                    {!isLoading && <ButtonCustom callback={login} text='Iniciar Sesión' />}
+                    {isLoading && 
+                    <TouchableOpacity style={styles.spinner}>
+                        <ActivityIndicator color={"#553900"} />
+                    </TouchableOpacity>}
                 </View>
             </View>
         </ScrollView>
@@ -178,6 +191,12 @@ const styles = StyleSheet.create(
             fontSize: 16,
             marginTop: 30
 
+        },
+        spinner: { 
+            elevation: 8,
+            backgroundColor: "#F3A200",
+            borderRadius: 15,
+            padding: 15
         }
 
     }

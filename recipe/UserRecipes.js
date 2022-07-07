@@ -71,6 +71,9 @@ export const UserRecipes = ({ navigation }) => {
                         timeToMake={elem.duration}
                         title={elem.name}
                         id={elem.id}
+                        onPressEdit={() => navigation.navigate("RecipeTabStack", {screen: "RecipeFormEdit", params:  {recipe: elem}})}
+                        // {type: 'edit', recipe: recipe}
+                        // onPressEdit={() => navigation.navigate('Recipe')}
                     />);
                 }}
             />}

@@ -8,7 +8,7 @@ import React from 'react';
 import { NotificationModal } from "./NotificationModal";
 import { useIsFocused } from "@react-navigation/native";
 
-export const MyRecipeCard = ({ onPress, image, title, timeToMake, id }) => {
+export const MyRecipeCard = ({ onPress, image, title, timeToMake, id, onPressEdit }) => {
 
 
     const [rating, setRating] = React.useState(0);
@@ -24,7 +24,6 @@ export const MyRecipeCard = ({ onPress, image, title, timeToMake, id }) => {
             try {
                 const res = await axios.get(`https://tasty-hub.herokuapp.com/api/rating/average/${id}`);
                 setRating(parseInt(res.data));
-                setIsLoading(false);
                 const resf = await axios.get(`https://tasty-hub.herokuapp.com/api/favorite/isfavourite?recipeId=${id}&userId=${userId}`);
                 setIsBookmarked(Boolean(resf.data));
             } catch (e) {
@@ -40,7 +39,7 @@ export const MyRecipeCard = ({ onPress, image, title, timeToMake, id }) => {
 
 
     let arrayRating = [];
-    for (let index = 0; index < 5; index++) {
+    for (let index = 0; index < rating; index++) {
         arrayRating.push(1);
     }
 
@@ -67,7 +66,7 @@ export const MyRecipeCard = ({ onPress, image, title, timeToMake, id }) => {
                     <Feather name="clock" size={15} color="#553900" />
                     <Text style={styles.time}>{timeToMake} min</Text>
                 </View>
-                <TouchableOpacity style={{marginBottom: 15, marginLeft: 20}} onPress={() => console.log("Edit Button Pressed")}>
+                <TouchableOpacity style={{marginBottom: 15, marginLeft: 20}} onPress={onPressEdit}>
                     <MaterialIcons name="edit" color="#5D420C" size={35} />
                 </TouchableOpacity>
             </View>

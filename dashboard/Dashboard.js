@@ -1,11 +1,24 @@
 import React from 'react';
-import { Modal,View, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions, RefreshControl, SafeAreaView, FlatList, KeyboardAvoidingView } from 'react-native';
+import {
+    View,
+    Text,
+    StatusBar,
+    StyleSheet,
+    TouchableOpacity,
+    Dimensions,
+    RefreshControl,
+    SafeAreaView,
+    FlatList,
+    KeyboardAvoidingView,
+    Pressable, Modal, ActivityIndicator
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 import { useFonts } from 'expo-font';
 import { RecipeDashboardCard } from '../shared-components/RecipeDashboardCard';
 import { Feather } from '@expo/vector-icons';
 import { DashboardInput } from './DashboardInput';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
@@ -13,15 +26,27 @@ import { RadioButton } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import {useIsFocused} from "@react-navigation/native";
+import * as UploadFromLocal from "../recipe-creation/UploadFromLocal";
+import {useNetInfo} from "@react-native-community/netinfo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
 
 export const Dashboard = ({ route, navigation }) => {
 
+    const focus = useIsFocused();
+    const netInfo = useNetInfo();
+    const [ignoredFirst, setIgnoredFirst] = React.useState(false);
     const [user, setUser] = React.useState(null);
     const [recipeList, setRecipeList] = React.useState([]);
     const [dataLoaded, setDataLoaded] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState('plato');
     const [inputValue, setInputValue] = React.useState("");
     const [isFetching, setIsFetching] = React.useState(false);
+    const [recipesModalVisible, setRecipesModalVisible] = React.useState(false);
+    const [pendingRecipes, setPendingRecipes] = React.useState(false);
+    const [isUploading, setIsUploading] = React.useState(false);
     const [isModalVisible,setIsModalVisible]=React.useState(false);
     const [checked, setChecked] = React.useState();
 
@@ -32,6 +57,33 @@ export const Dashboard = ({ route, navigation }) => {
         }
         fetchUserData();
     }, [])
+
+    React.useEffect(() => {
+
+        if (user && focus && netInfo.type === 'wifi') {
+            UploadFromLocal.hasQueues(user.id)
+                .then((res) => {
+                    console.log(res);
+                    if (res) {
+                        setPendingRecipes(true);
+                    }
+                })
+        }
+        if (netInfo.type === 'cellular') {
+            setPendingRecipes(false);
+        }
+    }, [user, focus, netInfo])
+
+    // React.useEffect(() => {
+    //     if (netInfo.type === 'none' && ignoredFirst) {
+    //         setTimeout(() => {
+    //             if (netInfo.type === 'none') {
+    //                 navigation.navigate('NoInternet');
+    //             }
+    //         }, 5000);
+    //     }
+    //     setIgnoredFirst(true);
+    // }, [netInfo])
 
     const onRefresh = () => {
         setIsFetching(true);
@@ -53,12 +105,21 @@ export const Dashboard = ({ route, navigation }) => {
         const resf = await axios.get(`https://tasty-hub.herokuapp.com/api/favorite/isfavourite?recipeId=${id}&userId=${user.id}`)
         return resf.data;
     }
-    
+
 
     React.useEffect(() => {
         fetchData();
     }, [user])
 
+    const emptyQueues = async () => {
+        setIsUploading(true);
+        await UploadFromLocal.UploadNormal(user.id);
+        await UploadFromLocal.Overwrite(user.id);
+        await UploadFromLocal.UploadEdit(user.id);
+        setPendingRecipes(false);
+        setIsUploading(false);
+        setRecipesModalVisible(false);
+    }
 
     const [loaded] = useFonts({
         InterSemiBold: require('../assets/fonts/Inter-SemiBold.ttf'),
@@ -99,15 +160,54 @@ export const Dashboard = ({ route, navigation }) => {
                 });
 
         }
-       
+
         setIsModalVisible(false)
     }
     return (
 
         <KeyboardAvoidingView style={{...styles.mainContainer, paddingTop: StatusBar.currentHeight+5}} >
             <StatusBar backgroundColor={"#fff"}/>
-            
-            <Text style={styles.welcomeMessage}>¡Bienvenido de nuevo, <Text style={styles.username}>{user.name.split(" ")[0]}</Text>!</Text>
+            <View style={{alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', marginBottom: 30,
+                marginTop: 9, justifyContent: 'space-between', marginLeft: 30, width: '85%'}}>
+                <Text style={styles.welcomeMessage}>¡Bienvenido de nuevo, <Text style={styles.username}>{user.name.split(" ")[0]}</Text>!</Text>
+                {pendingRecipes && <TouchableOpacity
+                    onPress={() => setRecipesModalVisible(true)}
+                    style={{backgroundColor: "#f3a200", borderRadius: 50, padding: 8}}
+                >
+                    <MaterialCommunityIcons name="bell-badge-outline" size={30} color="#553900"/>
+                </TouchableOpacity>}
+            </View>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={recipesModalVisible}
+                onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setRecipesModalVisible(!recipesModalVisible)
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={[styles.modalText, {fontFamily: 'InterSemiBold'}]}>Hay recetas pendientes de subida</Text>
+                        <Text style={[styles.modalText, {fontFamily: 'InterSemiBold'}]}>¿Desea subirlas en este momento?</Text>
+                        <Text style={styles.modalText}>(Esta acción podría demorar unos minutos)</Text>
+                        <View style={{flexDirection: 'row'}}>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose, {marginRight: 10}]}
+                                onPress={emptyQueues}
+                            >
+                                {!isUploading ? <Text style={[styles.textStyle, {fontSize: 18}]}>Aceptar</Text> : <ActivityIndicator/>}
+                            </Pressable>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => setRecipesModalVisible(!recipesModalVisible)}
+                            >
+                                <Text style={[styles.textStyle, {fontSize: 18}]}>Más tarde</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
             <View style={styles.ddcontainer}>
                 <Text>Buscar por </Text>
                 <View style={styles.pickerContainer}>
@@ -175,7 +275,7 @@ export const Dashboard = ({ route, navigation }) => {
                                     value="usuario"
                                     uncheckedColor='553900'
                                     status={ checked === 'usuario' ? 'checked' : 'unchecked' }
-                                    onPress={() => setChecked('usuario')}                                    
+                                    onPress={() => setChecked('usuario')}
                                         />
                             <Text style={styles.modalTextItem}>Nombre de Usuario</Text>
                         </View>
@@ -273,9 +373,7 @@ const styles = StyleSheet.create({
     welcomeMessage: {
         fontFamily: "InterRegular",
         fontSize: 18,
-        marginBottom: 30,
-        marginTop: 5,
-        marginLeft: 30
+
     },
     username: {
         fontFamily: "InterSemiBold"
@@ -321,6 +419,47 @@ const styles = StyleSheet.create({
         backgroundColor: '#F7EAB5',
         marginLeft: 5
     },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    button: {
+        borderRadius: 5,
+        padding: 10,
+        // elevation: 2
+    },
+    buttonOpen: {
+        backgroundColor: "#F194FF",
+    },
+    buttonClose: {
+        backgroundColor: "#F3A200",
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+    },
     titleModal:{
         fontWeight: "600",
         fontSize:35,
@@ -334,9 +473,10 @@ const styles = StyleSheet.create({
         fontWeight:"600",
         fontSize:25
     },
-    radioContainer:{
-        flexDirection:"row",
-        marginLeft:"10%",
-        alignItems:"center"
+    radioContainer: {
+        flexDirection: "row",
+        marginLeft: "10%",
+        alignItems: "center"
     }
+
 })
