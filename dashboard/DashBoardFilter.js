@@ -183,7 +183,6 @@ export const DashBoardFilter = ({ route, navigation }) => {
   
     }else{*/
       const recipes = await fetchRecipes()
-      console.log(recipes)
       recipes.map((recipe)=>
         filterRecipe(recipe
         )
@@ -197,6 +196,7 @@ export const DashBoardFilter = ({ route, navigation }) => {
   }
   const filterRecipe =  async (recipe) =>{
     const average = await getAverageOfRating(recipe.id)
+    console.log(duration.length == 0)
       if(starCount == 0 && isValidDuration(recipe)){
         filteredRecipes.push(recipe)
       }
@@ -207,6 +207,12 @@ export const DashBoardFilter = ({ route, navigation }) => {
         filteredRecipes.push(recipe)
       }
       else if( duration==null  && starCount == 0){
+        filteredRecipes.push(recipe)
+      }
+      else if(duration.length==0 && average == starCount){
+        filteredRecipes.push(recipe)
+      }
+      else if(duration.length == 0 && starCount==0){
         filteredRecipes.push(recipe)
       }
 
